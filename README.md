@@ -67,10 +67,12 @@ Amos 8> select name(father(p)) from Person p;
 
 ### Transactions
 
-Database changes can be undone by using the rollback statement with a generation number as argument. For example, the statement:
-Amos 4> rollback 2;
-will restore the database to the state it had at generation number 2. In the example the rollback thus undoes the effect of the statements after:
+Database changes can be undone by using the rollback statement with a generation number as argument. For example, the statement: `Amos 4> rollback 2;` will restore the database to the state it had at generation number 2. In the example the rollback thus undoes the effect of the statements after:
+
+```
 create type Student under Person;
+```
+
 After the rollback above, the type Student is removed from the database, but not type Person.
 A rollback without arguments undoes all database changes of the current transaction. All interface variables are cleared by rollback.
 
@@ -99,38 +101,31 @@ The remaining chapters in this document describe the basic Amos II commands. As 
 
 ### Java interface
 
-JavaAmos is a version of the Amos II kernel connected to the Java virtual machine. With it Java programs can call Amos II functions and send AmosQL statements to Amos II for evaluation (the callin interface) [ER00]. You can also define Amos II foreign functions in Java (the callout interface). To start JavaAmos use the script
-
-  javaamos
-instead of amos2. It will enter a top loop reading and evaluating AmosQL statements as amos2. JavaAmos requires the Java jar file javaamos.jar.
+JavaAmos is a version of the Amos II kernel connected to the Java virtual machine. With it Java programs can call Amos II functions and send AmosQL statements to Amos II for evaluation (the callin interface) [ER00]. You can also define Amos II foreign functions in Java (the callout interface). To start JavaAmos use the script `javaamos`
+instead of `amos2`. It will enter a top loop reading and evaluating AmosQL statements as amos2. JavaAmos requires the Java jar file `javaamos.jar`.
 
 
-Back-end relational databases
+### Back-end relational databases
 
 Amos II release 16 includes a wrapper of relational databases using JDBC on top of JavaAmos. Any relational database can be accessed in terms of AmosQL using this wrapper. The interface is described in the section Relational database wrapper.
 
-Graphical database browser
+### Graphical database browser
 
-The multi-database browser GOOVI [CR01] is a graphical browser for Amos II written as a Java application. You can start the GOOVI browser from the JavaAmos top loop by calling the Amos II function
+The multi-database browser GOOVI [CR01] is a graphical browser for Amos II written as a Java application. You can start the GOOVI browser from the JavaAmos top loop by calling the Amos II function `goovi();` It will start the browser in a separate thread.
 
-goovi();
-It will start the browser in a separate thread.
-
-
-PHP interface
+### PHP interface
 
 Amos II release 16 includes an interface allowing programs in PHP to call Amos II servers. The interface is tested for Apache servers. To use Amos II with PHP or SQL under Windows you are recommended to download and install WAMP http://www.wamp.org/. WAMP packages together a version of the Apache web server, the  PHP script language, and the MySQL database. Amos II  is tested with WAMP 2.0 (32 bits). See further the file readme.txt in subdirectory embeddings/PHP of the Amos II download.
 
-
-C interface
+### C interface
 
 The system is interfaced with the programming language C (and C++). As with Java, Amos  II can  be called from C (callin interface) and foreign Amos II functions can be implemented in C. See [Ris12].
 
-
-Lisp interface
+### Lisp interface
 
 There is a built-in interpreter for a subset of the programming language CommonLisp in Amos II, aLisp [Ris06]. The system can be accessed and extended using aLisp.
-2 AmosQL
+
+## AmosQL
 This section describes the syntax of AmosQL and explains some semantic details. For the syntax we use BNF notation with the following special constructs:
 A ::= B C: A consists of B followed by C.
 A ::= B | C, alternatively (B | C): A consists of B or C.
@@ -145,6 +140,8 @@ Comments
 
 The comment statement can be placed anywhere outside identifiers and constants.
 Syntax:
+
+```
 comment ::=
         '/*' character-list '*/'
 
@@ -157,6 +154,7 @@ identifier ::=
 
 identifier-character ::=
         alphanumeric | '_'
+```
 
 E.g.: MySalary
       x
@@ -164,43 +162,55 @@ E.g.: MySalary
       x1234_b
 Notice that Amos II identifiers are NOT case sensitive; i.e. they are always internally capitalized. By contrast Amos II keywords are always written with lower case letters.
 
-Variables
+### Variables
 
 Variables are of two kinds: local variables or interface variables:
 
+```
    variable ::= local variable | interface-variable
+```
 
 Local variables are identifiers for data values inside AmosQL queries and functions. Local variables must be declared in function signatures (see Function definitions), in from clauses (see Queries), or by the declare statement (see procedural functions). Notice that variables are not case sensitive.
-Syntax:
+
+```
 local-variable ::= identifier
 
    E.g. my_variable
         MyVariable2
+```
 
 Interface variables hold only temporary results during interactive sessions. Interface variables cannot be referenced in function bodies and they are not stored in the database. Their lifespan is the current transaction only. Their purpose is to hold temporary values in scripts and database interactions.
 Syntax:
+
+```
 interface-variable ::= ':' identifier
 
    E.g. :my_interface_variable
         :MyInterfaceVariable2
+```
 
 Interface variables are by default untyped (of type Object). The user can declare an interface variable to be of a particular type by the interface variable declare statement:
+
+```
 interface-variable-declare-stmt ::= 'declare' interface-variable-declaration-commalist
 
 interface-variable-declaration ::= type-spec interface-variable
+```
+_E.g. declare Integer :i, Real :x3;_
 
-   E.g. declare Integer :i, Real :x3;
 Interface variables can be assigned either by the into-clause of the select statement or by the interface variable assignment statement set:
-
+```
 set-interface-variable-stmt ::= 'set' interface-variable '=' expr
 
    E.g. set :x3 = 2.3;
         set :i = 2 + sqrt(:x3);
+```
 
-Constants
+### Constants
 
 Constants can be integers, reals, strings, time stamps, booleans, or nil.
-Syntax:
+
+```
 constant ::=
         integer-constant | real-constant | boolean-constant |
         string-constant | time-stamp | functional-constant | 'nil'
@@ -227,8 +237,11 @@ scientific-constant ::=
 
 boolean-constant ::=
         'true' | 'false'
+```
+
 The constant false is actually nil casted to type Boolean. The only legal boolean value that can be stored in the database is true and a boolean value is regarded as false if it is not in the database (close world assumption).
 
+```
 string-constant ::=
         string-separator character-list string-separator
 
@@ -259,11 +272,13 @@ expr ::=  simple-value | function-call | collection | casting | vector-indexing
          {1,2,3}
          cast(:p as Student)
                   a[3]
+```
 
 An expression is either a constant, a variable, or a function call. An expression has a computed value. The value of an expression is computed if the expression is entered to the Amos top loop, e.g.:
-
+```
    1+5*sqrt(6);
     => 13.2474487139159
+```
 
 Notice that Boolean expressions either return true, or nothing if the expression is not true. For example:
    1<2 or 3<2;
