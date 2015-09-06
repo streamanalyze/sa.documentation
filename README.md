@@ -1321,15 +1321,23 @@ from Person p;
 ```
 
 If you make the query
-  count(friends(:p));
+```
+count(friends(:p));
+```
 the system uses a rule that non bag arguments are converted (coerced) into a closed bags if an argument (e.g. of the aggregate function count) so requires.
 
 The query could also have been formulated with an explicitly specified bag as
-   count(select friends(:p));
+
+```
+count(select friends(:p));
+```
 
 Sometimes it may be necessary to materialize a bag explicitly, which is done by the function:
-  materialize(Bag of T b) -> T m
+```
+materialize(Bag of T b) -> T m
+```
 where T can be any type. The function materialize() extracts all the elements from bag b and stores them in the materialized bag m. Notice the differences between these assignments:
+
 ```
 set :f = friendsof("Bill");                /* assigns :f to a bag of Bill's friends. */
 set :mb = materialize(friendsof("Bill"));  /* Assigns :mb to a materialized bag of Bill's friends */
@@ -1365,7 +1373,7 @@ Vectors can be queried by converting them to bags using the in operator.
 For example:
 ```
 select x from Number x where x > 1 and x in :a;
-``
+```
 returns the bag elements:
 ```
 2
@@ -1375,102 +1383,154 @@ returns the bag elements:
 Notice that the order of the elements of a bag is not predetermined and you cannot assume that selecting elements from a vector is in the vector's element order. In general the order of the elements of a bag is undefined and the query optimizer has the freedom to return a bag in any order if that speeds up query execution.
 
 Vector elements can also be accessed using the vector-indexing notation:
-
-  vector-indexing ::= simple-expr '[' expr-commalist ']'
+```
+vector-indexing ::= simple-expr '[' expr-commalist ']'
+```
 
 The first element in a vector has index 0 etc.
 For example:
-  :a[0]+:a[1];
+```
+:a[0]+:a[1];
+```
 returns
-    3
-
+```
+3
+``
 Index variables can be unbound in queries to specify iteration over all possibles index positions of a vector.
 For example:
+```
 select i, :a[i] from Integer i, where i >= 1;
+```
 returns the bag of tuples:
+```
 (1,2)
 (2,3)
+```
 
 The following function converts a vector to a bag:
-  create function vectorBag(Vector v) -> Bag of Object
-  as select v[i]
-     from Integer i;
+```
+create function vectorBag(Vector v) -> Bag of Object
+as select v[i]
+   from Integer i;
+```
+
 For example:
-  vectorbag({1,2,3});
+```
+vectorbag({1,2,3});
+```
 returns the bag
+```
 1
 2
 3
+```
 
-The aggregate function vectorof() converts a bag to a vector:
-
-  vectorof(Bag of Object b) -> Vector v
+The aggregate function `vectorof()` converts a bag to a vector:
+```
+vectorof(Bag of Object b) -> Vector v
+```
 
 For example:
-  vectorof(select iota(1,10));
+```
+vectorof(select iota(1,10));
+```
 or just:
-  vectorof(iota(1,10));
-
+```
+vectorof(iota(1,10));
+```
 returns the vector
-  {1,2,3,4,5,6,7,8,9,10}
+```
+{1,2,3,4,5,6,7,8,9,10}
+```
 
-The function vectorof()  can be used when the order of the elements in the produced vector is unimportant. Notice again that the order of the elements returned by a select expression (bag) is undetermined.  The order of the elements in a bag depends on the operators in the query and is the order that is the most efficient to execute the query.
+The function `vectorof()`  can be used when the order of the elements in the produced vector is unimportant. Notice again that the order of the elements returned by a select expression (bag) is undetermined.  The order of the elements in a bag depends on the operators in the query and is the order that is the most efficient to execute the query.
 
 In order to exactly specify the index order when converting a bag to a vector, use the system aggregate function:
-  vectorize(Bag vb) -> Vector r
-The function vectorize() takes as input vb a vector bag of tuples (i, o) and forms a vector r containing objects o in position i of the vector bag.
+```
+vectorize(Bag vb) -> Vector r
+```
+The function `vectorize()` takes as input vb a vector bag of tuples `(i, o)` and forms a vector `r` containing objects `o` in position `i` of the vector bag.
 For example:
-  vectorize(select i, i*i
-            from Integer i
-            where i in iota(0,10));
+```
+vectorize(select i, i*i
+          from Integer i
+          where i in iota(0,10));
+```
 will form the vector
-  {0,1,4,9,16,25,36,49,64,81,100}
+```
+{0,1,4,9,16,25,36,49,64,81,100}
+```
+The function `vectorize()` is much slower than `vectorof()`, so use `vectorize()` only when needed.
 
-The function vectorize() is much slower than vectorof(), so use vectorize() only when needed.
-
-If the tuples in a vector bag has more than two elments,  (i, o1,o2,...), vectorize() will form vectors of vectors.
+If the tuples in a vector bag has more than two elments,  (i, o1,o2,...), `vectorize()` will form vectors of vectors.
 
 For example:
-  vectorize(select i, 2*i, 3*i
-            from Integer i
-            where i in iota(0,10));
+```
+vectorize(select i, 2*i, 3*i
+          from Integer i
+          where i in iota(0,10));
+```
 will form the vector
-  {{0,0},{2,3},{4,6},{6,9},{8,12},{10,15},{12,18},{14,21},{16,24},{18,27},{20,30}}
+```
+{{0,0},{2,3},{4,6},{6,9},{8,12},{10,15},{12,18},{14,21},{16,24},{18,27},{20,30}}
+```
 
 To convert a vector into a vector bag use the system function
-  bagify(Vector v)-> Bag of (Integer i, Object o1,...on)
+```
+bagify(Vector v)-> Bag of (Integer i, Object o1,...on)
+```
 
 For example:
-  bagify({2,4,6,8});
+```
+bagify({2,4,6,8});
+```
 yields the bag
-   (0,2)
-   (1,4)
-   (2,6)
-   (3,8)
-
+```
+(0,2)
+(1,4)
+(2,6)
+(3,8)
+```
 The query:
-  bagify({{1,2},{3,4}});
+```
+bagify({{1,2},{3,4}});
+```
 yields the bag:
-   (0,{1,2})
-   (1,{3,4})
+```
+(0,{1,2})
+(1,{3,4})
+```
+Notice that the function `bagify()` is the inverse of function `vectorize()`.
 
-Notice that the function bagify() is the inverse of function vectorize().
-
-The function project() constructs a new vector by extracting from the vector v the elements in the positions in pv:
-  project(Vector v, Vector of Number pv) -> Vector r
+The function `project()` constructs a new vector by extracting from the vector v the elements in the positions in pv:
+```
+project(Vector v, Vector of Number pv) -> Vector r
+```
 For example:
-  project({10, 20, 30, 40},{0, 3, 2});
- returns {10, 40, 30}
+```
+project({10, 20, 30, 40},{0, 3, 2});
+```
+returns:
+```
+{10, 40, 30}
+```
 
-The function substv() replaces x with y in any collection v:
-  substv(Object x, Object y, Object v) -> Object r
+The function `substv()` replaces x with y in any collection v:
 
+```
+substv(Object x, Object y, Object v) -> Object r
+```
 The system function dim() computes the size d of a vector v:
-  dim(Vector v) -> Integer d
 
-The function concat() concatenates two vectors:
-  concat(Vector x, Vector y) -> Vector r
-2.6.4 Key-value associations
+```
+dim(Vector v) -> Integer d
+```
+The function `concat()` concatenates two vectors:
+```
+concat(Vector x, Vector y) -> Vector r
+```
+
+#### Key-value associations
 
 The collection datatype named Record is used for representing dynamic associations between keys and values.  A record is a dynamic and associative array. Other commonly used terms for associative arrays are property lists, key-value pairs, or hash links (Java). For example the following expression represents a record where the key (property) 'Greeting' field has the value 'Hello, I am Tore' and the key 'Email' has the value 'Tore.Andersson@it.uu.se':
 {'Greeting':'Hello, I am Tore','Email':'Tore.Andersson@it.uu.se'}
@@ -2784,7 +2844,7 @@ timespan(Timeval, Timeval) -> (Time, Integer usec)
 Compute difference in Time and microseconds between two time values
 
 
-8.6 Sorting functions
+### Sorting functions
 
 There are several functions that can be used to sort bags or vectors.
 Sorting by tuple order
@@ -2847,7 +2907,7 @@ sortbag(Bag b, Function compfno) -> Vector
 sortbag(Bag b, Charstring compfn) -> Vector
 ```
 Example:
-```sh
+```
 create function younger(Person p1, Person p2) -> Boolean
 as age(p1) < age(p2);
 
