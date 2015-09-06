@@ -191,9 +191,11 @@ interface-variable ::= ':' identifier
 Interface variables are by default untyped (of type Object). The user can declare an interface variable to be of a particular type by the interface variable declare statement:
 
 ```
-interface-variable-declare-stmt ::= 'declare' interface-variable-declaration-commalist
+interface-variable-declare-stmt ::=
+        'declare' interface-variable-declaration-commalist
 
-interface-variable-declaration ::= type-spec interface-variable
+interface-variable-declaration ::=
+        type-spec interface-variable
 ```
 Example:
 ```
@@ -244,7 +246,6 @@ Example:
 -1.0
 2.3E2
 -2.4e-21
-
 ```
 
 The constant false is actually nil casted to type Boolean. The only legal boolean value that can be stored in the database is true and a boolean value is regarded as false if it is not in the database (close world assumption).
@@ -298,8 +299,8 @@ cast(:p as Student)
 An expression is either a constant, a variable, or a function call. An expression has a computed value. The value of an expression is computed if the expression is entered to the Amos REPL, e.g.:
 
 ```
-   1+5*sqrt(6);
-    => 13.2474487139159
+1+5*sqrt(6);
+=> 13.2474487139159
 ```
 
 Notice that Boolean expressions either return true, or nothing if the expression is not true. For example:
@@ -310,7 +311,7 @@ Notice that Boolean expressions either return true, or nothing if the expression
 
 Entering simple expressions is the simplest form of AmosQL queries.
 
-Collections
+### Collections
 
 collection ::= bag-expr | vector-expr
 bag-expr ::= bag(expr-commalist)
