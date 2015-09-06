@@ -1,4 +1,4 @@
-# Amos II Release 16 User's Manual
+# sa.amos User's Manual
 
 Amos II is an extensible NoSQL database system allowing different kinds of data sources to be integrated and queried. The system is centered around an object-oriented and functional query language, AmosQL, documented here. The system can store data in its main-memory object store. Furthermore, wrappers can be defined for different kinds of data sources and external storage managers accessed to make them queryable. This manual describes how to use the Amos II system and the AmosQL query language. Amos II includes primitives for data mining through functions for data analyzis, aggregation,  visualization, and handling of ordered collections through the datatype Vector. The principles of the Amos II system and AmosQL are described in the document [RJK03].
 
@@ -6,10 +6,6 @@ Several distributed Amos II peers can collaborate in a federation. The documenta
 
 The basic wrapper interface is based on user defined multi-directional foreign functions having various capabilities used to access external data sources in different ways [LR92] depending on what variables are bound or free in an execution plan, the binding patterns. On top of the basic foreign function mechanism object oriented abstractions are defined through mapped types [FR97]. A number of important query rewrite techniques for scalable access to wrapped sources, in particular relational databases, are described in [FR97]. Rewrites for handling scalable execution of queries involving late bound function calls are described in [FR95]. Multi-database views are further described in [JR99a][JR99b]. The distributed query decomposer is described in [JR02] and [RJK03].
 
-## Acknowledgments
-
-The following persons have contributed to the development of the Amos II Release 16 system:
-Andrej Andrejev, Sobhan Badiozamany, Kristofer Cassel, Daniel Elin, Gustav Fahl, Staffan Flodin, Ruslan Fomkin, Jörn Gebhardt, Gyozo Gidofalvi, Martin Hansson, Milena Ivanova, Vanja Josifovski, Markus Jägerskogh, Jonas Karlsson, Timour Katchaounov,  Salah-Eddine Machani, Lars Melander, Joakim Näs, Kjell Orsborn, Johan Petrini, Tore Risch, Manivasakan Sabesan, Martin Sköld, Silvia Stefanova, Thanh Truong, Christian Werner, Magnus Werner, Cheng Xu, Erik Zeitler, and Minpeng Zhu.
 
 ## Getting started
 
@@ -29,19 +25,18 @@ The executable has a number of command line parameters to specify, e.g., the dat
   `amos2 -h`
 
 
-### The Amos toploop
+### The Amos REPL
 
-When started, the system enters the Amos top loop where it reads AmosQL statements, executes them, and prints their results.  The prompter in the Amos II top loop is:
-`Amos n>`
-where n is a generation number. The generation number is increased every time an AmosQL statement that updates the database is executed in the Amos top loop.
+When started, the system enters the Amos REPL where it reads AmosQL statements, executes them, and prints their results. The prompt in the Amos II REPL is: `Amos n>` where n is a generation number. The generation number is increased every time an AmosQL statement that updates the database is executed in the Amos REPL.
 
 Typically you start by defining  meta-data (a schema) as types and functions. For example:
+
 ```
 Amos 1> create type Person;
 Amos 2> create function name(Person)->Charstring as stored;
 Amos 3> create function father(Person)->Person as stored;
 Amos 4> create type Student under Person;
-Often you load AmosQL definitions from a script file rather than entering them on the command line, e.g.
+# Often you load AmosQL definitions from a script file rather than entering them on the command line, e.g.
 Amos 1> < 'mycode.amosql';
 ```
 When the meta-data is defined you usually populate the database by creating objects and updating functions. For example:
@@ -51,7 +46,7 @@ Amos 6> set father(p) = q
             from Person p, Person q
             where name(p)="Jacob" and name(q) = "Sam";
 ```
-Interface variables can be used to bind created object.  For example:
+Interface variables can be used to bind created object.
 
 ```
 Amos 7> create Person(name, father) instances :b ("Bill",nil), ("John",:b);
@@ -59,7 +54,7 @@ Amos 7> create Person(name, father) instances :b ("Bill",nil), ("John",:b);
 
 Notice that interface variables  are not part of the database but simply place holders for created objects when running AmosQL scripts.
 
-When the database is populated you can query it, e.g.
+When the database is populated you can query it:
 
 ```
 Amos 8> select name(father(p)) from Person p;
@@ -89,78 +84,82 @@ Notice that all interface variables are cleared by rollback.
 
 ### Saving and quitting
 
-When your Amos II database is defined and populated, it can be saved on disk with the AmosQL statement: `save "filename";`
+When your sa.amos database is defined and populated, it can be saved on disk with the AmosQL statement: `save "filename";` In a later session you can connect to the saved database by starting sa.amos with: `amos2 filename`
 
-In a later session you can connect to the saved database by starting Amos II with: `amos2 filename`
+To shut down sa.amos orderly first save the database and then type: `Amos 1> quit;`
 
-To shut down Amos II orderly first save the database and then type: `Amos 1> quit;`
+This is all you need to get started with sa.amos.
 
-This is all you need to get started with Amos II.
-
-The remaining chapters in this document describe the basic Amos II commands. As an example of how to define and populate an Amos II database, cut-and-paste the commands in http://www.it.uu.se/research/group/udbl/amos/doc/intro.osql. There is a tutorial on object-oriented database design with Amos II http://www.it.uu.se/research/group/udbl/amos/doc/tut.pdf.
+The remaining chapters in this document describe the basic sa.amos commands. As an example of how to define and populate an sa.amos database, cut-and-paste the commands in http://www.it.uu.se/research/group/udbl/amos/doc/intro.osql. There is a tutorial on object-oriented database design with sa.amos http://www.it.uu.se/research/group/udbl/amos/doc/tut.pdf.
 
 ### Java interface
 
-JavaAmos is a version of the Amos II kernel connected to the Java virtual machine. With it Java programs can call Amos II functions and send AmosQL statements to Amos II for evaluation (the callin interface) [ER00]. You can also define Amos II foreign functions in Java (the callout interface). To start JavaAmos use the script `javaamos`
-instead of `amos2`. It will enter a top loop reading and evaluating AmosQL statements as amos2. JavaAmos requires the Java jar file `javaamos.jar`.
+JavaAmos is a version of the sa.amos kernel connected to the Java virtual machine. With it Java programs can call sa.amos functions and send AmosQL statements to sa.amos for evaluation (the callin interface) [ER00]. You can also define sa.amos foreign functions in Java (the callout interface). To start JavaAmos use the script `javaamos`
+instead of `amos2`. It will enter a REPL reading and evaluating AmosQL statements as amos2. JavaAmos requires the Java jar file `javaamos.jar`.
 
 
 ### Back-end relational databases
 
-Amos II release 16 includes a wrapper of relational databases using JDBC on top of JavaAmos. Any relational database can be accessed in terms of AmosQL using this wrapper. The interface is described in the section Relational database wrapper.
+sa.amos includes a wrapper of relational databases using JDBC on top of JavaAmos. Any relational database can be accessed in terms of AmosQL using this wrapper. The interface is described in the section Relational database wrapper.
 
 ### Graphical database browser
 
-The multi-database browser GOOVI [CR01] is a graphical browser for Amos II written as a Java application. You can start the GOOVI browser from the JavaAmos top loop by calling the Amos II function `goovi();` It will start the browser in a separate thread.
+The multi-database browser GOOVI [CR01] is a graphical browser for sa.amos written as a Java application. You can start the GOOVI browser from the JavaAmos REPL by calling the sa.amos function `goovi();` It will start the browser in a separate thread.
 
 ### PHP interface
 
-Amos II release 16 includes an interface allowing programs in PHP to call Amos II servers. The interface is tested for Apache servers. To use Amos II with PHP or SQL under Windows you are recommended to download and install WAMP http://www.wamp.org/. WAMP packages together a version of the Apache web server, the  PHP script language, and the MySQL database. Amos II  is tested with WAMP 2.0 (32 bits). See further the file readme.txt in subdirectory embeddings/PHP of the Amos II download.
+sa.amos includes an interface allowing programs in PHP to call sa.amos servers. The interface is tested for Apache servers. To use sa.amos with PHP or SQL under Windows you are recommended to download and install WAMP http://www.wamp.org/. WAMP packages together a version of the Apache web server, the  PHP script language, and the MySQL database. sa.amos  is tested with WAMP 2.0 (32 bits). See further the file readme.txt in subdirectory embeddings/PHP of the sa.amos download.
 
 ### C interface
 
-The system is interfaced with the programming language C (and C++). As with Java, Amos  II can  be called from C (callin interface) and foreign Amos II functions can be implemented in C. See [Ris12].
+The system is interfaced with the programming language C (and C++). As with Java, Amos  II can  be called from C (callin interface) and foreign sa.amos functions can be implemented in C. See [Ris12].
 
 ### Lisp interface
 
-There is a built-in interpreter for a subset of the programming language CommonLisp in Amos II, aLisp [Ris06]. The system can be accessed and extended using aLisp.
+There is a built-in interpreter for a subset of the programming language CommonLisp in sa.amos, aLisp [Ris06]. The system can be accessed and extended using aLisp.
 
 ## AmosQL
+
 This section describes the syntax of AmosQL and explains some semantic details. For the syntax we use BNF notation with the following special constructs:
+
+```bnf
 A ::= B C: A consists of B followed by C.
 A ::= B | C, alternatively (B | C): A consists of B or C.
 A ::= [B]: A consists of B or nothing.
 A ::= B-list: A consists of one or more Bs.
 A ::= B-commalist: A consists of one or more Bs separated by commas.
 'xxx': The string (keyword) xxx.
+```
+AmosQL statements are always terminated by a semicolon (`;`).
 
-AmosQL statements are always terminated by a semicolon (;).
-
-Comments
+### Comments
 
 The comment statement can be placed anywhere outside identifiers and constants.
 Syntax:
 
-```
+```bnf
 comment ::=
         '/*' character-list '*/'
+```
 
-Identifiers
+### Identifiers
 
 Identifiers have the syntax:
+```
 identifier ::=
-
         ('_' | letter) [identifier-character-list]
 
 identifier-character ::=
         alphanumeric | '_'
 ```
-
-E.g.: MySalary
-      x
-      x1234
-      x1234_b
-Notice that Amos II identifiers are NOT case sensitive; i.e. they are always internally capitalized. By contrast Amos II keywords are always written with lower case letters.
+Example:
+```
+MySalary
+x
+x1234
+x1234_b
+```
+Notice that sa.amos identifiers are NOT case sensitive; i.e. they are always internally capitalized. By contrast sa.amos keywords are always written with lower case letters.
 
 ### Variables
 
@@ -196,14 +195,20 @@ interface-variable-declare-stmt ::= 'declare' interface-variable-declaration-com
 
 interface-variable-declaration ::= type-spec interface-variable
 ```
-_E.g. declare Integer :i, Real :x3;_
+Example:
+```
+declare Integer :i, Real :x3;_
+```
 
 Interface variables can be assigned either by the into-clause of the select statement or by the interface variable assignment statement set:
 ```
 set-interface-variable-stmt ::= 'set' interface-variable '=' expr
+```
 
-   E.g. set :x3 = 2.3;
-        set :i = 2 + sqrt(:x3);
+Example:
+```
+set :x3 = 2.3;
+set :i = 2 + sqrt(:x3);
 ```
 
 ### Constants
@@ -218,9 +223,6 @@ constant ::=
 integer-constant ::=
         ['-'] digit-list
 
-   E.g. 123
-        -123
-
 real-constant ::=
         decimal-constant | scientific-constant
 
@@ -230,13 +232,19 @@ decimal-constant ::=
 scientific-constant ::=
         decimal-constant ['e' | 'E'] integer-constant
 
-   E.g. 1.2
-        -1.0
-        2.3E2
-        -2.4e-21
-
 boolean-constant ::=
         'true' | 'false'
+```
+
+Example:
+```
+123
+-123
+ 1.2
+-1.0
+2.3E2
+-2.4e-21
+
 ```
 
 The constant false is actually nil casted to type Boolean. The only legal boolean value that can be stored in the database is true and a boolean value is regarded as false if it is not in the database (close world assumption).
@@ -247,34 +255,48 @@ string-constant ::=
 
 string-separator ::=
         ''' | '"'
-
-E.g. "A string"
+```
+Example:
+```
+"A string"
 'A string'
 'A string with "'
 "A string with \" and '"
-The enclosing string separators (' or ") for a string constant must be the same. If the string separator is " then \ is the escape character inside the string, replacing the succeeding character. For example the string 'ab"\' can also be written as "ab\"\\", and the string a'"b must be written as "a'\"b".
-
-simple-value ::= constant | variable
-
-   E.g. :MyInterfaceVariable
-        MyLocalVariable
-        123
-        "Hello World"
-A simple value is either a constant or a variable reference.
-
-Expressions
-
-expr ::=  simple-value | function-call | collection | casting | vector-indexing
-    E.g. 1.23
-         1+2
-         1<2 and 1>3
-         sqrt(:a) + 3 * :b
-         {1,2,3}
-         cast(:p as Student)
-                  a[3]
 ```
 
-An expression is either a constant, a variable, or a function call. An expression has a computed value. The value of an expression is computed if the expression is entered to the Amos top loop, e.g.:
+The enclosing string separators (`'` or `"`) for a string constant must be the same. If the string separator is `"` then `\` is the escape character inside the string, replacing the succeeding character. For example the string `'ab"\'` can also be written as `"ab\"\\"`, and the string `a'"b` must be written as `"a'\"b"`.
+
+```
+simple-value ::= constant | variable
+```
+Example:
+```
+:MyInterfaceVariable
+MyLocalVariable
+123
+"Hello World"
+```
+
+A simple value is either a constant or a variable reference.
+
+### Expressions
+
+```
+expr ::=  simple-value | function-call | collection | casting | vector-indexing
+```
+Example:
+```
+1.23
+1+2
+1<2 and 1>3
+sqrt(:a) + 3 * :b
+{1,2,3}
+cast(:p as Student)
+        a[3]
+```
+
+An expression is either a constant, a variable, or a function call. An expression has a computed value. The value of an expression is computed if the expression is entered to the Amos REPL, e.g.:
+
 ```
    1+5*sqrt(6);
     => 13.2474487139159
@@ -302,43 +324,51 @@ vector-expr ::= '{' expr-comma-list '}'
 
 Collections represent sets of objects. Collections can be bags (type Bag), vectors (type Vector) or key/value pairs (type Record):
  Bags are unordered sets of objects with duplicates allowed. The value of a query is by default a bag. When a query returns a bag the elements of the bag are printed on separate lines, for example:
+ ```
   Amos 2> select name(p) from Person p;
   "Bill"
   "Carl"
   "Adam"
-
+```
  Vectors are sequences of objects of any kind. Curly brackets {} enclose vector elements, for example:
+```
   Amos 1> set :v={1,2,3};
   Amos 2> :v;
   {1,2,3}
-Statements
+```
+### Statements
 
-Statements instruct Amos II to perform various kinds of services. The following statements can be entered to the Amos II top loop:
-        create-type-stmt |
-        delete-type-stmt |
-        create-object-stmt |
-        delete-object-stmt |
-        create-function-stmt |
-        delete-function-stmt |
-        query |
-        update-stmt |
-        add-type-stmt |
-        remove-type-stmt |
-        for-each-stmt |
-        set-interface-variable-stmt |
-        declare-interface-variable-stmt |
-        commit-stmt |
-        rollback-stmt |
-        open-cursor-stmt |
-        fetch-cursor-stmt |
-        close-cursor-stmt |
-        quit-stmt |
-        exit-stmt
-2.1 Types
+Statements instruct sa.amos to perform various kinds of services. The following statements can be entered to the sa.amos REPL:
+
+```
+  create-type-stmt |
+  delete-type-stmt |
+  create-object-stmt |
+  delete-object-stmt |
+  create-function-stmt |
+  delete-function-stmt |
+  query |
+  update-stmt |
+  add-type-stmt |
+  remove-type-stmt |
+  for-each-stmt |
+  set-interface-variable-stmt |
+  declare-interface-variable-stmt |
+  commit-stmt |
+  rollback-stmt |
+  open-cursor-stmt |
+  fetch-cursor-stmt |
+  close-cursor-stmt |
+  quit-stmt |
+  exit-stmt
+```
+
+### Types
 
 The create type statement creates a new type in the database.
 Syntax:
 
+```
 create-type-stmt ::=
         'create type' type-name ['under' type-name-commalist]
                 ['properties' '(' attr-function-commalist ')']
@@ -349,30 +379,34 @@ type-name ::= identifier
 
 attr-function ::=
         generic-function-name type-spec ['key']
+```
+Example:
+```
+  create type Person;
+  create type Employee under Person;
+  create type Student under Person;
+  create type Kid under Person properties
+   (name Charstring key,
+    attitude Integer);
+```
 
-   E.g. create type Person;
-        create type Employee under Person;
-        create type Student under Person;
-        create type Kid under Person properties
-         (name Charstring key,
-          attitude Integer);
 Type names must be unique in the database.
 
 Type names are not case sensitive and the type names are always internally upper-cased. For clarity all type names used in examples in this manual always have the first letter capitalized.
 The new type will be a subtype of all the supertypes in the 'under' clause. If no supertypes are specified the new type becomes a subtype of the system type named Userobject. Multiple inheritance is specified through more than one supertype, for example:
-   create type TA under Student, Employee;
-The attr-function-commalist clause is optional, and provides a way to define attributes for the new type. Each attribute is a function having a single argument and a single result. An attribute is represented as a stored function in the local database. The argument type of an attribute function is the type being created and the result type is specified by the type-spec. The result type must be previously defined. In the above example the function name() has the argument of type Person and result of type Charstring.
+   `create type TA under Student, Employee;`
+The attr-function-commalist clause is optional, and provides a way to define attributes for the new type. Each attribute is a function having a single argument and a single result. An attribute is represented as a stored function in the local database. The argument type of an attribute function is the type being created and the result type is specified by the type-spec. The result type must be previously defined. In the above example the `function name()` has the argument of type Person and result of type Charstring.
 If 'key' is specified for a property, it indicates that each value of the attribute is unique and the system will raise an error if this uniqueness is violated. In the example, two objects of type Person cannot have the same value of attribute name.
 
 
-2.1.1 Deleting types
+#### Deleting types
 
 The delete type statement deletes a type and all its subtypes.
-Syntax:
 
+```
 delete-type-stmt ::=
         'delete type' type-name
-
+```
    E.g. delete type Person;
 If the deleted type has subtypes they will be deleted as well, in this case types Employee, Student, and Kid. Functions using the deleted types will be deleted as well.
 2.2 Objects
@@ -380,6 +414,7 @@ If the deleted type has subtypes they will be deleted as well, in this case type
 The create-object statement creates one or more objects and makes the new object(s) instance(s) of a given user type and all its supertypes.
 Syntax:
 
+```
 create-object-stmt ::=
         'create' type-name
         ['(' generic-function-name-commalist ')'] 'instances' initializer-commalist
@@ -387,9 +422,9 @@ create-object-stmt ::=
 initializer ::=
         variable |
         [variable] '(' expr-commalist ')'
-
+```
 Examples:
-
+```
    create Person (name,age) instances
           :adam ('Adam',26),:eve ('Eve',32);
 
@@ -400,41 +435,47 @@ Examples:
 
    create Person (name,age) instances
           ("Kalle "+"Persson" , 30*1.5);
-The new objects are assigned initial values for the specified attributes. The attributes can be any updatable AmosQL functions of a single argument and value.
-One object will be created for each initializer. Each initializer can have an optional variable name which will be bound to the new object. The variable name can subsequently be used as a reference to the object.
+```
 
-The initializer also contains a comma-separated list of initial values for the specified functions in generic-function-name-commalist.
+The new objects are assigned initial values for the specified attributes. The attributes can be any updatable AmosQL functions of a single argument and value. One object will be created for each initializer. Each initializer can have an optional variable name which will be bound to the new object. The variable name can subsequently be used as a reference to the object. The initializer also contains a comma-separated list of initial values for the specified functions in generic-function-name-commalist.
 
 Initial values are specified as expressions.
 
 The types of the initial values must match the declared result types of the corresponding functions.
 
-Bag valued functions are initialized using the syntax 'bag(e1,...)' (syntax bag-expr).
+Bag valued functions are initialized using the syntax `bag(e1,...)` (syntax bag-expr).
 
 Vector result functions are formed with a comma-separated list of values enclosed in curly brackets (syntax vector-expr).
 
 It is possible to specify nil for a value when no initialization is desired for the corresponding function.
-2.2.1 Deleting objects
+
+#### Deleting objects
 
 Objects are deleted from the database with the delete statement.
 Syntax:
 
+```
 delete-object-stmt ::=
         'delete' variable
-The system will automatically remove the deleted object from all stored functions where it is referenced.
-Deleted objects are printed as
+```
 
-#[OID nnn *DELETED*]
+The system will automatically remove the deleted object from all stored functions where it is referenced.
+Deleted objects are printed as `#[OID nnn *DELETED*]`
+
 The objects may be undeleted by rollback. An automatic garbage collector physically removes an OID from the database only if its creation has been rolled back or its deletion committed, and it is not referenced from some variable or external system.
-2.3 Queries
+
+### Queries
 
 Queries retrieve objects having specified properties. They are specified using the query statement denoting either  function calls, select statements, or variable references.
-
+```
 query ::= select-stmt | function-call | expr
+
 2.3.1 Function calls
+```
+A simple form of queries are calls to functions.
 
-A simple form of queries are calls to functions. Syntax:
-
+Syntax:
+```
 function-call ::=
         function-name '(' [parameter-value-commalist] ')' |
         expr infix-operator expr |
@@ -449,21 +490,29 @@ parameter-value ::=
         tuple-expr
 
 tuple-expr ::= '(' expr-commalist ')'
-
-
-   E.g. sqrt(2.1);
-        1+2;
-        1+2 < 3+4;
-        "a" + 1;
-The built-in functions plus(), minus(), times(), and div()  have infix syntax +,-,*,/ with the usual priorities.
+```
+Examples:
+```
+sqrt(2.1);
+1+2;
+1+2 < 3+4;
+"a" + 1;
+```
+The built-in functions `plus()`, `minus()`, `times()`, and `div()` have infix syntax `+`,`-`,`*`,`/` with the usual priorities.
 For example:
- (income(:eve) + income(:ulla)) * 0.5;
+```
+(income(:eve) + income(:ulla)) * 0.5;
+```
 is equivalent to:
- times(plus(income(:eve),income(:ulla)),0.5);
-The '+' operator is defined for both numbers and strings. For strings it implements string concatenation.
-In a function call, the types of the actual parameters and results must be the same as, or subtypes of, the types of the corresponding formal parameters or results.
+
+```
+times(plus(income(:eve),income(:ulla)),0.5);
+```
+
+The `+` operator is defined for both numbers and strings. For strings it implements string concatenation. In a function call, the types of the actual parameters and results must be the same as, or subtypes of, the types of the corresponding formal parameters or results.
 Tuple expressions are used for assigning values of tuple valued functions in queries.
-2.3.2 The select statement
+
+#### The select statement
 
 The select statement provides the most flexible way to specify queries.
 Syntax:
@@ -489,18 +538,18 @@ where-clause ::=
 ```
    For example:
 ```
-      select name(p)
-      from Person p
-      where age(p)<2 and
-            city(p)="Uppsala";
+select name(p)
+from Person p
+where age(p)<2 and
+      city(p)="Uppsala";
 
-      select income(x),income(father(x))+income(mother(x))
-      from Person x
-      where name(p) = "Carl"; /* Returns bag of tuples */
+select income(x),income(father(x))+income(mother(x))
+from Person x
+where name(p) = "Carl"; /* Returns bag of tuples */
 
-      select {income(x),income(father(x))+income(mother(x))}
-      from Person x
-      where name(p) = "Carl"; /* Returns bag of vectors constructed using {....} notation */
+select {income(x),income(father(x))+income(mother(x))}
+from Person x
+where name(p) = "Carl"; /* Returns bag of vectors constructed using {....} notation */
 ```
 
 The expr-commalist defines the object(s) to be retrieved.
@@ -510,49 +559,60 @@ The where-clause gives selection criteria for the search. The where clause is sp
 
 The result of a select statement is a bag of single result tuples. Duplicates are removed only when the keyword 'distinct' is specified, in which case a set (rather than a bag) is returned. The in operator can be used for extracting the values in a bag.
 
-For example:
-      select distinct friends(p)
-      from Person p
-      where "Carl" in name(parents(p));
+Example:
+```
+select distinct friends(p)
+from Person p
+where "Carl" in name(parents(p));
+```
 
 The optional into-clause specifies variables to be bound to the result.
 
-For example:
-
-      select p into :eve2 from Person p where name(p) = 'Eve';
-      name(:eve2);
+Example:
+```
+select p into :eve2 from Person p where name(p) = 'Eve';
+name(:eve2);
+```
 This query retrieves into the environment variable :eve2 the Person whose name is 'Eve'.
 
-NOTICE that if more than one object is retrieved the into variable(s) will be bound only to the first retrieved tuple. In the example, if more that one person is named Eve the first one retrieved will be assigned to :eve2.
+__If more than one object is retrieved the into variable(s) will be bound only to the first retrieved tuple. In the example, if more that one person is named Eve the first one retrieved will be assigned to `:eve2`.__
 
-To assign the results of tuple valued functions in queries, use tuple expressions, e.g.
-
-      select m, f from Person m, Person p where (m,f) = parents2(:p);
+To assign the results of tuple valued functions in queries, use tuple expressions:
+```
+select m, f from Person m, Person p where (m,f) = parents2(:p);
+```
 
 If you wish to assign the entire result from the select statement in a variable, enclose it in parentheses. The result will be a bag. The elements of the bag can then be extracted with the in() function or the infix in operator:
-      set :r = (select p from Person p where name(p) = 'eve');
-      in(:r);
-      select p in :r from Person p;
+```
+set :r = (select p from Person p where name(p) = 'eve');
+in(:r);
+select p in :r from Person p;
+```
 
-2.3.3 Predicate expressions
+#### Predicate expressions
 
-Predicate expressions are expressions returning boolean values. The where clauses of queries are predicate expressions. The boolean operators and and or can be used to combine boolean values. The general syntax of a predicate expression is:
+Predicate expressions are expressions returning boolean values. The where clauses of queries are predicate expressions. The boolean operators and and or can be used to combine boolean values.
+
+Syntax:
+```
 predicate-expression ::=
         predicate-expression 'and' predicate-expression |
         predicate-expression 'or' predicate-expression |
         '(' predicate-expression ')' |
         expr
-
-For example:
-	x < 5
-        child(x)
-        "a" != s
-        home(p) = "Uppsala" and name(p) = "Kalle"
-        name(x) = "Carl" and child(x)
-        x < 5 or x > 6 and 5 < y
-        1+y <= sqrt(5.2)
-        parents2(p) = (m,f)
-        count(select friends(x) from Person x where child(x)) < 5
+```
+Example:
+```
+x < 5
+  child(x)
+  "a" != s
+  home(p) = "Uppsala" and name(p) = "Kalle"
+  name(x) = "Carl" and child(x)
+  x < 5 or x > 6 and 5 < y
+  1+y <= sqrt(5.2)
+  parents2(p) = (m,f)
+  count(select friends(x) from Person x where child(x)) < 5
+```
 
 The boolean operator and has precedence over or.
 For example:
@@ -581,7 +641,7 @@ select name(p) from Person p where notany(select parents(p) where age(p)>65);
 2.4 Functions
 
 The create function statement defines a new user function. Functions can be defined as one of the following:
-Stored functions are stored in the Amos II database as a table.
+Stored functions are stored in the sa.amos database as a table.
 Derived functions are defined by a single query that returns the result of the a function call for given parameters.
 Foreign functions are defined in an external programming language. Foreign functions can be defined in the programming languages C/C++ [Ris12], Java [ER00], and Lisp [Ris06].
 Procedural functions are defined using procedural AmosQL statements that can have side effects changing the state of the database. Procedural functions makes AmosQL computationally complete.
@@ -723,7 +783,7 @@ Deleting a function also deletes all functions calling the deleted function.
 2.4.2 Overloaded functions
 
 Function names may be overloaded, i.e., functions having the same name may be defined differently for different argument types. This allows generic functions applicable on objects of several different argument types. Each specific implementation of an overloaded function is called a resolvent.
-For example, assume the following two Amos II function definitions having the same generic function name less():
+For example, assume the following two sa.amos function definitions having the same generic function name less():
 
 create function less(Number i, Number j)->Boolean
         as i < j;
@@ -748,7 +808,7 @@ create function nameordered(Person p,Person q)->Boolean
 will choose the resolvent NUMBER.NUMBER.LESS->BOOLEAN since the function name() returns a string. In both cases the type resolution (selection of resolvent) will be done at compile time.
 Late binding
 
-Dynamic type resolution at run time, late binding, is done for top loop function calls to choose the correct resolvent. For example, the query
+Dynamic type resolution at run time, late binding, is done for REPL function calls to choose the correct resolvent. For example, the query
 less(1,2);
 will choose NUMBER.NUMBER.LESS->BOOLEAN based on the numeric types the the arguments.
 
@@ -759,115 +819,168 @@ Inside function definitions and queries there may be expressions requiring late 
  create function income(Employee)->Integer as stored;
  create function income(Manager m)->Integer i
         as income(cast(m as Employee)) + mgrbonus(m);
-Now, suppose that we need a function that returns the gross incomes of all persons in the database, i.e. we use MANAGER.INCOME->INTEGER for managers and EMPLOYEE.INCOME->INTEGER for non-manager. In Amos II such a function is defined as:
+Now, suppose that we need a function that returns the gross incomes of all persons in the database, i.e. we use MANAGER.INCOME->INTEGER for managers and EMPLOYEE.INCOME->INTEGER for non-manager. In sa.amos such a function is defined as:
+```
  create function grossincomes()->Integer i
         as select income(p)
         from Employee p;
         /* income(p) late bound */
+```
 Since income is overloaded with resolvents EMPLOYEE.INCOME->INTEGER and MANAGER.INCOME->INTEGER and both qualify to apply to employees, the resolution of income(p) will be done at run time.
 To avoid the overhead of late binding one may use casting.
 
 Since the detection of the necessity of dynamic resolution is often at compile time, overloading a function name may lead to a cascading recompilation of functions defined in terms of that function name. For a more detailed presentation of the management of late bound functions see [FR95].
-2.4.3 Casting
+
+#### Casting
 
 The type of an expression can be explicitly defined using the casting statement:
  casting ::= 'cast'(expr 'as' type-spec)
 for example
- create function income(Manager m)->Integer i
-        as income(cast(m as Employee)) + mgrbonus(m);
+```
+create function income(Manager m)->Integer i
+       as income(cast(m as Employee)) + mgrbonus(m);
+```
 By using casting statements one can avoid late binding.
-2.4.4 Second order functions
-Amos II functions are internally represented as any other objects and stored in the database. Object representing functions can be used in functions and queries too. An object representing a function is called a functional. Second order functions take functionals as arguments or results. The system function functionnamed() retrieves the functional fno having a given name fn:
+
+#### Second order functions
+
+sa.amos functions are internally represented as any other objects and stored in the database. Object representing functions can be used in functions and queries too. An object representing a function is called a functional. Second order functions take functionals as arguments or results. The system function functionnamed() retrieves the functional fno having a given name fn:
+```
 functionnamed(Charstring fn) -> Function fno
+```
+
 The name fn is not case sensitive.
 
 For example
+```
 functionnamed("plus");
   => #[OID 155 "PLUS"]
+```
 returns the object representing the generic function plus, while
+```
 functionnamed("number.number.plus->number");
   => #[OID 156 "NUMBER.NUMBER.PLUS->NUMBER"]
+```
 returns the object representing the resolvent named NUMBER.NUMBER.PLUS->NUMBER.
 
 Another example of a second order function is the system function
+```
 apply(Function fno, Vector argl) -> Bag of Vector
+```
 It calls the functional fno with argl as argument list. The result tuples are returned as a bag of vectors, for example:
+```
 apply(functionnamed("number.number.plus->number"),{1,3.4});
-  => {4.4}
-Notice how apply represents argument lists and result tuples as vectors.
-When using second order functions one often needs to retrieve a functional fno given its name and the function functionnamed() provides one way to achieve this. However, a simpler way is often to use functional constants with syntax:
+=> {4.4}
+```
+Notice how apply represents argument lists and result tuples as vectors. When using second order functions one often needs to retrieve a functional fno given its name and the function `functionnamed()` provides one way to achieve this. However, a simpler way is often to use functional constants with syntax:
+```
 functional-constant ::= '#' string-constant
-for example
+```
+Example:
+```
 #'mod';
+```
 A functional constant is translated into the functional with the name uniquely specified by the string constant. For example, the following expression
+```
 apply(#'mod',{4,3});
   => {1}
+```
 Notice that an error is raised if the function name specified in the functional constant is not uniquely identifying the functional. This happens if it is the generic name of an overloaded function. For example, the functional constant #'plus' is illegal, since plus() is overloaded. For overloaded functions the name of a resolvent has to be used instead, for example:
+```
 apply(#'plus',{2,3.5});
+```
 generates an error, while
+```
 apply(#'number.number.plus->number', {2,3.5});
  => {5.5}
+```
 and
+```
 apply(functionnamed("plus"),{2,3.5});
  => {5.5}
-The last call using functionnamed("plus") will be somewhat slower than using #'number.number.plus->number' since the functional for the generic function plus is selected and then the system uses late binding to determine dynamically which resolvent of plus() to apply.
-2.4.5 Transitive closures
-The transitive closure functions tclose() is a second order function to explore graphs where the edges are expressed by a transition function specified by argument fno:
+```
 
-   tclose(Function fno, Object o) -> Bag of Object
-tclose() applies the transition function fno(o), then fno(fno(o)), then fno(fno(fno(o))), etc until fno returns  no new result. Because of the Daplex semantics, if the transition function fno returns a bag of values for some argument o, the successive applications of fno will be applied on each element of the result bag. The result types of a transition function must either be the same as the argument types or a bag of the argument types. Such a function that has the same arguments and (bag of) result types is called a closed function.
+The last call using functionnamed("plus") will be somewhat slower than using #'number.number.plus->number' since the functional for the generic function plus is selected and then the system uses late binding to determine dynamically which resolvent of plus() to apply.
+
+#### Transitive closures
+The transitive closure functions tclose() is a second order function to explore graphs where the edges are expressed by a transition function specified by argument fno:
+```
+tclose(Function fno, Object o) -> Bag of Object
+```
+`tclose()` applies the transition function `fno(o)`, then `fno(fno(o))`, then `fno(fno(fno(o)))`, etc until fno returns  no new result. Because of the Daplex semantics, if the transition function fno returns a bag of values for some argument o, the successive applications of fno will be applied on each element of the result bag. The result types of a transition function must either be the same as the argument types or a bag of the argument types. Such a function that has the same arguments and (bag of) result types is called a closed function.
 For example, assume the following definition of a graph defined by the transition function arcsto():
-  create function arcsto(Integer node)-> Bag of Integer n as stored;
-  set arcsto(1) = bag(2,3);
-  set arcsto(2) = bag(4,5);
-  set arcsto(5) = bag(1);
+```
+create function arcsto(Integer node)-> Bag of Integer n as stored;
+set arcsto(1) = bag(2,3);
+set arcsto(2) = bag(4,5);
+set arcsto(5) = bag(1);
+```
 The following query traverses the graph starting in node 1:
+```
 Amos 5> tclose(#'arcsto', 1);
   1
   3
   2
   5
   4
-In general the function tclose() traverses a graph where the edges (arcs) are defined by the transition function. The vertices (nodes) are defined by the arguments and results of calls to the transition function fno, i.e. a call to the transition function fno defines the neighbors of a node in the graph. The graph may contain loops and tclose() will remember what vertices it has visited earlier and stop further traversals for vertices already visited.
-You can also query the inverse of tclose(), i.e. from which nodes f can be reached, by the query:
-
+```
+In general the function `tclose()` traverses a graph where the edges (arcs) are defined by the transition function. The vertices (nodes) are defined by the arguments and results of calls to the transition function fno, i.e. a call to the transition function fno defines the neighbors of a node in the graph. The graph may contain loops and tclose() will remember what vertices it has visited earlier and stop further traversals for vertices already visited.
+You can also query the inverse of `tclose()`, i.e. from which nodes f can be reached, by the query:
+```
 Amos 6> select f from Integer f where 1 in tclose(#'arcsto',f);
   1
   5
   2
+```
+
 If you know that the graph to traverse is a tree or a directed acyclic graph (DAG) you can instead use the faster function
-   traverse(Function fno, Object o) -> Bag of Object
+```
+traverse(Function fno, Object o) -> Bag of Object
+```
+
 The children in the tree to traverse is defined by the transition function fno. The tree is traversed in pre-order depth first. Leaf nodes in the tree are nodes for which fno returns nothing. The function traverse() will not terminate if the graph is circular. Nodes are visited more than once for acyclic graphs having common subtrees.
 A transition function may have extra arguments and results, as long as it is closed. This allows to pass extra parameters to a transitive closure computation. For example, to compute not only the transitive closure, but also the distance from the root of each visited graph node, specify the following transition function:
+```
 create function arcstod(Integer node, Integer d) -> Bag of (Integer,Integer)
   as select arcsto(node),1+d;
 and call
 tclose(#'arcstod',1,0);
+```
 which will return
+```
 (1,0)
 (3,1)
 (2,1)
 (5,2)
 (4,2)
+```
 Notice that only the first argument and result in the transition function define graph vertices, while the remaining arguments and results are extra parameters for passing information through the traversal, as with arcstod(). Notice that there may be no more than three extra parameters in a transition function.
 
-2.4.6 Iteration
+#### Iteration
 
-
-The function iterate() applies a function fn() repeadely. Signature:
+The function `iterate()` applies a function `fn()` repeadely.
+Signature:
+```
    iterate(Function fn, Number maxdepth, Object x) -> Object r
-The iteration is initialized by setting x0=x. Then xi+1= fn(xi) is repeadedly computed until one of the following conditions hold:
-   i) there is no change (xi = xi+1), or
-  ii) fn() returns nil (xi+1 = nil), or
- iii) an upper limit  maxdepth of the number of iterations is reached for xi.
+```
+The iteration is initialized by setting `x0=x`. Then `xi+1= fn(xi)` is repeadedly computed until one of the following conditions hold:
 
-There is another overloaded variant of iterate() that accepts an extra parameter p passed into fn(xi,p) in the iterations. Signature:
-   iterate(Function fn, Number maxdepth, Object x0, Object p) -> Object r
-This enables flexible termination of the iteration since fn(x,p) can return nil based on both x and p.
+1. there is no change `(xi = xi+1)`, or
+2. `fn()` returns nil `(xi+1 = nil)`, or
+3. an upper limit  maxdepth of the number of iterations is reached for `xi`.
 
-2.4.7 Abstract functions
+There is another overloaded variant of `iterate()` that accepts an extra parameter p passed into `fn(xi,p)` in the iterations.
+Signature:
+```
+iterate(Function fn, Number maxdepth, Object x0, Object p) -> Object r
+```
 
-Sometimes there is a need to have a function defined for subtypes of a common supertype, but the function should never be used for the supertype itself. For example, one may have a common supertype Dog with two subtypes Beagle and Poodle. One would like to have the function bark defined for different kinds of dogs, but not for dogs in general. In this case one defines the bark function for type Dog as an abstract function, for example::
+This enables flexible termination of the iteration since `fn(x,p)` can return `nil` based on both `x` and `p`.
+
+#### Abstract functions
+
+Sometimes there is a need to have a function defined for subtypes of a common supertype, but the function should never be used for the supertype itself. For example, one may have a common supertype Dog with two subtypes Beagle and Poodle. One would like to have the function bark defined for different kinds of dogs, but not for dogs in general. In this case one defines the bark function for type Dog as an abstract function, for example:
+```
 create type Dog;
 create function name(Dog)->Charstring as stored;
 create type Beagle under Dog;
@@ -877,13 +990,19 @@ create function bark(Beagle d) -> charstring;
 create function bark(Poodle d) -> charstring;
 create Poodle(name,bark) instances ('Fido','yip yip');
 create Beagle(name,bark) instances ('Snoopy','arf arf');
-Now you can use bark() as a function over dogs in general, but only if the object is a subtype of Dog:
+```
+Now you can use `bark()` as a function over dogs in general, but only if the object is a subtype of Dog:
+```
 Amos 15> select bark(d) from dog d;
 "arf arf"
 "yip yip"
+```
 An abstract function is defined by:
-create function foo(...)->... as foreign 'abstract-function'.
-An abstract functions are implemented as a foreign function whose implementation is named 'abstract-function'. If an abstract function is called it gives an informative error message. For example,  if one tries to call bark() for an object of type Dog, the following error message is printed:
+```
+create function foo(...)->... as foreign 'abstract-function'
+```
+An abstract functions are implemented as a foreign function whose implementation is named 'abstract-function'. If an abstract function is called it gives an informative error message. For example,  if one tries to call `bark()` for an object of type Dog, the following error message is printed:
+```
 Amos 16> create Dog instances :buggy;
 NIL
 Amos 17> bark(:buggy);
@@ -891,12 +1010,13 @@ BARK(DOG)->CHARSTRING
   is an abstract function requiring a more specific argument signature than
   (DOG) for arguments
   (#[OID 1009])
+```
 
-2.5 Updates
+### Updates
 
-Information stored in Amos II represent mappings between function arguments and results. These mappings are either defined at object creation time (Objects), or altered by one of the function update statements 'set', 'add', or 'remove'. The  extent  of a function is the bag of tuples mapping its arguments to corresponding results. Updating a stored function means updating its extent.
+Information stored in sa.amos represent mappings between function arguments and results. These mappings are either defined at object creation time (Objects), or altered by one of the function update statements `set`, `add`, or `remove`. The  extent  of a function is the bag of tuples mapping its arguments to corresponding results. Updating a stored function means updating its extent.
 Syntax:
-
+```
 update-stmt ::=
         update-op update-item [from-clause] [where-clause]
 
@@ -905,11 +1025,13 @@ update-op ::=
 
 update-item ::=
         function-name '(' expr-commalist ')' '=' expr
-
+```
 For example, assume we have defined the following functions:
+```
   create function name(Person) -> Charstring as stored;
   create function hobbies(Person) -> Bag of Charstring as stored;
-Furthermore, assume we have created two objects of type Person bound to the environment variables :sam and :eve:
+```
+Furthermore, assume we have created two objects of type Person bound to the environment variables `:sam` and `:eve:`
   create Person instances :sam, :eve;
 The set statement sets the value of an updatable function given the arguments.
 For example, to set the names of the two persons, do:
@@ -950,7 +1072,7 @@ The statement
   set hobbies(:eve) = hobbies(:sam);
 will update Eve's all hobbies to be the same a Sam's hobbies.
 
-Not every function is updatable. Amos II defines a function to be updatable if it is a stored function, or if it is derived from a single updatable function without a join that includes all arguments. In particular inverses to stored functions are updatable. For example, the following function is updatable:
+Not every function is updatable. sa.amos defines a function to be updatable if it is a stored function, or if it is derived from a single updatable function without a join that includes all arguments. In particular inverses to stored functions are updatable. For example, the following function is updatable:
   create function marriedto(Person p) -> Person q
   as select q where married(p,q);
 The user can declare explicit update rules for derived functions making also non-updatable functions updatable.
@@ -1019,14 +1141,19 @@ It is possible to register user defined user update procedures for any function.
   set_setfunction(Function f, Function up)->Boolean
 
 The function f is the function for which we wish to declare a user update function and up is the actual update procedure. The arguments of a user update procedures is the concatenation of argument and result tuples of f. For example, assume we have a function
-  create function netincome(Employee e) -> Number
-         as income(e)-taxes(e);
+```
+create function netincome(Employee e) -> Number
+    as income(e)-taxes(e);
+```
 Then we can define the following user update procedure:
-  create function set_netincome(Employee e, Number i)-> Boolean
-         as begin
-               set taxes(e)= i*taxes(e)/income(e) + taxes(e);
-               set income(e) = i*(1-taxes(e))/income(e) + income(e);
-            end;
+
+```
+create function set_netincome(Employee e, Number i)-> Boolean
+       as begin
+             set taxes(e)= i*taxes(e)/income(e) + taxes(e);
+             set income(e) = i*(1-taxes(e))/income(e) + income(e);
+          end;
+```
 
 The following declaration makes netincome() updatable with the set statement:
   set_setfunction(#'employee.netincome->number',
@@ -1036,7 +1163,7 @@ Now one can update netincome() with, e.g.:
   set netincome(p)=32000 from Person p where name(p)="Tore";
 
 
-2.5.4 Dynamic updates
+#### Dynamic updates
 
 Sometimes it is necessary to be able to create objects whose types are not known until runtime. Similarly one may wish to update functions without knowing the name of the function until runtime. For this there are the following system procedural system functions:
 createobject(Type t)->Object
@@ -1055,7 +1182,7 @@ To delete all rows in a stored function fn, use
 dropfunction(Function fn, Integer permanent)->Function
 If the parameter permanent is one the deletion cannot be rolled back.
 2.6 Collections
-Amos II supports three kinds of collections: bags, vectors, and key-value collections (records):
+sa.amos supports three kinds of collections: bags, vectors, and key-value collections (records):
 A bag is a set where duplicates are allowed.
 A vector is an ordered sequence of objects.
 A record is an associative array of key-value pairs.
@@ -1078,7 +1205,7 @@ Now consider the query:
   select name(friends(p))
   from Person p
   where name(p)= "Bill";
-The function friends() returns several (a bag of) persons on which the function name() is applied. The normal semantics in Amos II is that when a function (e.g. name()) is applied on a bag valued function  (e.g. friends()) it will be applied on each element of the returned bag.  In the example a bag of the names of the persons named Bill is returned.
+The function friends() returns several (a bag of) persons on which the function name() is applied. The normal semantics in sa.amos is that when a function (e.g. name()) is applied on a bag valued function  (e.g. friends()) it will be applied on each element of the returned bag.  In the example a bag of the names of the persons named Bill is returned.
 
 Aggregate functions work differently. They are applied on the entire bag. For example:
   count(friends(:p));
@@ -1292,7 +1419,7 @@ The function concat() concatenates two vectors:
 
 The collection datatype named Record is used for representing dynamic associations between keys and values.  A record is a dynamic and associative array. Other commonly used terms for associative arrays are property lists, key-value pairs, or hash links (Java). For example the following expression represents a record where the key (property) 'Greeting' field has the value 'Hello, I am Tore' and the key 'Email' has the value 'Tore.Andersson@it.uu.se':
 {'Greeting':'Hello, I am Tore','Email':'Tore.Andersson@it.uu.se'}
-You can store records in Amos II as any other datatype, e.g.
+You can store records in sa.amos as any other datatype, e.g.
 create function pdata(Person) -> Record as stored;
 create Person(pdata) instances ({'Greeting':'Hello, I am Tore',
                                  'Email':'Tore.Andersson@it.uu.se'});
@@ -1300,10 +1427,10 @@ A possible query could be:
 select r['Greeting']
 from Person p, Record r
 where name(p)='Tore' and pdata(p)=r;
-Notice that records and Amos II function are similar. The main difference is that records are dynamic in the sense that one can assign property values without any restrictions, while functions must be predefined by the schema. The problem with arbitrary properties is that there is no guarantee that users are actually being systematic when assigning new properties, while with schema-defined functions one gets a systematic naming of the properties. The user should be careful to choose the right data representation depending on the application.
+Notice that records and sa.amos function are similar. The main difference is that records are dynamic in the sense that one can assign property values without any restrictions, while functions must be predefined by the schema. The problem with arbitrary properties is that there is no guarantee that users are actually being systematic when assigning new properties, while with schema-defined functions one gets a systematic naming of the properties. The user should be careful to choose the right data representation depending on the application.
 2.7 Data mining primitives
 
-Amos II Release 16 provides primitives for advanced analysis, aggregation, and visualizations of data collections. This is useful for data mining applications, e.g. for clustering and identifying patterns in data collections. Primitives are provided for analyzing both unordered collections (bags) and ordered collections (vectors). Primitive functions are provided for grouping the result of queries, basic numerical vector functions, distance functions, and  statistical functions. The results of the analyzes can be visualized by calling an external data visualization package.
+sa.amos provides primitives for advanced analysis, aggregation, and visualizations of data collections. This is useful for data mining applications, e.g. for clustering and identifying patterns in data collections. Primitives are provided for analyzing both unordered collections (bags) and ordered collections (vectors). Primitive functions are provided for grouping the result of queries, basic numerical vector functions, distance functions, and  statistical functions. The results of the analyzes can be visualized by calling an external data visualization package.
 2.7.1 Top-k queries
 
 The function topk() returns the top k elements in a bag:
@@ -1530,7 +1657,7 @@ scatter3p(Vector of Integer projs, Bag of Vector v) -> Integer
 
 2.8 Accessing data in files
 
-The file system where an Amos II server is running can be access with a number of system functions:
+The file system where an sa.amos server is running can be access with a number of system functions:
 
 The function pwd() returns the path to the current working directory of the server:
   pwd() -> Charstring path
@@ -1586,11 +1713,12 @@ Then the call read_ntuples("test.nt") returns a beg with the following vectors:
 2.9 Cursors
 
 Cursors provide a way to iterate over the result of a query or a function call or the value of a variable. The open-cursor-stmt opens a new scan on the result of a query, function call, or variable binding. A scan is a data structure holding a current element, the cursor, of a potentially very large bag produced by a query, function call, or variable binding. The next element in the bag is retrieved by the fetch-cursor-stmt. Every time a fetch-cursor-stmt statement is executed the cursor is moved forward over the bag. When the end of the bag is reached the fetch-cursor-stmt returns empty result. The user can test whether there is any more elements in a scan by calling one of the functions
-   more(Scan s)   -> Boolean
-   nomore(Scan s) -> Boolean
-that test whether the scan is has more rows or not, respectively.
-Syntax:
+   `more(Scan s)   -> Boolean`
+   `nomore(Scan s) -> Boolean`
 
+that test whether the scan is has more rows or not, respectively.
+
+```sh
 open-cursor-stmt ::=
         'open' cursor-name 'for' expr
 
@@ -1602,13 +1730,19 @@ fetch-cursor-stmt ::=
 
 close-cursor-stmt ::=
         'close' cursor-name
+```
+
 For example:
+
+```sh
 create person (name,age) instances :Viola ('Viola',38);
 open :c1  for (select p from Person p where name(p) = 'Viola');
 fetch :c1 into :Viola1;
 close :c1;
 name(:Viola1);
 --> "Viola";
+```
+
 The fetch-cursor-stmt fetches the next result tuple from the scan; i.e. the tuple is removed from the scan.
 
 If present in a fetch-cursor-stmt, the into clause will bind elements of the first result tuple to AmosQL interface variables. There must be one interface variable for each element in the next cursor tuple.
@@ -1636,7 +1770,7 @@ Notice that cursors can be used as an alternative to the for-each statement for 
 peek(Scan s)->Vector
 returns the next tuple in a scan without moving the cursor forward.
 3 Procedural functions
-A procedural function is an Amos II function defined as a sequence of AmosQL statements that may have side effects (e.g. database update statements). Procedural functions may return a bag of results by using a special return statement. Each time return is called another result ba element is emitted from the function. Procedural functions should not be used in queries. However, this restriction is currently not enforced. Most, but not all, AmosQL statements are allowed in procedure bodies as can be seen by the syntax below.
+A procedural function is an sa.amos function defined as a sequence of AmosQL statements that may have side effects (e.g. database update statements). Procedural functions may return a bag of results by using a special return statement. Each time return is called another result ba element is emitted from the function. Procedural functions should not be used in queries. However, this restriction is currently not enforced. Most, but not all, AmosQL statements are allowed in procedure bodies as can be seen by the syntax below.
 Syntax:
 
 procedural-function-definition ::=
@@ -1751,9 +1885,9 @@ The for-each-option specifies how to treat the result of the query iterated over
 
 4 The SQL processor
 
-Amos II databases can be manipulated using SQL as an alternative to AmosQL. The SQL preprocessor translates SQL commands to corresponding AmosQL statements. The SQL preprocessor is called using a special foreign function:
+sa.amos databases can be manipulated using SQL as an alternative to AmosQL. The SQL preprocessor translates SQL commands to corresponding AmosQL statements. The SQL preprocessor is called using a special foreign function:
  sql(Charstring query)->Bag of vector result
-To make an Amos II function be queried using SQL its name must be prefixed with 'sql:'. Thus an Amos II function whose name is sql:<table> can be regarded as a table named <table> which is queried and updated using SQL statements passed as argument to the foreign function sql.
+To make an sa.amos function be queried using SQL its name must be prefixed with 'sql:'. Thus an sa.amos function whose name is sql:<table> can be regarded as a table named <table> which is queried and updated using SQL statements passed as argument to the foreign function sql.
 
 For example, assume we define the stored functions:
  create function sql:employee(Integer ssn) -> (Charstring name, Number Income, Integer dept) as stored;
@@ -1770,7 +1904,7 @@ Examples of SQL queries are:
 The parser is based on the SQL-92 version of SQL. Thus, the SQL processor allows an Amos II database be both updated and queried using SQL-92. The parser passes most of the SQL-92 validation test.  However, SQL views are not supported. For further details see http://www.it.uu.se/research/group/udbl/Theses/MarkusJagerskoghMSc.pdf.
 The command line option
          amos2 ... -q sql...
-will make Amos II accept SQL as query language in the top loop rather than AmosQL.
+will make Amos II accept SQL as query language in the REPL rather than AmosQL.
 5 Peer management
 Using a basic Amos II peer communication system, distributed Amos II peers can be set up that communicate using TCP/IP. A federation of Amos II peers is managed by a name server which is an Amos II peer knowing addresses and names of other Amos II peers. Queries, AmosQL commands, and results can be shipped between peers. Once a federation is set up, multi-database facilities can be used for defining queries and views spanning several Amos II peers [RJK03]. Reconciliation primitives can be used for defining object-oriented multi-peer views [JR99a][JR99b].
 5.1 Peer communication
@@ -2040,7 +2174,8 @@ To get a relational data source object given its name use:
 for example:
 
    relational_named("db1");
-6.2.2 Accessing meta-data
+
+####  Accessing meta-data
 Relational meta-data are general information about the tables stored in a relational database.
 
 Tables in database
@@ -2637,17 +2772,23 @@ The second case illustrates how several tuples positions with different ordering
 Sorting bags or vectors with a custom comparison function
 
 This group of sort functions are useful to sort bags or vectors of either objects or tuples with a custom function supplied by the user. Either the function object or function named can be supplied. The comparison function must take two arguments with types compatible with the elements of the bag or the vector and return a boolean value. Signatures:
+
+```sh
 sortvector(Vector v1, Function compfno) -> Vector
 sortvector(Vector v, Charstring compfn) -> Vector
 sortbag(Bag b, Function compfno) -> Vector
 sortbag(Bag b, Charstring compfn) -> Vector
+```
 Example:
+```sh
 create function younger(Person p1, Person p2) -> Boolean
 as age(p1) < age(p2);
 
 /* Sort all persons sorted by their age */
 sortbag((select p from Person p), 'YOUNGER');
-8.7 Accessing system meta-data
+```
+
+### Accessing system meta-data
 
 The data that the system internally uses for maintaining the database is exposed to the query language as well and can be queried in terms of types and functions as other data. For example:
 The types and functions used in a database are accessible through system functions. It is possible to search the database for types and functions and how they relate.
@@ -2859,19 +3000,20 @@ loads a file containing AmosQL statements.
 loadSystem(Charstring dir, Charstring filename)->Charstring
 loads a master file, filename, containing an AmosQL script defining a subsystem. The current directory is temporarily set to dir while loading. The file is not loaded if it was previously loaded into the database. To see what master files are currently loaded, call loadedSystems().
 
-
 getenv(Charstring var)->Charstring value
 retrieves the value of OS environment variable var. Generates an error of variable not set.
 
 The trace and untrace functions are used for tracing foreign function calls:
-
-    trace(Function fno)->Bag of Function r
-  trace(Charstring fn)->Bag of Function r
-  untrace(Function fno)->Bag of Function r
-  untrace(Charstring fn)->Bag of Function r
+```sh
+trace(Function fno)->Bag of Function r
+trace(Charstring fn)->Bag of Function r
+untrace(Function fno)->Bag of Function r
+untrace(Charstring fn)->Bag of Function r
+```sh
 
 If an overloaded functions is (un)traced it means that all its resolvents are (un)traced. Results are the foreign functions (un)traced. For example:
 
+```sh
 Amos 2> trace("iota");
 #[OID 116 "INTEGER.INTEGER.IOTA->INTEGER"]
 Amos 2> iota(1,3);
@@ -2885,21 +3027,31 @@ Amos 2> iota(1,3);
 Amos 2>
 
 dp(Object x, Number priority)-> Boolean
+```
+
 For debug printing in where clauses. Prints x on the console. Always returns true. The placement of dp in the execution plan is regulated with priority which must be positive numeric constant. The higher priority the earlier in the execution plan.
 
-9 References
+## Acknowledgments
 
-[CR01]K.Cassel and T.Risch: An Object-Oriented Multi-Mediator Browser. Presented at 2nd International Workshop on User Interfaces to Data Intensive Systems, Zürich, Switzerland, May 31 - June 1, 2001
+The following persons have contributed to the development of the sa.amos system:
+Andrej Andrejev, Sobhan Badiozamany, Kristofer Cassel, Daniel Elin, Gustav Fahl, Staffan Flodin, Ruslan Fomkin, Jörn Gebhardt, Gyozo Gidofalvi, Martin Hansson, Milena Ivanova, Vanja Josifovski, Markus Jägerskogh, Jonas Karlsson, Timour Katchaounov,  Salah-Eddine Machani, Lars Melander, Joakim Näs, Kjell Orsborn, Johan Petrini, Tore Risch, Manivasakan Sabesan, Martin Sköld, Silvia Stefanova, Thanh Truong, Christian Werner, Magnus Werner, Cheng Xu, Erik Zeitler, and Minpeng Zhu.
+
+## References
+
+[CR01] K.Cassel and T.Risch: An Object-Oriented Multi-Mediator Browser. Presented at 2nd International Workshop on User Interfaces to Data Intensive Systems, Zürich, Switzerland, May 31 - June 1, 2001
 
 [ER00] D.Elin and T. Risch: Amos II Java Interfaces,  Uppsala University, 2000.
 
 [FR95] S. Flodin and T. Risch, Processing Object-Oriented Queries with Invertible Late Bound Functions, Proc. VLDB Conf., Zürich, Switzerland, 1995.
 
 [FR97] G. Fahl and T. Risch: Query Processing over Object Views of Relational Data, The VLDB Journal , Vol. 6 No. 4, November 1997, pp 261-281.
+
 [JR99a] V.Josifovski, T.Risch: Functional Query Optimization over Object-Oriented Views for Data Integration Journal of Intelligent Information Systems (JIIS), Vol. 12, No. 2-3, 1999.
 
 [JR99b] V.Josifovski, T.Risch: Integrating Heterogeneous Overlapping Databases through Object-Oriented Transformations. In Proc. 25th Intl. Conf. On Very Large Databases, Edinburgh, Scotland, September 1999.
+
 [JR02] V.Josifovski, T.Risch: Query Decomposition for a Distributed Object-Oriented Mediator System . Distributed and Parallel Databases J., Kluwer, May 2002.
+
 [KJR03] T.Katchaounov, V.Josifovski, and T.Risch: Scalable View Expansion in a Peer Mediator System, Proc. 8th International Conference on Database Systems for Advanced Applications (DASFAA 2003), Kyoto, Japan, March 2003.
 
 [LR92] W.Litwin and T.Risch: Main Memory Oriented Optimization of OO Queries Using Typed Datalog with Foreign Predicates, IEEE Transactions on Knowledge and Data Engineering, Vol. 4, No. 6, December 1992 ( http://user.it.uu.se/~udbl/publ/tkde92.pdf).
@@ -2907,5 +3059,7 @@ For debug printing in where clauses. Prints x on the console. Always returns tru
 [Nas93] J.Näs: Randomized optimization of object oriented queries in a main memory database management system, MSc thesis, LiTH-IDA-Ex 9325 Linköping University 1993.
 
 [Ris12] T.Risch: Amos II C Interfaces, Uppsala University, 2012.
+
 [Ris06]T.Risch: ALisp v2 User's Guide, Uppsala University, 2006.
+
 [RJK03] T.Risch, V.Josifovski, and T.Katchaounov: Functional Data Integration in a Distributed Mediator System, in P.Gray, L.Kerschberg, P.King, and A.Poulovassilis (eds.): Functional Approach to Data Management - Modeling, Analyzing and Integrating Heterogeneous Data, Springer, ISBN 3-540-00375-4, 2003.
