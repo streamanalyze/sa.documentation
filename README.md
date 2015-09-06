@@ -1,23 +1,23 @@
 # sa.amos User's Manual
 
-Amos II is an extensible NoSQL database system allowing different kinds of data sources to be integrated and queried. The system is centered around an object-oriented and functional query language, AmosQL, documented here. The system can store data in its main-memory object store. Furthermore, wrappers can be defined for different kinds of data sources and external storage managers accessed to make them queryable. This manual describes how to use the Amos II system and the AmosQL query language. Amos II includes primitives for data mining through functions for data analyzis, aggregation,  visualization, and handling of ordered collections through the datatype Vector. The principles of the Amos II system and AmosQL are described in the document [RJK03].
+sa.amos is an extensible NoSQL database system allowing different kinds of data sources to be integrated and queried. The system is centered around an object-oriented and functional query language, AmosQL, documented here. The system can store data in its main-memory object store. Furthermore, wrappers can be defined for different kinds of data sources and external storage managers accessed to make them queryable. This manual describes how to use the sa.amos system and the AmosQL query language. sa.amos includes primitives for data mining through functions for data analyzis, aggregation,  visualization, and handling of ordered collections through the datatype Vector. The principles of the sa.amos system and AmosQL are described in the document [RJK03].
 
-Several distributed Amos II peers can collaborate in a federation. The documentation includes documentation of basic peer communication primitives, multi-database queries and views, the wrapper functionality, and the predefined wrappers for relational databases through  JDBC.
+Several distributed sa.amos peers can collaborate in a federation. The documentation includes documentation of basic peer communication primitives, multi-database queries and views, the wrapper functionality, and the predefined wrappers for relational databases through  JDBC.
 
 The basic wrapper interface is based on user defined multi-directional foreign functions having various capabilities used to access external data sources in different ways [LR92] depending on what variables are bound or free in an execution plan, the binding patterns. On top of the basic foreign function mechanism object oriented abstractions are defined through mapped types [FR97]. A number of important query rewrite techniques for scalable access to wrapped sources, in particular relational databases, are described in [FR97]. Rewrites for handling scalable execution of queries involving late bound function calls are described in [FR95]. Multi-database views are further described in [JR99a][JR99b]. The distributed query decomposer is described in [JR02] and [RJK03].
 
 
 ## Getting started
 
-Download the Amos II zip  from http://www.it.uu.se/research/group/udbl/amos/. Unpack the zip file to a directory for Amos II, <privdir>. The following files are needed in <privdir>:
+Download the sa.amos zip  from http://www.it.uu.se/research/group/udbl/amos/. Unpack the zip file to a directory for sa.amos, <privdir>. The following files are needed in <privdir>:
 
 ```
 amos2.exe
 amos2.dll
 amos2.dmp
-Amos II is ready to run in <privdir> by the command:
+sa.amos is ready to run in <privdir> by the command:
 amos2 [<db>]
-where [<db>] is an optional name of an Amos II database image.
+where [<db>] is an optional name of an sa.amos database image.
 You need not connect to any particular database, but instead, if <db> is omitted, the system enters an empty database (named amos2.dmp), where only the system objects are defined. The system looks for amos2.dmp in the same directory as where the executable amos2.exe is located.
 ```
 
@@ -27,7 +27,7 @@ The executable has a number of command line parameters to specify, e.g., the dat
 
 ### The Amos REPL
 
-When started, the system enters the Amos REPL where it reads AmosQL statements, executes them, and prints their results. The prompt in the Amos II REPL is: `Amos n>` where n is a generation number. The generation number is increased every time an AmosQL statement that updates the database is executed in the Amos REPL.
+When started, the system enters the Amos REPL where it reads AmosQL statements, executes them, and prints their results. The prompt in the sa.amos REPL is: `Amos n>` where n is a generation number. The generation number is increased every time an AmosQL statement that updates the database is executed in the Amos REPL.
 
 Typically you start by defining  meta-data (a schema) as types and functions. For example:
 
@@ -1118,29 +1118,36 @@ Cardinality constraints can also be specified for foreign functions. These are i
 
 
 
-2.5.2 Changing object types dynamically
+#### Changing object types dynamically
+
 The add-type-stmt changes the type of one or more objects to the specified type.
 Syntax:
-
+```
 add-type-stmt ::=
         'add type' type-name ['(' [generic-function-name-commalist] ')']
         'to' variable-commalist
+```
 The updated objects may be assigned initial values for all the specified property functions in the same manner as in the create object statement.
 The remove-type-stmt makes one or more objects no longer belong to the specified type.
 Syntax:
-
+```
 remove-type-stmt ::=
         'remove type' type-name 'from' variable-commalist
+```
+
 Referential integrity is maintained so that all references to the objects as instances of the specified type cease to exist.  If all user defined types have been removed, the object will still be member of type Userobject.
 
-2.5.3 User update procedures
+#### User update procedures
 
 It is possible to register user defined user update procedures for any function. The user update procedures are procedural functions which are transparently invoked when update statements are executed for the function.
-    set_addfunction(Function f, Function up)->Boolean
-  set_remfunction(Function f, Function up)->Boolean
-  set_setfunction(Function f, Function up)->Boolean
+```
+set_addfunction(Function f, Function up)->Boolean
+set_remfunction(Function f, Function up)->Boolean
+set_setfunction(Function f, Function up)->Boolean
+```
 
-The function f is the function for which we wish to declare a user update function and up is the actual update procedure. The arguments of a user update procedures is the concatenation of argument and result tuples of f. For example, assume we have a function
+The function `f` is the function for which we wish to declare a user update function and up is the actual update procedure. The arguments of a user update procedures is the concatenation of argument and result tuples of f. For example, assume we have a function
+
 ```
 create function netincome(Employee e) -> Number
     as income(e)-taxes(e);
@@ -1181,13 +1188,16 @@ The procedural system functions setfunction(), addfunction(), and remfunction() 
 To delete all rows in a stored function fn, use
 dropfunction(Function fn, Integer permanent)->Function
 If the parameter permanent is one the deletion cannot be rolled back.
-2.6 Collections
+
+### Collections
+
 sa.amos supports three kinds of collections: bags, vectors, and key-value collections (records):
 A bag is a set where duplicates are allowed.
 A vector is an ordered sequence of objects.
 A record is an associative array of key-value pairs.
 The result of a query is a bag of tuples of objects. The tuples themselves are not objects but must be retrieved using the tuple-expr notation. This section first introduces aggregate functions, which are functions computing aggregated values over bags, such as sums and averages. Then the general behavior of the built in collection types Bag and Vector are described.
-2.6.1 Subqueries and aggregate functions
+
+#### Subqueries and aggregate functions
 
 Aggregate functions are functions where one or several arguments are declared as bags:
    Bag of type x
@@ -1208,74 +1218,107 @@ Now consider the query:
 The function friends() returns several (a bag of) persons on which the function name() is applied. The normal semantics in sa.amos is that when a function (e.g. name()) is applied on a bag valued function  (e.g. friends()) it will be applied on each element of the returned bag.  In the example a bag of the names of the persons named Bill is returned.
 
 Aggregate functions work differently. They are applied on the entire bag. For example:
-  count(friends(:p));
-In this case count() is applied on the entire bag of all friends of :p. This closed bag is specified by declaring the type of an argument of an aggregate function with 'Bag of''. The function count() has the signature:
-  count(Bag of Object) -> Integer
+```
+count(friends(:p));
+```
+In this case `count()` is applied on the entire bag of all friends of :p. This closed bag is specified by declaring the type of an argument of an aggregate function with 'Bag of''. The function count() has the signature:
+```
+count(Bag of Object) -> Integer
+```
 Aggregate functions can be applied on subqueries, for example:
-  count(select p from Person p);
+```
+count(select p from Person p);
+```
 The following two queries return the same values:
-  count(select friends(:p));
-  count(friends(:p));
+```
+count(select friends(:p));
+count(friends(:p));
+```
 Local variables in queries may be declared as bags that can be used as arguments to aggregate functions.
 For example, the function totalincomes() computes the sum of all incomes:
-
+```
 create function totalincomes()->Integer
   as sum(select income(p) from Person P);
+```
 or
+```
 create function totalincomes()->Integer
   as select sum(b)
      from Bag of Integer b
      where b = (select income(p)
                  from Person p);
+```
 Notice that stored functions cannot have arguments declared 'Bag of''.
-2.6.2 Bags
+
+#### Bags
+
 When a stored function is defined the default is that it can return only a single value. For example:
-  create function friends(Person p) -> Person f as stored;
+```
+create function friends(Person p) -> Person f as stored;
+```
 In this case there is a cardinality constraint that says that a given person p can have only a single friend f. This cardinality constraint is removed by instead defining:
-  create function friends(Person p) -> Bag of Person f as stored;
-The update commands set,  add, and remove can be used for updating such bag valued functions.
+```
+create function friends(Person p) -> Bag of Person f as stored;
+```
+The update commands set, add, and remove can be used for updating such bag valued functions.
 
 For derived functions the result can potentially always be a bag since the result of the select statement is a bag. For example:
+```
 create function friendsof(Charstring pn)-> Bag of Charstring fn
   as select name(friends(p))
      from Person p
      where name(p)=pn;
+```
 You can set a variable to the bag representing the result from a query (i.e. a select statement), for example:
-  set :fnb = friendsof("Bill");
+```
+set :fnb = friendsof("Bill");
+```
 Since the result type of friendsof() is 'Bag of Charstring', in this case the variable :fnb is bound to the bag of friends of Bill. If the result type had been just 'Charstring', instead :fnb would have been assigned the first element in the bag of Bill's friends.
 
-You can extract the elements from the bag with the in() function or infix operator:
-  in(:fnb);
-  select fn from Charstring fn where fn in :fnb;
+You can extract the elements from the bag with the `in()` function or infix operator:
+```
+in(:fnb);
+select fn from Charstring fn where fn in :fnb;
+```
+
 Notice that, unlike most programming languages, bags are usually not evaluated when they are assigned. It is up to the query optimizer to compute the values of a bag when so needed.
 
 Query variables can also be bound to bags, e.g.:
-  select sum(b),count(b)
-  from Bag of Integer b
-  where b = (select income(p)
-             from Person p);
+```
+select sum(b),count(b)
+from Bag of Integer b
+where b = (select income(p)
+           from Person p);
+```
 The elements of a bag can be extracted with the in operator, e.g.:
-    select t/i
-  from Number i, Number t, Bag of (Number, Number) b
-  where (i, t) in b and
-        b = (select income(p), taxes(p)
-             from Person p);
+```
+select t/i
+from Number i, Number t, Bag of (Number, Number) b
+where (i, t) in b and
+       b = (select income(p), taxes(p)
+            from Person p);
+```
 
 Notice that in this case the preferred much more elegant flat formulation of the query is:
-    select income(p)/taxes(p)
-  from Person p;
-
+```
+select income(p)/taxes(p)
+from Person p;
+```
 Avoid using the in operator if a more elegant flat query formulation can be made!
 
 Sometimes it is more convenient to use the function in() that extracts the elements from closed bags, for example:
-    select in(b)
-  from Bag of Number b
-  where b = (select income(p)
-             from Person p);
+```
+select in(b)
+from Bag of Number b
+where b = (select income(p)
+           from Person p);
+```
 
 Notice that the preferred elegant flat formulation of the above query is:
-    select income(p)
-  from Person p;
+```
+select income(p)
+from Person p;
+```
 
 If you make the query
   count(friends(:p));
@@ -1287,35 +1330,47 @@ The query could also have been formulated with an explicitly specified bag as
 Sometimes it may be necessary to materialize a bag explicitly, which is done by the function:
   materialize(Bag of T b) -> T m
 where T can be any type. The function materialize() extracts all the elements from bag b and stores them in the materialized bag m. Notice the differences between these assignments:
-set :f = friendsof("Bill");            /* assigns :f to a bag of Bill's friends. */
-
-set :mb = materialize(friendsof("Bill")); /* Assigns :mb to a materialized bag of Bill's friends */
+```
+set :f = friendsof("Bill");                /* assigns :f to a bag of Bill's friends. */
+set :mb = materialize(friendsof("Bill"));  /* Assigns :mb to a materialized bag of Bill's friends */
+```
 
 To compare that two bags are equal use:
+```
   bequal(Bag x, Bag y) -> Boolean
+```
 Notice that bequal() materializes its arguments before doing the equality computation.
-2.6.3 Vectors
 
-Vectors represent sequences of objects of any type.
+#### Vectors
 
-Vectors can be constructed in queries and updates using the vector-expr notation.
+Vectors represent sequences of objects of any type. Vectors can be constructed in queries and updates using the vector-expr notation.
 For example:
-  set :a = {1,2,3};
+```
+set :a = {1,2,3};
+```
 sets variable :a to a vector value.
 
 The following query forms a bag of vectors holding the persons named Bill together with their ages.
-  select {p,age(p)} from Person p where name(p)="Bill";
+```
+select {p,age(p)} from Person p where name(p)="Bill";
+```
 
 The previous query is different from the query
-  select p, age(p) from Person p where name(p)="Bill"
+```
+select p, age(p) from Person p where name(p)="Bill"
+```
 that returns bag of tuples.
 
 Vectors can be queried by converting them to bags using the in operator.
 For example:
+```
 select x from Number x where x > 1 and x in :a;
+``
 returns the bag elements:
+```
 2
 3
+```
 
 Notice that the order of the elements of a bag is not predetermined and you cannot assume that selecting elements from a vector is in the vector's element order. In general the order of the elements of a bag is undefined and the query optimizer has the freedom to return a bag in any order if that speeds up query execution.
 
@@ -1496,10 +1551,12 @@ groupby(Bag of (Object,Object) sq, Function aggfn) -> Bag of (Object gk, Object 
 The bag sq contains key-value pairs  (k, v) where k is called a group key and v is an arbitrary value paired with k.  The result is a bag of new key-value pairs (gk, aggv) where gk is each distinct group key in sq and aggv is the result of applying aggfn on the bag of the values paired with gk.
 2.7.3 Numerical vector functions
 
-The times() function (infix operator: * ) is defined as the scalar product for vectors of numbers:
+The `times()` function `(infix operator: * )` is defined as the scalar product for vectors of numbers:
   times(Vector x, Vector y) -> Number r
 For example:
+```
   {1, 2, 3} * {4, 5, 6};
+```
 returns the number 32.
 
 The elemtimes() function (infix operator: .*) is defined as the element wise product for vectors of numbers:
@@ -1588,19 +1645,24 @@ The function minkowski() computes the Minkowski distance between two points p1 a
 
 The function maxnorm() computes the Maxnorm distance between two points p1 and p2 (conceptually, this is the same as the Minkowski distance with r = infinity):
   maxnorm(Vector of Number p1, Vector of Number p2) -> Real d
-2.7.4 Vector aggregate functions
+
+#### Vector aggregate functions
 
 The following functions group and compute aggregate values over collections of numerical vectors.
 
 Dimension-wise aggregates over bags of vectors can be computed using the function aggv:
-  aggv(Bag of Vector, Function) -> Vector
+```
+aggv(Bag of Vector, Function) -> Vector
+```
 For example:
-  aggv((select {i, i + 10}
-   from integer i
-   where i in iota(1, 10)), #'avg');
- results in {5.5, 15.5}
+```
+aggv((select {i, i + 10}
+ from integer i
+ where i in iota(1, 10)), #'avg');
+results in {5.5, 15.5}
+ ```
 
-Each dimension in a bag of vector of number can be normalized using one of the normalization functions meansub(), zscore(), or maxmin(). They all have the same signature:
+Each dimension in a bag of vector of number can be normalized using one of the normalization functions `meansub()`, `zscore()`, or `maxmin()`. They all have the same signature:
 meansub(Bag of Vector of Number b) -> Bag of Vector of Number
 zscore(Bag of Vector of Number b) -> Bag of Vector of Number
 maxmin(Bag of Vector of Number b) -> Bag of Vector of Number
@@ -1628,9 +1690,9 @@ The label of each vector remains unchanged during projection.
 
 Note that the input data might have to be pre-processed, using some vector normalization.
 
-2.7.5 Plotting numerical data
+#### Plotting numerical data
 
-AmosII can utilize GNU Plot (v 4.2 or above), to plot numerical data. The plot() function is used to plot a line connecting two-dimensional points. Each vector in the vector v is a data point. plot() will plot the points in the order they appear in the v.
+sa.engine can utilize GNU Plot (v 4.2 or above), to plot numerical data. The `plot()` function is used to plot a line connecting two-dimensional points. Each vector in the vector v is a data point. plot() will plot the points in the order they appear in the v.
   plot(Vector of Vector v) -> Integer
 The return value is the exit code of the plot program. A nonzero value indicates error.
 If the data points have a higher dimensionality than two, the optional argument projs is used to select the dimension to be plotted.
@@ -1642,6 +1704,7 @@ scatter2p() and scatter2l() plots three-dimensional data in two dimensions. scat
 
 Three-dimensional scatter plots are generated using scatter3(), scatter3l(), and scatter3p(). scatter3() plots 3-dimensional data, whereas scatter3l() and scatter3p() plot 4-dimensional data in the same fashion as scatter2p() and scatter2l().
 Each scatter plot function have two different signatures:
+```
 scatter2(Bag of Vector v) -> Integer
 scatter2l(Bag of Vector v) -> Integer
 scatter2p(Bag of Vector v) -> Integer
@@ -1654,8 +1717,9 @@ scatter2p(Vector of Integer projs, Bag of Vector v) -> Integer
 scatter3(Vector of Integer projs, Bag of Vector v) -> Integer
 scatter3l(Vector of Integer projs, Bag of Vector v) -> Integer
 scatter3p(Vector of Integer projs, Bag of Vector v) -> Integer
+```
 
-2.8 Accessing data in files
+### Accessing data in files
 
 The file system where an sa.amos server is running can be access with a number of system functions:
 
@@ -1680,7 +1744,7 @@ The function directoryp() returns true if a path is a directory:
 The function filedate() returns the write time of a file with a given name:
   filedate(Charstring file) -> Date
 
-2.8.1 Reading vectors from a file
+#### Reading vectors from a file
 
 The function csv_file_tuples() reads a CSV (Comma Separated Values) file. Each line is returned as a vector.
   csv_file_tuples(Charstring file) -> Bag of Vector
@@ -1710,7 +1774,8 @@ Then the call read_ntuples("test.nt") returns a beg with the following vectors:
 {"This is the first line","another","word"}
 {1,2,3,4.45,2000000000.0}
 {"This line is parsed into two fields",3.14}
-2.9 Cursors
+
+### Cursors
 
 Cursors provide a way to iterate over the result of a query or a function call or the value of a variable. The open-cursor-stmt opens a new scan on the result of a query, function call, or variable binding. A scan is a data structure holding a current element, the cursor, of a potentially very large bag produced by a query, function call, or variable binding. The next element in the bag is retrieved by the fetch-cursor-stmt. Every time a fetch-cursor-stmt statement is executed the cursor is moved forward over the bag. When the end of the bag is reached the fetch-cursor-stmt returns empty result. The user can test whether there is any more elements in a scan by calling one of the functions
    `more(Scan s)   -> Boolean`
@@ -1718,7 +1783,7 @@ Cursors provide a way to iterate over the result of a query or a function call o
 
 that test whether the scan is has more rows or not, respectively.
 
-```sh
+```
 open-cursor-stmt ::=
         'open' cursor-name 'for' expr
 
@@ -1734,7 +1799,7 @@ close-cursor-stmt ::=
 
 For example:
 
-```sh
+```
 create person (name,age) instances :Viola ('Viola',38);
 open :c1  for (select p from Person p where name(p) = 'Viola');
 fetch :c1 into :Viola1;
@@ -1901,12 +1966,12 @@ Then we can populate the tables by the following calls to the sql function:
 Examples of SQL queries are:
  sql("select ssn from employee where name = ‘Kalle’");
  sql("select dname from dept, employee where dept = dno and name=’Kalle’");
-The parser is based on the SQL-92 version of SQL. Thus, the SQL processor allows an Amos II database be both updated and queried using SQL-92. The parser passes most of the SQL-92 validation test.  However, SQL views are not supported. For further details see http://www.it.uu.se/research/group/udbl/Theses/MarkusJagerskoghMSc.pdf.
+The parser is based on the SQL-92 version of SQL. Thus, the SQL processor allows an sa.amos database be both updated and queried using SQL-92. The parser passes most of the SQL-92 validation test.  However, SQL views are not supported. For further details see http://www.it.uu.se/research/group/udbl/Theses/MarkusJagerskoghMSc.pdf.
 The command line option
          amos2 ... -q sql...
-will make Amos II accept SQL as query language in the REPL rather than AmosQL.
+will make sa.amos accept SQL as query language in the REPL rather than AmosQL.
 5 Peer management
-Using a basic Amos II peer communication system, distributed Amos II peers can be set up that communicate using TCP/IP. A federation of Amos II peers is managed by a name server which is an Amos II peer knowing addresses and names of other Amos II peers. Queries, AmosQL commands, and results can be shipped between peers. Once a federation is set up, multi-database facilities can be used for defining queries and views spanning several Amos II peers [RJK03]. Reconciliation primitives can be used for defining object-oriented multi-peer views [JR99a][JR99b].
+Using a basic sa.amos peer communication system, distributed sa.amos peers can be set up that communicate using TCP/IP. A federation of sa.amos peers is managed by a name server which is an sa.amos peer knowing addresses and names of other sa.amos peers. Queries, AmosQL commands, and results can be shipped between peers. Once a federation is set up, multi-database facilities can be used for defining queries and views spanning several sa.amos peers [RJK03]. Reconciliation primitives can be used for defining object-oriented multi-peer views [JR99a][JR99b].
 5.1 Peer communication
 
 The following AmosQL system functions are available for inter-peer communication:
@@ -1924,7 +1989,7 @@ Registers the current database as a peer in the federation name server running o
 as register() but first unregisters another registered peer having same name rather than signaling error. Good when restarting peer registered in name server after crash so the crashed peer will be unregistered.
 
    this_amosid()->Charstring name
-Returns the name of the peer where the call is issued. Returns the string "NIL" if issued in a not registered standalone Amos II system.
+Returns the name of the peer where the call is issued. Returns the string "NIL" if issued in a not registered standalone sa.amos system.
 
    other_peers()->Bag of Charstring name
 Returns the names of the other peers in the federation managed by the name server.
@@ -1932,12 +1997,12 @@ Returns the names of the other peers in the federation managed by the name serve
    ship(Charstring peer, Charstring cmd)-> Bag of Vector
 Ships the AmosQL command cmd for execution in the named peer. The result is shipped back to the caller as a set of tuples represented as vectors.  If an error happens at the other peer the error is also shipped back.
    call_function(Charstring peer, Charstring fn, Vector args, Integer stopafter)-> Bag of Vector
-Calls the Amos II function named fn with argument list args in peer. The result is shipped back to the caller as a set of tuples represented as vectors. The maximum number of tuples shipped back is limited by stopafter. If an error happens at the other peer the error is also shipped back.
+Calls the sa.amos function named fn with argument list args in peer. The result is shipped back to the caller as a set of tuples represented as vectors. The maximum number of tuples shipped back is limited by stopafter. If an error happens at the other peer the error is also shipped back.
 
    send(Charstring peer, Charstring cmd)-> Charstring peer
 Sends the AmosQL command cmd for asynchronous execution in the named peer without waiting for the result to be returned. Errors are handled at the other peer and not shipped back.
    send_call(Charstring peer, Charstring fn, Vector args)-> Boolean
-Calls the Amos II function named fn with argument list args asynchronously in the named peer without waiting for the result to be returned. Errors are handled at the other peer and not shipped back.
+Calls the sa.amos function named fn with argument list args asynchronously in the named peer without waiting for the result to be returned. Errors are handled at the other peer and not shipped back.
 
    broadcast(Charstring cmd)-> Bag of Charstring
 Sends the AmosQL command cmd for asynchronous execution in all other peers. Returns the names of the receiving peers.
@@ -1958,7 +2023,7 @@ Waits until the peer is running and then returns the peer name.
 Returns all peers managed by the name server on this computer. You need not be member of federation to run the function.
 
 5.2 Peer queries and views
-Once you have established connections to Amos II peers you can define views of data from your peers. You first have to import the meta-data about selected types and functions from the peers. This is done by defining proxy types and proxy functions [RJK03] using the system function import_types:
+Once you have established connections to sa.amos peers you can define views of data from your peers. You first have to import the meta-data about selected types and functions from the peers. This is done by defining proxy types and proxy functions [RJK03] using the system function import_types:
    import_types(Vector of Charstring typenames,  Charstring p)-> Bag of Type pt
 defines proxy types pt for types named typenames in peer p. Proxy functions are defined for the functions in p having the imported types as only argument. Inheritance among defined proxy types  is imported according to the corresponding  inheritance relationships between imported types in the peer p.
 Once the proxy types and functions are defined they can transparently be queried. Proxy types can be references using @ notation to reference types in other peers.
@@ -1971,14 +2036,14 @@ imports a function named fn from peer p returning proxy function pf.
 On top of the imported types object-oriented multi-peer views can be defined, as described in [RJK03] consisting of derived types [JR99a] whose extents are derived through queries intersecting extents of other types, and IUTs [JR99b] whose extents reconciles unions of other type extents. Notice that the implementation of IUTs is limited. (In particular the system flag latebinding('OR'); must be set before IUTs can be used and this may cause other problems).
 6 Accessing external systems
 
-This chapter first describes multi-directional foreign functions [LR92], the basis for accessing external systems from Amos II queries.
-The we describe how to query relational databases through Amos II. Finally some general types and functions used for defining wrappers of external sources are described.
+This chapter first describes multi-directional foreign functions [LR92], the basis for accessing external systems from sa.amos queries.
+The we describe how to query relational databases through sa.amos. Finally some general types and functions used for defining wrappers of external sources are described.
 
-Amos II contains number of primitives for accessing different external data sources by defining wrappers for each kind external sources. A wrapper is a software module for making it possible to query an external data source using AmosQL. To allow transparent queries, wrappers allow specification of different capabilities for different kinds of data sources. The capabilities provide hooks to define data source specific re-write rules and cost models.
-A general wrappers for relational databases using JDBC is predefined in Amos II.
+sa.amos contains number of primitives for accessing different external data sources by defining wrappers for each kind external sources. A wrapper is a software module for making it possible to query an external data source using AmosQL. To allow transparent queries, wrappers allow specification of different capabilities for different kinds of data sources. The capabilities provide hooks to define data source specific re-write rules and cost models.
+A general wrappers for relational databases using JDBC is predefined in sa.amos.
 6.1 Foreign and multi-directional functions
 
-The basis for accessing external systems from Amos II is to define foreign functions. A foreign function allows subroutines defined in C/C++ [Ris12], Lisp [Ris06], or Java [ER00] to be called from Amos II queries. This allows access to external databases, storage managers, or computational libraries. A foreign function is defined by the following function implementation:
+The basis for accessing external systems from sa.amos is to define foreign functions. A foreign function allows subroutines defined in C/C++ [Ris12], Lisp [Ris06], or Java [ER00] to be called from sa.amos queries. This allows access to external databases, storage managers, or computational libraries. A foreign function is defined by the following function implementation:
 
 foreign-body ::= simple-foreign-definition | multidirectional-definition
 
@@ -2019,7 +2084,7 @@ A computation that produces a result given that the arguments are known, e.g. + 
 A generator that has a result of type Bag. It produces the result as a bag by generating a stream of several  result tuples given the argument tuple, e.g. iota() or the function sending SQL statements to a relational database for evaluation where the result is a bag of tuples.
 An aggregate function has some argument of type Bag but not result of type Bag. It iterates over one or several bag argument to compute some aggregate value over the bag, e.g. average().
 A combiner has has both one or several arguments of type Bag and some result of type Bag. It combines one or several bags to form a new bag. For example, basic join operators can be defined as combiners.
-Amos II functions in general are multi-directional. A multi-directional function can be executed also when the result of a function is given and some corresponding argument values are sought. For example, if we have a function
+sa.amos functions in general are multi-directional. A multi-directional function can be executed also when the result of a function is given and some corresponding argument values are sought. For example, if we have a function
     parents(Person)-> Bag of Person
 we can ask these AmosQL queries:
     parents(:p);  /* Result is the bag of parents of :p */
@@ -2048,7 +2113,7 @@ To implement a multi-directional foreign function you first need to think of whi
 
 The following steps are required to define a foreign function:
 Implement each foreign function capability using the interface of the implementation language. For Java this is explained in [ER00]  and for C in  [Ris12].
-In case the foreign code implemented in C/C++ the implementation must be implemented as a DLL (Windows) or a shared library (Unix) and dynamically linked to the kernel by calling the function load_extension("name-of-extension"). There is an example of a Visual Studio project (Windows) files or a Makefile (Unix) in folder demo of the downloaded Amos II version.
+In case the foreign code implemented in C/C++ the implementation must be implemented as a DLL (Windows) or a shared library (Unix) and dynamically linked to the kernel by calling the function load_extension("name-of-extension"). There is an example of a Visual Studio project (Windows) files or a Makefile (Unix) in folder demo of the downloaded sa.amos version.
 The main program of the DLL/shared library extension must also assign a symbolic name to the foreign C functions which is referenced in the foreign function definition (sqrts and square in the example above) [Ris12].
 Finally a multidirectional foreign function needs to be defined through a foreign function definition in AmosQL as above. Here the implementor may associate a binding pattern and an optional cost estimate with each capability. Normally the foreign function definition is done separate from the actual code implementing its capabilities, in an AmosQL script.
 A capability can also be defined as a select expression (i.e. query) executed for the given binding pattern. The variables marked bound (b) are inputs to the select expression and the result binds the free (f) variables. For example, sqroots() could also have been defined by:
@@ -2086,11 +2151,11 @@ Furthermore, the cost of executing a query depends on the expected size of the r
 Thus for good query optimization each foreign function capability should have associated costs and fanouts:
 The cost is an estimate of how expensive it is to completely execute (emit all tuples of) a foreign function for given arguments.
 The fanout estimates the expected number of elements in the result stream (emitted tuples), given the arguments.
-The cost and fanout for a multi-directional foreign function implementation can be either specified as a constant vector of two numbers (as in sqroots()) or as an Amos II cost function returning the vector of cost and fanout for a given function call. The numbers normally need only be rough numbers, as they are used by the query optimizer to compare the costs of different possible execution plans to produce the optimal one. The number 1 for the cost of a foreign function should roughly be the cost to perform a cheap function call, such as '+' or '<'. Notice that these estimates are run a query optimization time, not when the query is executed, so the estimates must be based on meta-data about the multi-directional foreign function.
+The cost and fanout for a multi-directional foreign function implementation can be either specified as a constant vector of two numbers (as in sqroots()) or as an sa.amos cost function returning the vector of cost and fanout for a given function call. The numbers normally need only be rough numbers, as they are used by the query optimizer to compare the costs of different possible execution plans to produce the optimal one. The number 1 for the cost of a foreign function should roughly be the cost to perform a cheap function call, such as '+' or '<'. Notice that these estimates are run a query optimization time, not when the query is executed, so the estimates must be based on meta-data about the multi-directional foreign function.
 
 If the simplified syntax is used or no cost is specified the system tries to put reasonable default costs and fanouts on foreign functions, the default cost model. The default cost model estimates the cost based on the signature of the function, index definitions, and some other heuristics. For example, the default cost model assumes aggregate functions are expensive to execute and combiners even more expensive. If you have expensive foreign functions you are strongly advised to specify cost and fanout estimates.
 
-The cost function cfn is an Amos II function with signature
+The cost function cfn is an sa.amos function with signature
 create function <cfn>(Function f, Vector bpat, Vector args)
                     -> (Integer cost, Integer fanout) as ...;
 e.g.
@@ -2099,7 +2164,7 @@ e.g.
                              -> (Integer cost, Integer fanout) as foreign ...;
 The cost function is normally called at compile time when the optimizer needs the cost and fanout of a function call in some query. The arguments and results of the cost function are:
 
-f       is the full name the called Amos II function.
+f       is the full name the called sa.amos function.
 bpat is the binding pattern of the call as a vector of strings ’b’ and ’f’, e.g. {"f","b"} indicating which arguments in the call are bound or free, respectively.
 args is a vector of actual variable names and constants used in the call.
 cost   is the computed estimated cost to execute a call to f with the given binding pattern and argument list. The cost to access a tuple of a stored function (by hashing) is 2; other costs are calibrated accordingly.
@@ -2107,7 +2172,7 @@ fanout is the estimated fanout of the execution, i.e. how many results are emitt
 
 If the cost hint function does not return anything it indicates that the function is not executable in the given context and the optimizer will try some other capability or execution strategy.
 
-The costs and fanouts are normally specified as part of the capability specifications for a multi-directional foreign function definition, as in the example. The costs can also be specified after the definition of a foreign function by using the following Amos II system function:
+The costs and fanouts are normally specified as part of the capability specifications for a multi-directional foreign function definition, as in the example. The costs can also be specified after the definition of a foreign function by using the following sa.amos system function:
    costhint(Charstring fn,Charstring bpat,Vector ch)->Boolean
 e.g.
    costhint("number.sqroots->number","bf",{4,2});
@@ -2123,7 +2188,7 @@ To find out what cost estimates are associated with a function use:
    costhints(Function r)-> Bag of (Charstring bpat, Object q)
 It returns the cost estimates for resolvent r and their associated binding patterns.
 
-To obtain the estimated cost of executing an Amos II  function f for a given binding pattern bp, use
+To obtain the estimated cost of executing an sa.amos  function f for a given binding pattern bp, use
    plan_cost(Function r, Charstring bp)-> (Number cost, Numbers fanout)
 6.2 The relational database wrapper
 
@@ -2138,7 +2203,7 @@ An instance of type Relational represents a relational database and the function
 	  Jdbc
 If some other interface than JDBC (e.g. ODBC) is used for a relational database it would require the implementation of a new wrapper and subtype to Relational.
 
-The use of abstract functions makes sure that Amos II will use the type resolution to look for implementations of these functions in any subtype to Relational.
+The use of abstract functions makes sure that sa.amos will use the type resolution to look for implementations of these functions in any subtype to Relational.
 6.2.1 Connecting
 The instances of relational data sources are created using a datasource constructor function that loads necessary drivers. Later the connect() functions associates a connection object to a wrapped database using the driver.
 
@@ -2280,11 +2345,11 @@ Hint: If something is wrong in the script you may trace the calls inside read_sq
 
 The relational wrapper allows to to define object-oriented views of data residing in a relational database. Once the view has been defined the contents of the database can be used in AmosQL queries without any explicit calls to SQL.
 
-To regard a relational table as an Amos II type use:
+To regard a relational table as an sa.amos type use:
     import_table(Relational r, Charstring table_name) -> Mapped_type
 for example
     import_table(relational_named("db1"),"SALES");
-The view is represented by a mapped type which is a type whose extent is defined by the rows of the table. Each instance of the mapped type corresponds to a row in the table. The name of the mapped type is constructed by concatenating the table name, the character _ and the data source name, for example Person_db1. Mapped type names are internally capitalized, as for other Amos II types.
+The view is represented by a mapped type which is a type whose extent is defined by the rows of the table. Each instance of the mapped type corresponds to a row in the table. The name of the mapped type is constructed by concatenating the table name, the character _ and the data source name, for example Person_db1. Mapped type names are internally capitalized, as for other sa.amos types.
 For each columns in the table import_table will generate a corresponding derived wrapper function returning the column's value given an instance of the mapped type. For example, a table named person having the column ssn will have a function
 
  ssn(Person_db1)->Integer
@@ -2307,7 +2372,7 @@ The most general resolvent of import_table() is:
                    Charstring schema_name, Charstring table_name,
                    Charstring typename, Boolean updatable,
                    Vector supertypes) -> Mappedtype mt
-The table resides in the given catalog and schema. If catalog is "", the table is assumed not to be in a catalog. If schema is "", the table is assumed not to be in a schema. typename is the desired name of the mapped type created, as alternative to the system generated concatenation of table and data source name. updatable gives an updatable mapped type. supertypes is a vector of either type names or type objects, or a mixture of both. The effect is that Amos II will perceive the mapped type as an immediate subtype of the types.
+The table resides in the given catalog and schema. If catalog is "", the table is assumed not to be in a catalog. If schema is "", the table is assumed not to be in a schema. typename is the desired name of the mapped type created, as alternative to the system generated concatenation of table and data source name. updatable gives an updatable mapped type. supertypes is a vector of either type names or type objects, or a mixture of both. The effect is that sa.amos will perceive the mapped type as an immediate subtype of the types.
 
 There are also two other variants of import_table()  to be used for relational databases where schema and catalog names need not be specified:
       import_table(Relational r,
@@ -2360,10 +2425,10 @@ import_relation(my_relational, 'telephone', 'ssn','ext_no','phones', false);
 create function phones(person@my_relational p) -> telephone@my_relational t as select t where phones(ssn(p)) = ext_no(t);
 Notice that only relationship functions with a single argument and result can be generated, i.e. composite foreign keys are not supported.
 6.3 Defining new wrappers
-Wrappers make data sources queryable. Some wrapper functionality is completely data source independent while other functionality is specific for a particular kind of data source. Therefore, to share wrapper functionality Amos II contains a type hierarchy of wrappers. In this section we describe common functionality used for defining any kind of wrapper.
+Wrappers make data sources queryable. Some wrapper functionality is completely data source independent while other functionality is specific for a particular kind of data source. Therefore, to share wrapper functionality sa.amos contains a type hierarchy of wrappers. In this section we describe common functionality used for defining any kind of wrapper.
 6.3.1 Data sources
 
-Types and objects of type Datasource describe properties of different kinds of data sources accessible through Amos II. Each kind of wrapped data source has a corresponding data source type, for example type Amos, Relational, or Jdbc to describe Amos II peers, relational databases, or relational data bases accessed through JDBC, respectively. These types are all subtypes of type Datasource. Each instance of a data source type represents a particular data source of that kind, e.g. a particular relational database accessed trough JDBC are instances of type Jdbc.
+Types and objects of type Datasource describe properties of different kinds of data sources accessible through Amos II. Each kind of wrapped data source has a corresponding data source type, for example type Amos, Relational, or Jdbc to describe sa.amos peers, relational databases, or relational data bases accessed through JDBC, respectively. These types are all subtypes of type Datasource. Each instance of a data source type represents a particular data source of that kind, e.g. a particular relational database accessed trough JDBC are instances of type Jdbc.
 
 6.3.2 Mapped types
 
@@ -2393,16 +2458,16 @@ Once the mapped type is defined it can be queried as any other type, e.g.:
 
 6.3.3 Type translation
 
-Types in a specific data source are translated to corresponding types in Amos II using the following system functions:
+Types in a specific data source are translated to corresponding types in sa.amos using the following system functions:
 amos_type(Datasource ds, Charstring native_type_name) -> Type;
 for example
 amos_type(relational_named("IBDS"),"VARCHAR");
-amos_type returns the Amos II type corresponding to the a specific data source.
+amos_type returns the sa.amos type corresponding to the a specific data source.
 wrapped_type(Datasource ds, Type t) -> Charstring typename;
 for example
 wrapped_type(relational_named("IBDS"),typenamed("CHARSTRING"));
-returns the data source type corresponding to an Amos II type. Since one external type may correspond to more than one Amos II type wrapped_type is not the inverse of amos_type.
-The most common relational types and their Amos II counterparts are provided by default. Both functions are stored functions that can be updated as desired for future wrappers.
+returns the data source type corresponding to an sa.amos type. Since one external type may correspond to more than one sa.amos type wrapped_type is not the inverse of amos_type.
+The most common relational types and their sa.amos counterparts are provided by default. Both functions are stored functions that can be updated as desired for future wrappers.
 7 Physical database design
 
 This section describes some AmosQL commands for database space and performance tuning.
@@ -2611,20 +2676,22 @@ unique(bag(1,2,1,4)); =>
 Extract non-duplicated elements from a bag:
 exclusive(Bag of TP b) -> Bag of TP r
 The type of the result bag is the same as the type of elements of argument bag. For example:
+```
 exclusive(bag(1,2,1,4)); =>
 2
 4
-
+```
 Insert x between elements in a bag b:
 inject(Bag of Object b, Object x) -> Bag of Object r
 For example:
+```
 inject(bag(1,2,3),0); =>
 1
 0
 2
 0
 3
-
+```
 Make a string of elements in a bag b:
 concatagg(Bag of Object b)-> Charstring s
 For example:
@@ -2634,9 +2701,9 @@ concatagg(bag("ab",2,"cd")); =>
 concatagg(inject(bag("ab",2,"cd"),",")); =>
 "ab,2,cd"
 
-8.5 Temporal functions
+### Temporal functions
 
-Amos II supports three data types for referencing Time, Timeval, and Date.
+sa.amos supports three data types for referencing Time, Timeval, and Date.
 Type Timeval  is for specifying absolute time points including year, month, and time-of-day.
 The type Date specifies just year and date, and type Time specifies time of day. A limitation is that the internal operating system representation is used for representing Timeval values, which means that one cannot specify value too far in the past or future.
 
@@ -2792,8 +2859,10 @@ sortbag((select p from Person p), 'YOUNGER');
 
 The data that the system internally uses for maintaining the database is exposed to the query language as well and can be queried in terms of types and functions as other data. For example:
 The types and functions used in a database are accessible through system functions. It is possible to search the database for types and functions and how they relate.
-The goovi browser available from javaamos by calling the system function goovi(); presents the database graphically. It is written completely as an application Java program using AmosQL queries as the only interface to the Amos II kernel.
-8.7.1 Type meta-data
+The goovi browser available from javaamos by calling the system function goovi(); presents the database graphically. It is written completely as an application Java program using AmosQL queries as the only interface to the sa.amos kernel.
+
+#### Type meta-data
+
 alltypes() -> Bag of Type
 returns all types in the database.
 subtypes(Type t) -> Bag of Type s
@@ -2823,7 +2892,9 @@ returns the number of object of type t and all its subtypes.
 
 objectname(Object o, Charstring nm) -> Boolean
 returns TRUE if the object o has the name nm.
-8.7.2 Function meta-data
+
+#### Function meta-data
+
 allfunctions() -> Bag of Function
 returns all functions in the database.
 
@@ -2860,7 +2931,8 @@ returns the number of arguments of function.
 
 width(Function f) -> Integer
 returns the width of the result tuple of function f.
-8.8 Searching source code
+
+### Searching source code
 
 The source codes of all functions except some basic system functions are stored in the database. You can retrieve the source code for a particular function, search for functions whose names contain some string, or make searches based on the source code itself. Some system functions are available to do this.
 
@@ -2897,9 +2969,10 @@ usertypes() -> Bag of Type
 returns all user defined types in the database.
 allfunctions(Type t)-> Bag of Function
 returns all functions where one of the arguments are of type t.
-8.9 Extents
 
-The local Amos II database can be regarded as a set of extents. There are two kinds of extents:
+### Extents
+
+The local sa.amos database can be regarded as a set of extents. There are two kinds of extents:
 Type extents represent surrogate objects belonging to a particular type.
 The deep extent of a type is defined as the set of all surrogate objects belonging to that type and to all its descendants in the type hierarchy. The deep extent of a type is retrieved with:
 extent(Type t)->Bag of Object
@@ -2926,11 +2999,11 @@ The extent of a foreign function is always empty.
 
 The extent of a generic function is the union of the extents of its resolvents.
 
-8.10 Query optimizer tuning
+### Query optimizer tuning
 
 
 optmethod(Charstring new) -> Charstring old
-sets the optimization method used for cost-based optimization in Amos II to the method named new.
+sets the optimization method used for cost-based optimization in sa.amos to the method named new.
 Three optimization modes for AmosQL queries can be chosen:
 "ranksort": (default) is fast but not always optimal.
 "exhaustive": is optimal but it may slow down the optimizer considerably.
@@ -2945,18 +3018,18 @@ reoptimize(Function f) -> Boolean
 reoptimize(Charstring f) -> Boolean
 reoptimizes function named fn.
 
-8.11 Unloading
+### Unloading
 
-The data stored in the local database can be unloaded to a text file as an unload script of AmosQL statements generated by the system. The state of the database can be restored by loading the unload script as any other AmosQL file. Unloading is useful for backups and for transporting data between different systems such as different Amos II versions or Amos II systems running on different computers. The unload script can be edited in case the schema has changed.
+The data stored in the local database can be unloaded to a text file as an unload script of AmosQL statements generated by the system. The state of the database can be restored by loading the unload script as any other AmosQL file. Unloading is useful for backups and for transporting data between different systems such as different sa.amos versions or sa.amos systems running on different computers. The unload script can be edited in case the schema has changed.
 unload(Charstring filename)->Boolean
-generates an AmosQL script that restores the current local database state if loaded into an Amos II peer with the same schema as the current one.
+generates an AmosQL script that restores the current local database state if loaded into an sa.amos peer with the same schema as the current one.
 
 excluded_fns()->Bag of Function
 set of functions that should not be unloaded. Can be updated by user.
 
 
 
-8.12 Miscellaneous
+### Miscellaneous
 
 apply(Function fn, Vector args) -> Bag of Vector r
 calls the AmosQL function fn with elements in vector args as arguments and returns the result tuples as vectors.
@@ -2969,7 +3042,7 @@ prints an error message on the terminal and raises an exception. Transaction abo
 output_lines(Number n) -> Number
 controls how many lines to print on standard output before prompting for more lines. By default the system prints the entire result of a query on standard output. The user can interrupt the printing by CTRL-C. However, when running under Emacs and Windows the CTRL-C method to terminate an output may not be effective. As an alternative to CTRL-C output_lines(n) causes the system to prompt for more output lines after n lines have been printed on standard output. output_lines(0) turns off output line control.
 print(Object x) -> Boolean
-prints x. Always returns true. The printing is by default to the standard output (console) of the Amos II server where print() is executed but can be redirected to a file by the function openwritefile:
+prints x. Always returns true. The printing is by default to the standard output (console) of the sa.amos server where print() is executed but can be redirected to a file by the function openwritefile:
 openwritefile(Charstring filename)->Boolean
 openwritefile() changes the output stream for print()  to the specified filename. The file is closed and output directed to standard output by calling closewritefile().
 
@@ -2982,7 +3055,7 @@ quit;
 quits Amos II.
 
 exit;
-returns to the program that called Amos II if the system is embedded in some other system.
+returns to the program that called sa.amos if the system is embedded in some other system.
 Same as quit; for stand-alone Amos II.
 
 goovi();
