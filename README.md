@@ -25,7 +25,7 @@ The executable has a number of command line parameters to specify, e.g., the dat
   `amos2 -h`
 
 
-### The Amos REPL
+### The sa.amos REPL
 
 When started, the system enters the Amos REPL where it reads AmosQL statements, executes them, and prints their results. The prompt in the sa.amos REPL is: `Amos n>` where n is a generation number. The generation number is increased every time an AmosQL statement that updates the database is executed in the Amos REPL.
 
@@ -137,7 +137,7 @@ AmosQL statements are always terminated by a semicolon (`;`).
 The comment statement can be placed anywhere outside identifiers and constants.
 Syntax:
 
-```bnf
+```
 comment ::=
         '/*' character-list '*/'
 ```
@@ -622,219 +622,282 @@ is equivalent to
 The comparison operators (=, !=, <, <=, and >=) are treated as binary boolean functions. You can compare objects of any type.
 Predicate expressions are allowed in the result of a select expression.
 For example, the query:
+```
 select age(:p1) < 20 and home(:p1)="Uppsala";
+```
 or simply
+```
 age(:p1) < 20 and home(:p1)="Uppsala";
-returns true if person :p1 is younger than 20 and lives in Uppsala.
-2.3.4 Quantifiers
-The function some() implements logical exist over a subquery.
-To test if a subquery sq returns empty result use some():
+```
+returns true if person `:p1` is younger than 20 and lives in Uppsala.
+
+#### Quantifiers
+
+The function `some()` implements logical exist over a subquery.
+To test if a subquery sq returns empty result use `some()`:
+```
 some(Bag sq) -> Boolean
+```
 for example
+```
 select name(p) from Person p where some(parents(p));
+```
 
-The function notany() tests if a subquery sq returns empty result, i.e. negation:
+The function `notany()` tests if a subquery sq returns empty result, i.e. negation:
+```
 notany(Bag sq) -> Boolean
+```
 for example
+```
 select name(p) from Person p where notany(select parents(p) where age(p)>65);
-
-2.4 Functions
+```
+### Functions
 
 The create function statement defines a new user function. Functions can be defined as one of the following:
-Stored functions are stored in the sa.amos database as a table.
-Derived functions are defined by a single query that returns the result of the a function call for given parameters.
-Foreign functions are defined in an external programming language. Foreign functions can be defined in the programming languages C/C++ [Ris12], Java [ER00], and Lisp [Ris06].
-Procedural functions are defined using procedural AmosQL statements that can have side effects changing the state of the database. Procedural functions makes AmosQL computationally complete.
-Overloaded functions have different implementations depending on the argument types in a function call.
+
+- Stored functions are stored in the sa.amos database as a table.
+- Derived functions are defined by a single query that returns the result of the a function call for given parameters.
+- Foreign functions are defined in an external programming language.
+- Foreign functions can be defined in the programming languages C/C++ [Ris12], Java [ER00], and Lisp [Ris06].
+- Procedural functions are defined using procedural AmosQL statements that can have side effects changing the state of the database.
+- Procedural functions makes AmosQL computationally complete.
+- Overloaded functions have different implementations depending on the argument types in a function call.
+
 Syntax:
-
+```
 create-function-stmt ::=
-      'create function' generic-function-name argument-spec '->' result-spec [fn-implementation]
+  'create function' generic-function-name argument-spec '->' result-spec [fn-implementation]
+```
+Example:
+```
+create function born(Person) -> Integer as stored;
+```
 
-   E.g. create function born(Person) -> Integer as stored;
-
+```
 generic-function-name ::= identifier
 
-
 function-name ::= generic-function-name |
-                     type-name-list '.' generic-function-name '->' type-name-list
-
-   E.g. plus
-
+  type-name-list '.' generic-function-name '->' type-name-list
+```
+Example:
+```
+plus
+```
 
 Function names are not case sensitive and are internally stored upper-cased.
-
+```
 type-name-list ::= type-name |
                    type-name '.' type-name-list
-
+```
 The types used in the function definitions must be previously defined.
-
+```
 argument-spec ::='(' [argument-declaration-commalist] ')'
 
 argument-declaration ::= type-spec [local-variable] [key-constraint]
-
+```
 The names of the argument and result parameters of a function definition must be distinct.
-
+```
 key-constraint ::= ('key' | 'nonkey')
 
 result-spec ::=   argument-spec | tuple-result-spec
 
 tuple-result-spec ::= ['Bag of'] '(' argument-declaration-commalist ')'
 
-fn-implementation ::=   'as' (query |
-                                 'stored' |
-                                 procedural-function-definition |
-                                 foreign-function-definition)
-
+fn-implementation ::= 'as' (query |
+                            'stored' |
+                            procedural-function-definition |
+                            foreign-function-definition)
+```
 
 The argument-spec and the result-spec together specify the signature of the function, i.e. the types and optional names of formal parameters and results.
 
 A stored function is defined by the implementation 'as stored'.
-For example:
-        create function age(Person p) -> Integer a as stored;
+Example:
+```
+create function age(Person p) -> Integer a as stored;
+```
 The name of an argument or result parameter can be left unspecified if it is not referenced in the function's implementation.
-For example:
+Example:
+```
+create function name(Person) -> Charstring as stored;
+```
 
-   create function name(Person) -> Charstring as stored;
-
-'Bag of' specifications on a single result parameter of a stored function declares the function to return a bag of values, i.e. a set with tuples allowed. For example:
-
-     create function parents(Person) -> Bag of Person as stored;
-
+`Bag of` specifications on a single result parameter of a stored function declares the function to return a bag of values, i.e. a set with tuples allowed. For example:
+```
+create function parents(Person) -> Bag of Person as stored;
+```
 AmosQL functions may also have tuple valued results by using the tuple-result-spec notation. For example:
-  create function parents2(Person p) -> (Person m, Person f) as stored;
-
-  create function marriages(Person p)
-                   -> Bag of (Person spouse, Integer year) as stored;
+```
+create function parents2(Person p) -> (Person m, Person f) as stored;
+create function marriages(Person p)
+                -> Bag of (Person spouse, Integer year) as stored;
+```
 Tuple expressions are used for binding the results of tuple valued functions in queries, for example:
-
-  select s,y from Person s, Integer y where (s,y) in marriages(:p);
+```
+select s,y from Person s, Integer y where (s,y) in marriages(:p);
+```
 
 A derived function is defined by a single AmosQL query.
 For example:
-         create function netincome(Person p) -> Number
-            as income(p) - taxes(p);
+```
+create function netincome(Person p) -> Number
+       as income(p) - taxes(p);
+```
+
 Boolean functions  return true or nothing (nil).
+
 For example:
-        create function child(Person p) -> Boolean
-            as select true where age(p)<18;
-        alternatively:
-         create function child(Person p) -> Boolean
-            as age(p) < 18;
+```
+create function child(Person p) -> Boolean
+  as select true where age(p)<18;
+/* alternatively */
+create function child(Person p) -> Boolean
+  as age(p) < 18;
+```
 Since the select statement returns a bag of values, derived functions also often return a  Bag of results. If you know that a function returns a bag of values you should indicate that in the signature.
 For example:
-    create function youngFriends(Person p)-> Bag of Person
-     as select f
-        from Person f
-        where age(f) < 18
-          and f in friends(p);
+```
+create function youngFriends(Person p)-> Bag of Person
+  as select f
+  from Person f
+  where age(f) < 18
+  and f in friends(p);
+```
 If you write:
-        create function youngFriends(Person p)-> Person
-          as select f
-             from Person f
-             where age(f) < 18
-               and f in friends(p);
-you indicate to the system that youngFriends() returns a single value. However, this constraint is not enforced by the system so if there are more that one youngFriends() the system will treat the result as  a bag.
-Variables declared in the result of a derived function need not be declared again in the from clause. For example, youngFriends() can also be defined as
-   create function youngFriends(Person p)-> Bag of Person f
-          as select f
-             where age(f) < 18
-               and f in friends(p);
-Notice that the variable f is bound to the elements of the bag, not the bag itself. This definition is equivalent:
-        create function youngFriends(Person p)-> Bag of (Person f)
-          as select f
-             where age(f) < 18
-               and f in friends(p);
+```
+create function youngFriends(Person p)-> Person
+  as select f
+  from Person f
+  where age(f) < 18
+  and f in friends(p);
+```
+you indicate to the system that youngFriends() returns a single value. However, this constraint is not enforced by the system so if there are more that one `youngFriends()` the system will treat the result as a bag.
+Variables declared in the result of a derived function need not be declared again in the from clause. For example, youngFriends() can also be defined as:
+```
+create function youngFriends(Person p)-> Bag of Person f
+  as select f
+  where age(f) < 18
+  and f in friends(p);
+```
+Notice that the variable `f` is bound to the elements of the bag, not the bag itself. This definition is equivalent:
+```
+create function youngFriends(Person p)-> Bag of (Person f)
+  as select f
+  where age(f) < 18
+  and f in friends(p);
+```
 
 If a function is applied on the result of a function returning a bag of values, the outer function is applied on each element of that bag, the bag is flattened. This is called Daplex semantics. See also Bags. For example:
-        create function grandparents(Person p) -> Bag of Person
-          as parents(parents(p));
+```
+create function grandparents(Person p) -> Bag of Person
+  as parents(parents(p));
+```
 
-     If there are two parents per parent generation of Carl there will be four names returned when querying:
+If there are two parents per parent generation of Carl there will be four names returned when querying:
 
-        select name(grandparents(q)) from Person q where name(q)= "Carl";
+```
+select name(grandparents(q)) from Person q where name(q)= "Carl";
+```
 Derived functions whose arguments are declared 'Bag of' are called aggregate functions.
 For example:
-
-   create function myavg(Bag of Number x) -> Number
-     as sum(x)/count(x);
+```
+create function myavg(Bag of Number x) -> Number
+  as sum(x)/count(x);
+```
 
 Aggregate functions do not flatten the argument bag. For example, the following query computes the average age of Carl's grandparents:
-
-   select myavg(age(grandparents(q))) from Person p where name(q)="Carl";
+```
+select myavg(age(grandparents(q))) from Person p where name(q)="Carl";
+```
 When tuple valued functions are called the values are bound by enclosing the function result within parentheses (..) through the tuple-expr syntax. For example:
-       select age(m), age(f)
-       from Person m, Person f, Person p
-       where (m,f) = parents2(p) and
-             name(p) = "Oscar";
+```
+select age(m), age(f)
+from Person m, Person f, Person p
+where (m,f) = parents2(p) and
+              name(p) = "Oscar";
+```
 The value of a bag valued function can be saved in a bag and extracted using in(), e.g.:
-      set :par = parents(:p);
-      in(:par);
-2.4.1 Deleting functions
+```
+set :par = parents(:p);
+in(:par);
+```
+
+#### Deleting functions
 
 Functions are deleted with the delete function statement.
 Syntax:
-
+```
 delete-function-stmt ::=
         'delete function' function-name
+```
 For example:
-   delete function married;
+```
+delete function married;
+```
 Deleting a function also deletes all functions calling the deleted function.
-2.4.2 Overloaded functions
+
+#### Overloaded functions
 
 Function names may be overloaded, i.e., functions having the same name may be defined differently for different argument types. This allows generic functions applicable on objects of several different argument types. Each specific implementation of an overloaded function is called a resolvent.
-For example, assume the following two sa.amos function definitions having the same generic function name less():
-
+For example, assume the following two sa.amos function definitions having the same generic function name `less()`:
+```
 create function less(Number i, Number j)->Boolean
         as i < j;
 create function less(Charstring s,Charstring t)->Boolean
         as s < t;
+```
 Its resolvents will have the signatures:
-  less(Number,Number) -> Boolean
-  less(Charstring,Charstring) -> Boolean
-Internally the system stores the resolvents under different function names. The name of a resolvent is obtained by concatenating the type names of its arguments with the name of the overloaded function followed by the symbol '->' and the type of the result. The two resolvents above will be given the internal resolvent names NUMBER.NUMBER.LESS->BOOLEAN and CHARSTRING.CHARSTRING.LESS->BOOLEAN.
+```
+less(Number,Number) -> Boolean
+less(Charstring,Charstring) -> Boolean
+```
+Internally the system stores the resolvents under different function names. The name of a resolvent is obtained by concatenating the type names of its arguments with the name of the overloaded function followed by the symbol `->` and the type of the result. The two resolvents above will be given the internal resolvent names `NUMBER.NUMBER.LESS->BOOLEAN` and `CHARSTRING.CHARSTRING.LESS->BOOLEAN`.
 The query compiler resolves the correct resolvent to apply based on the types of the arguments; the type of the result is not considered. If there is an ambiguity, i.e. several resolvents qualify in a call, or if no resolvent qualify, an error will be generated by the query compiler.
 
 When overloaded function names are encountered in AmosQL function bodies, the system will try to use local variable declarations to choose the correct resolvent (early binding).
 For example:
-
- create function younger(Person p,Person q)->Boolean
-        as less(age(p),age(q));
-will choose the resolvent NUMBER.NUMBER.LESS->BOOLEAN, since age returns integers and the resolvent NUMBER.NUMBER.LESS->BOOLEAN is applicable to integers by inheritance. The other function resolvent CHARSTRING.CHARSTRING.LESS->BOOLEAN does not qualify since it is not legal to apply to arguments of type Integer.
-On the other hand, this function:
-
+```
+create function younger(Person p,Person q)->Boolean
+       as less(age(p),age(q));
+```
+will choose the resolvent `NUMBER.NUMBER.LESS->BOOLEAN`, since age returns integers and the resolvent `NUMBER.NUMBER.LESS->BOOLEAN` is applicable to integers by inheritance. The other function resolvent `CHARSTRING.CHARSTRING.LESS->BOOLEAN` does not qualify since it is not legal to apply to arguments of type Integer. On the other hand, this function:
+```
 create function nameordered(Person p,Person q)->Boolean
         as less(name(p),name(q));
-will choose the resolvent NUMBER.NUMBER.LESS->BOOLEAN since the function name() returns a string. In both cases the type resolution (selection of resolvent) will be done at compile time.
-Late binding
+```
+will choose the resolvent `NUMBER.NUMBER.LESS->BOOLEAN` since the function `name()` returns a string. In both cases the type resolution (selection of resolvent) will be done at compile time.
+
+#### Late binding
 
 Dynamic type resolution at run time, late binding, is done for REPL function calls to choose the correct resolvent. For example, the query
-less(1,2);
-will choose NUMBER.NUMBER.LESS->BOOLEAN based on the numeric types the the arguments.
+`less(1,2);` will choose `NUMBER.NUMBER.LESS->BOOLEAN` based on the numeric types the the arguments.
 
 Inside function definitions and queries there may be expressions requiring late bound overloaded functions. For example, suppose that managers are employees whose incomes are the sum of the income as a regular employee plus some manager bonus:
- create type Employee under Person;
- create type Manager under Employee;
- create function mgrbonus(Manager)->Integer as stored;
- create function income(Employee)->Integer as stored;
- create function income(Manager m)->Integer i
-        as income(cast(m as Employee)) + mgrbonus(m);
-Now, suppose that we need a function that returns the gross incomes of all persons in the database, i.e. we use MANAGER.INCOME->INTEGER for managers and EMPLOYEE.INCOME->INTEGER for non-manager. In sa.amos such a function is defined as:
 ```
- create function grossincomes()->Integer i
-        as select income(p)
-        from Employee p;
-        /* income(p) late bound */
+create type Employee under Person;
+create type Manager under Employee;
+create function mgrbonus(Manager)->Integer as stored;
+create function income(Employee)->Integer as stored;
+create function income(Manager m)->Integer i
+       as income(cast(m as Employee)) + mgrbonus(m);
 ```
-Since income is overloaded with resolvents EMPLOYEE.INCOME->INTEGER and MANAGER.INCOME->INTEGER and both qualify to apply to employees, the resolution of income(p) will be done at run time.
-To avoid the overhead of late binding one may use casting.
+Now, suppose that we need a function that returns the gross incomes of all persons in the database, i.e. we use `MANAGER.INCOME->INTEGER` for managers and `EMPLOYEE.INCOME->INTEGER` for non-manager. In sa.amos such a function is defined as:
+```
+create function grossincomes()->Integer i
+       as select income(p)
+       from Employee p;
+       /* income(p) late bound */
+```
+Since income is overloaded with resolvents `EMPLOYEE.INCOME->INTEGER` and `MANAGER.INCOME->INTEGER` and both qualify to apply to employees, the resolution of `income(p)` will be done at run time. To avoid the overhead of late binding one may use casting.
 
 Since the detection of the necessity of dynamic resolution is often at compile time, overloading a function name may lead to a cascading recompilation of functions defined in terms of that function name. For a more detailed presentation of the management of late bound functions see [FR95].
 
 #### Casting
 
 The type of an expression can be explicitly defined using the casting statement:
- casting ::= 'cast'(expr 'as' type-spec)
+```
+casting ::= 'cast'(expr 'as' type-spec)
+```
 for example
 ```
 create function income(Manager m)->Integer i
@@ -2038,7 +2101,7 @@ The following AmosQL system functions are available for inter-peer communication
    nameserver(Charstring name)->Charstring
 The function makes the current stand-alone database into a name server and registers there itself as a peer with the given name. If name is empty ("") the name server will become anonymous and not registered as a peer. It can be accessed under the peer name "NAMESERVER" through.
    listen()
-The function starts the peer listening loop. It informs the name server that this peer is ready to receive incoming messages. The listening loop can be interrupted with CTRL-C and resumed again by calling listen(). The name server must be listening before any other peer can register.
+The function starts the peer listening loop. It informs the name server that this peer is ready to receive incoming messages. The listening loop can be interrupted with `ctrl-c` and resumed again by calling listen(). The name server must be listening before any other peer can register.
 
    register(Charstring name)->Charstring
 The function registers in the name server the current stand-alone database as a peer with the given name.  The system will complain if the name is already registered in the name server.  The peer needs to be activated with listen() to be able to receive incoming requests. The name server must be running on the local host.
@@ -3090,63 +3153,82 @@ set of functions that should not be unloaded. Can be updated by user.
 
 
 ### Miscellaneous
-
+```
 apply(Function fn, Vector args) -> Bag of Vector r
+```
 calls the AmosQL function fn with elements in vector args as arguments and returns the result tuples as vectors.
-
+```
 evalv(Charstring stmt) -> Bag of Vector r
+```
 evaluates the AmosQL statement stmt and returns the result tuples as vectors.
-
+```
 error(Charstring msg) -> Boolean
+```
 prints an error message on the terminal and raises an exception. Transaction aborted.
+```
 output_lines(Number n) -> Number
-controls how many lines to print on standard output before prompting for more lines. By default the system prints the entire result of a query on standard output. The user can interrupt the printing by CTRL-C. However, when running under Emacs and Windows the CTRL-C method to terminate an output may not be effective. As an alternative to CTRL-C output_lines(n) causes the system to prompt for more output lines after n lines have been printed on standard output. output_lines(0) turns off output line control.
+```
+controls how many lines to print on standard output before prompting for more lines. By default the system prints the entire result of a query on standard output. The user can interrupt the printing by `ctrl-c`. However, when running under Emacs and Windows the `ctrl-c` method to terminate an output may not be effective. As an alternative to `ctrl-c` `output_lines(n)` causes the system to prompt for more output lines after n lines have been printed on standard output. output_lines(0) turns off output line control.
+```
 print(Object x) -> Boolean
-prints x. Always returns true. The printing is by default to the standard output (console) of the sa.amos server where print() is executed but can be redirected to a file by the function openwritefile:
+```
+prints x. Always returns true. The printing is by default to the standard output (console) of the sa.amos server where `print()` is executed but can be redirected to a file by the function openwritefile:
+```
 openwritefile(Charstring filename)->Boolean
-openwritefile() changes the output stream for print()  to the specified filename. The file is closed and output directed to standard output by calling closewritefile().
-
+```
+`openwritefile()` changes the output stream for `print()` to the specified filename. The file is closed and output directed to standard output by calling `closewritefile()`.
+```
 filedate(Charstring file) -> Date
+```
 returns the time for modification or creation of file.
-
+```
 amos_version() -> Charstring
+```
 returns string identifying the current version of Amos II.
+```
 quit;
+```
 quits Amos II.
-
+```
 exit;
+```
 returns to the program that called sa.amos if the system is embedded in some other system.
-Same as quit; for stand-alone Amos II.
-
+Same as `quit;` for stand-alone Amos II.
+```
 goovi();
-starts the multi-database browser GOOVI[CR01].
-This works only under JavaAmos.
+```
+starts the multi-database browser GOOVI[CR01]. This works only under JavaAmos.
+
 The redirect statement reads AmosQL statements from a file:
-
+```
 redirect-stmt ::= '<' string-constant
+```
 For example
+```
 < 'person.amosql';
-
+```
+```
 load_AmosQL(Charstring filename)->Charstring
+```
 loads a file containing AmosQL statements.
-
+```
 loadSystem(Charstring dir, Charstring filename)->Charstring
-loads a master file, filename, containing an AmosQL script defining a subsystem. The current directory is temporarily set to dir while loading. The file is not loaded if it was previously loaded into the database. To see what master files are currently loaded, call loadedSystems().
-
+```
+loads a master file, filename, containing an AmosQL script defining a subsystem. The current directory is temporarily set to dir while loading. The file is not loaded if it was previously loaded into the database. To see what master files are currently loaded, call `loadedSystems()`.
+```
 getenv(Charstring var)->Charstring value
+```
 retrieves the value of OS environment variable var. Generates an error of variable not set.
 
 The trace and untrace functions are used for tracing foreign function calls:
-```sh
+```
 trace(Function fno)->Bag of Function r
 trace(Charstring fn)->Bag of Function r
 untrace(Function fno)->Bag of Function r
 untrace(Charstring fn)->Bag of Function r
-```sh
-
+```
 If an overloaded functions is (un)traced it means that all its resolvents are (un)traced. Results are the foreign functions (un)traced. For example:
-
-```sh
+```
 Amos 2> trace("iota");
 #[OID 116 "INTEGER.INTEGER.IOTA->INTEGER"]
 Amos 2> iota(1,3);
@@ -3172,27 +3254,15 @@ Andrej Andrejev, Sobhan Badiozamany, Kristofer Cassel, Daniel Elin, Gustav Fahl,
 ## References
 
 [CR01] K.Cassel and T.Risch: An Object-Oriented Multi-Mediator Browser. Presented at 2nd International Workshop on User Interfaces to Data Intensive Systems, Zürich, Switzerland, May 31 - June 1, 2001
-
 [ER00] D.Elin and T. Risch: Amos II Java Interfaces,  Uppsala University, 2000.
-
 [FR95] S. Flodin and T. Risch, Processing Object-Oriented Queries with Invertible Late Bound Functions, Proc. VLDB Conf., Zürich, Switzerland, 1995.
-
 [FR97] G. Fahl and T. Risch: Query Processing over Object Views of Relational Data, The VLDB Journal , Vol. 6 No. 4, November 1997, pp 261-281.
-
 [JR99a] V.Josifovski, T.Risch: Functional Query Optimization over Object-Oriented Views for Data Integration Journal of Intelligent Information Systems (JIIS), Vol. 12, No. 2-3, 1999.
-
 [JR99b] V.Josifovski, T.Risch: Integrating Heterogeneous Overlapping Databases through Object-Oriented Transformations. In Proc. 25th Intl. Conf. On Very Large Databases, Edinburgh, Scotland, September 1999.
-
 [JR02] V.Josifovski, T.Risch: Query Decomposition for a Distributed Object-Oriented Mediator System . Distributed and Parallel Databases J., Kluwer, May 2002.
-
 [KJR03] T.Katchaounov, V.Josifovski, and T.Risch: Scalable View Expansion in a Peer Mediator System, Proc. 8th International Conference on Database Systems for Advanced Applications (DASFAA 2003), Kyoto, Japan, March 2003.
-
 [LR92] W.Litwin and T.Risch: Main Memory Oriented Optimization of OO Queries Using Typed Datalog with Foreign Predicates, IEEE Transactions on Knowledge and Data Engineering, Vol. 4, No. 6, December 1992 ( http://user.it.uu.se/~udbl/publ/tkde92.pdf).
-
 [Nas93] J.Näs: Randomized optimization of object oriented queries in a main memory database management system, MSc thesis, LiTH-IDA-Ex 9325 Linköping University 1993.
-
 [Ris12] T.Risch: Amos II C Interfaces, Uppsala University, 2012.
-
 [Ris06]T.Risch: ALisp v2 User's Guide, Uppsala University, 2006.
-
 [RJK03] T.Risch, V.Josifovski, and T.Katchaounov: Functional Data Integration in a Distributed Mediator System, in P.Gray, L.Kerschberg, P.King, and A.Poulovassilis (eds.): Functional Approach to Data Management - Modeling, Analyzing and Integrating Heterogeneous Data, Springer, ISBN 3-540-00375-4, 2003.
