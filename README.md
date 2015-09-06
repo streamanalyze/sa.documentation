@@ -326,16 +326,16 @@ vector-expr ::= '{' expr-comma-list '}'
 Collections represent sets of objects. Collections can be bags (type Bag), vectors (type Vector) or key/value pairs (type Record):
  Bags are unordered sets of objects with duplicates allowed. The value of a query is by default a bag. When a query returns a bag the elements of the bag are printed on separate lines, for example:
  ```
-  Amos 2> select name(p) from Person p;
-  "Bill"
-  "Carl"
-  "Adam"
+Amos 2> select name(p) from Person p;
+"Bill"
+"Carl"
+"Adam"
 ```
  Vectors are sequences of objects of any kind. Curly brackets {} enclose vector elements, for example:
 ```
-  Amos 1> set :v={1,2,3};
-  Amos 2> :v;
-  {1,2,3}
+Amos 1> set :v={1,2,3};
+Amos 2> :v;
+{1,2,3}
 ```
 ### Statements
 
@@ -1141,46 +1141,45 @@ Not every function is updatable. sa.amos defines a function to be updatable if i
   as select q where married(p,q);
 The user can declare explicit update rules for derived functions making also non-updatable functions updatable.
 
-2.5.1 Cardinality constraints
+#### Cardinality constraints
 
 A cardinality constraint is a system maintained restriction on the number of allowed occurrences in the database of an argument or result of a stored function. For example, a cardinality constraint can be that there at most one salary per person, while a person may have any number of children. The cardinality constraints are normally specified by the result part of a stored function's signature.
 
 For example, the following restricts each person to have one salary while many children are allowed:
-
-   create function salary(Person p) -> Charstring nm as stored;
-   create function children(Person p) -> Bag of Person c as stored;
-
-The system will restrict database updates so that the cardinality constraints are not violated.  For the function salary() an error is raised if one tries to make a person have two salaries when updating it with the add statement, while there is no such restriction on children(). If the cardinality constraint is violated by a database update the following error message is printed:
-
-   Update would violate upper object participation (updating function ...)
+```
+create function salary(Person p) -> Charstring nm as stored;
+create function children(Person p) -> Bag of Person c as stored;
+```
+The system will restrict database updates so that the cardinality constraints are not violated.  For the function `salary()` an error is raised if one tries to make a person have two salaries when updating it with the add statement, while there is no such restriction on children(). If the cardinality constraint is violated by a database update the following error message is printed: `Update would violate upper object participation (updating function ...)`
 
 In general one can maintain four kinds of cardinality constraints for a function modeling a relationship between types, many-one, many-many, one-one, and one-many:
-many-one is the default when defining a stored function as in salary().
+many-one is the default when defining a stored function as in `salary()`.
 
-many-many is specified by prefixing the result type specification with 'Bag of' as in children().
+many-many is specified by prefixing the result type specification with 'Bag of' as in `children()`.
 
 one-one is specified by suffixing a result variable with 'key'
 For example:
-   create function name(Person p) -> Charstring nm key as stored;
+```
+create function name(Person p) -> Charstring nm key as stored;
+```
 will guarantee that a person's name is unique.
 
 one-many is normally represented by the inverse function. For example, suppose we want to represent the one-many relationship between types Department and Employee, there can be many employees for a given department but only one department for a given employee. The recommended way is to define the function:
-
-  create function department(Employee e) -> Department d as stored;
-
+```
+create function department(Employee e) -> Department d as stored;
+```
 The inverse function can then be defined as a derived function:
-
-  create function employees(Department d) -> Bag of Employee e
-    as select e where department(e) = d;
+```
+create function employees(Department d) -> Bag of Employee e
+  as select e where department(e) = d;
+```
 
 Inverse functions are updatable.
 Any variable in a stored function can be specified as key, which will restrict the updates the stored functions to maintain key uniqueness for the argument or result of the stored function. For example, the cardinality constraints on the following function distance() prohibits more than one distance between two cities:
-
-  create function distance(City x key, City y  key) ->  Integer d as stored;
-
+```
+create function distance(City x key, City y  key) ->  Integer d as stored;
+```
 Cardinality constraints can also be specified for foreign functions. These are important for optimizing queries involving foreign functions. However, it is up to the foreign function implementor to guarantee that specified cardinality constraints hold.
-
-
 
 #### Changing object types dynamically
 
