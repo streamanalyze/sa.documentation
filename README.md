@@ -1,11 +1,7 @@
 ---
-title: 'Amos II Release 18 User''s Manual'
-...
-
---- title: sa.amos user manual | Stream Analyze description: sa.amos
-documentation. hidden: true ---
-
-&lt;%= partial 'includes/google\_tag\_manager' if build? %&gt;
+title: 'sa.amos user manual'
+description: 'Read the sa.amos user manual'
+---
 
 +--------------------------------------+--------------------------------------+
 | \                                    | [&lt;%= image\_tag                   |
