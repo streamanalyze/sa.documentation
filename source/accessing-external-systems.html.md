@@ -1,84 +1,52 @@
 # Accessing external systems
 
-This chapter first describes multi-directional foreign functions
-[\[LR92\]](#LR92), the basis for accessing external systems from Amos II
-queries. Then we describe how to query relational databases through Amos
-II. Finally some general types and functions used for defining wrappers
-of external sources are described.
+This chapter first describes multi-directional foreign functions [\[LR92\]](#LR92), the basis for accessing external systems from sa.amos queries. Then we describe how to query relational databases through sa.amos. Finally some general types and functions used for defining wrappers of external sources are described.
 
-Amos II provides a number of primitives for accessing different external
-data sources by defining *wrappers* for each kind external sources. A
-wrapper is a software module for making it possible to query an external
-data source using AmosQL. The basic wrapper interface is based on user
-defined <span style="font-style: italic;">multi-directional</span>
-foreign functions having various <span
-style="font-style: italic;">capabilities</span> used to access external
-data sources in different ways [\[LR92\]](#LR92) depending on what
-variables are bound or free in an execution plan, the <span
-style="font-style:
-          italic;">binding patterns</span>. On top of the basic foreign
-function mechanism object oriented abstractions are defined through
-<span style="font-style: italic;">mapped types</span> [\[FR97\]](#FR97).
-A number of important query rewrite techniques used in the system for
-scalable access to wrapped sources, in particular relational databases,
-are described in [\[FR97\]](#FR97). Rewrites for handling scalable
-execution of queries involving late bound function calls are described
-in [\[FR95\]](#FR95). Multi-database views are further described
-in [\[JR99a\]](#JR99a)[\[JR99b\]](#JR99b). The distributed query
-decomposer is described in [\[JR02\]](#JR02) and [\[RJK03\]](#KJR03).\
+sa.amos provides a number of primitives for accessing different external data sources by defining *wrappers* for each kind external sources. A wrapper is a software module for making it possible to query an external data source using AmosQL. The basic wrapper interface is based on user defined *multi-directional* foreign functions having various capabilities used to access external data sources in different ways [\[LR92\]](#LR92) depending on what variables are bound or free in an execution plan, the *binding patterns*. On top of the basic foreign function mechanism object oriented abstractions are defined through *mapped types* [\[FR97\]](#FR97). A number of important query rewrite techniques used in the system for scalable access to wrapped sources, in particular relational databases, are described in [\[FR97\]](#FR97). Rewrites for handling scalable execution of queries involving late bound function calls are described in [\[FR95\]](#FR95). Multi-database views are further described in [\[JR99a\]](#JR99a)[\[JR99b\]](#JR99b). The distributed query decomposer is described in [\[JR02\]](#JR02) and [\[RJK03\]](#KJR03).
 
-A general wrapper for [relational databases](#relational) using JDBC is
-predefined in Amos II.
+A general wrapper for [relational databases](#relational) using JDBC is predefined in sa.amos.
 
-6.1 Foreign and multi-directional functions
+## Foreign and multi-directional functions
 -------------------------------------------
 
-The basis for accessing external systems from Amos II is to define <span
-style="font-style: italic;">foreign functions</span>. A foreign function
-allows subroutines defined in C/C++ [\[Ris12\]](#Ris00a), Lisp
-[\[Ris06\]](#Ris00b), or Java [\[ER00\]](#ER00) to be called from Amos
-II queries. This allows access to external databases, storage managers,
-or computational libraries. A foreign function is defined by the
-following [function implementation](#fn-implementation):\
-\
+The basis for accessing external systems from sa.amos is to define *foreign functions*. A foreign function allows subroutines defined in C/C++ [\[Ris12\]](#Ris00a), Lisp [\[Ris06\]](#Ris00b), or Java [\[ER00\]](#ER00) to be called from sa.amos queries. This allows access to external databases, storage managers, or computational libraries. A foreign function is defined by the following [function implementation](#fn-implementation):
 
-`         foreign-body ::= simple-foreign-definition | multidirectional-definition                           simple-foreign-body ::= 'foreign' [string-constant]                           multidirectional-definition ::= 'multidirectional' capability-list                           capability ::= (binding-pattern 'foreign' `
-`string-constant       ` `['cost' cost-spec]['rewriter' `
-`string-constant` `])                           binding-pattern ::= `A
-string constant containing 'b':s <span style="font-family:
-      Times New Roman;"> and </span>'f':s <span style="font-family:
-      Times New Roman;">
-`                   cost-number ::= integer-constant | real-constant                   cost-spec ::= function-name | '{' cost-number ',' cost-number '}'                         `
-<span style="font-family: times new roman;">  For example: </span>
-`                     create function iota(Integer l, Integer u) -> Bag of Integer              as foreign 'iota--+';                              create function sqroots(Number x)-> Bag of Number r              as multidirectional                 ("bf" foreign 'sqrts' cost {2,2})                 ("fb" foreign 'square' cost {1.2,1});            create function bk_access(Integer handle_id )->(Vector  key, Vector)                 /* Access rows in BerkeleyDB table */                                  as multidirectional                 ('bff' foreign 'bk_scan' cost bk_cost rewriter 'abkw')                 ('bbf' foreign 'bk_get' cost {1002, 1});            create function myabs(real x)->real y              as multidirectional                 ("bf" foreign "JAVA:Foreign/absbf" cost {2,1})                 ("fb" foreign "JAVA:Foreign/absfb" cost {4,2});                `\
- The syntax using [multidirectional definition](#multidirectional)
-provides for specifying different implementations of foreign functions
-depending on what variables are known for a call to the function in a
-query execution plan, which is called different [<span
-style="font-style:
-          italic;">binding patterns</span>](#binding-pattern). The
-simplified syntax using [simple-foreign-body](#simple-foreign) is mainly
-for quick implementations of functions without paying attention to
-different implementations based on different binding patterns.\
-\
- A foreign function can implement one of the following:\
- </span>
+```
+foreign-body ::= simple-foreign-definition | multidirectional-definition
+simple-foreign-body ::= 'foreign' [string-constant]
+multidirectional-definition ::= 'multidirectional' capability-list
+capability ::= (binding-pattern 'foreign' string-constant ['cost' cost-spec]['rewriter' string-constant ])
+binding-pattern ::= A string constant containing 'b':s and 'f':s
+cost-number ::= integer-constant | real-constant
+cost-spec ::= function-name | '{' cost-number ',' cost-number '}'
+```
 
-1.  A <span style="font-style: italic;"> filter </span>which is a
-    predicate, indicated by a foreign function whose result is of type
-    <span style="font-style: italic;">Boolean</span>, e.g. '&lt;', that
-    succeeds when certain conditions over its results are satisfied.
-2.  A <span style="font-style: italic;"> computation </span>that
-    produces a result given that the arguments are known, e.g. + or
-    <span style="font-family: monospace;">sqrt</span>. Such a function
-    has no argument nor result of type <span
-    style="font-style: italic;">Bag</span>.\
-3.  A <span style="font-style: italic;"> generator </span>that has a
-    result of type <span style="font-style: italic;">Bag</span>. It
-    produces the result as a bag by generating a stream of several 
-    result tuples given the argument tuple, e.g. [iota()](#iota) or the
-    function sending SQL statements to a relational database for
-    evaluation where the result is a bag of tuples.
+For example:
+
+```sql
+create function iota(Integer l, Integer u) -> Bag of Integer
+  as foreign 'iota--+';
+
+create function sqroots(Number x)-> Bag of Number r
+  as multidirectional
+        ("bf" foreign 'sqrts' cost {2,2})
+        ("fb" foreign 'square' cost {1.2,1});
+create function bk_access(Integer handle_id )->(Vector  key, Vector)
+     /* Access rows in BerkeleyDB table */                
+  as multidirectional
+    ('bff' foreign 'bk_scan' cost bk_cost rewriter 'abkw')
+    ('bbf' foreign 'bk_get' cost {1002, 1});
+create function myabs(real x)->real y
+    as multidirectional
+      ("bf" foreign "JAVA:Foreign/absbf" cost {2,1})
+      ("fb" foreign "JAVA:Foreign/absfb" cost {4,2});
+```
+
+ The syntax using [multidirectional definition](#multidirectional) provides for specifying different implementations of foreign functions depending on what variables are known for a call to the function in a query execution plan, which is called different [binding patterns](#binding-pattern). The simplified syntax using [simple-foreign-body](#simple-foreign) is mainly for quick implementations of functions without paying attention to different implementations based on different binding patterns. A foreign function can implement one of the following:
+
+1.  A `filter` which is a predicate, indicated by a foreign function whose result is of type `Boolean`, e.g. `<`, that succeeds when certain conditions over its results are satisfied.
+2.  A computation that produces a result given that the arguments are known, e.g. `+` or `sqrt`. Such a function has no argument nor result of type `Bag`.
+3.  A `generator` that has a result of type `Bag`. It produces the result as a bag by generating a stream of several  result tuples given the argument tuple, e.g. [`iota()`](#iota) or the function sending SQL statements to a relational database for evaluation where the result is a bag of tuples.
 4.  An <span style="font-style: italic;">aggregate function</span> has
     one argument of type <span style="font-style: italic;">Bag</span>
     but not result of type <span style="font-style: italic;">Bag</span>.
@@ -92,7 +60,7 @@ different implementations based on different binding patterns.\
     bags to form a new bag. For example, basic join operators can be
     defined as combiners.\
 
-Amos II functions in general are <span style="font-style:
+sa.amos functions in general are <span style="font-style:
         italic;">multi-directional</span>. A multi-directional function
 can be executed also when the result of a function is given and some
 corresponding argument values are sought. For example, if we have a
@@ -109,7 +77,7 @@ we can ask these AmosQL queries:\
                     /* Result is bag of children of :p */ 
 
 It is often desirable to make <span
-style="font-style: italic;">foreign</span> Amos II functions
+style="font-style: italic;">foreign</span> sa.amos functions
 multi-directional as well. As a very simple example, we may wish to ask
 these queries using the square root function <span
 style="font-family: monospace;">sqroots</span> above:\
@@ -187,7 +155,7 @@ style="font-family: monospace;">"bf"</span> for the square root and
     the kernel by calling the function
     *load\_extension("name-of-extension")*. There is an example of a
     Visual Studio project (Windows) files or a Makefile (Unix) in folder
-    *demo* of the downloaded Amos II version.\
+    *demo* of the downloaded sa.amos version.\
 3.  The exported initializer named xxx of the DLL/shared library
     extension must assign a <span style="font-style: italic;">symbolic
     name </span> to the foreign C functions which is referenced in the
@@ -295,7 +263,7 @@ have associated *costs* and *fanouts*:\
 
 The cost and fanout for a multi-directional foreign function
 implementation can be either specified as a constant vector of two
-numbers (as in *sqroots()*) or as an Amos II <span
+numbers (as in *sqroots()*) or as an sa.amos <span
 style="font-style: italic;">cost function </span>returning the vector of
 cost and fanout for a given function call. The numbers normally need
 only be rough numbers, as they are used by the query optimizer to
@@ -319,7 +287,7 @@ functions you are strongly advised to specify cost and fanout
 estimates.\
 \
  The cost function <span style="font-family: monospace;">cfn</span> is
-an Amos II function with signature\
+an sa.amos function with signature\
  </span>
 
     create function <cfn>(Function f, Vector bpat, Vector args) 
@@ -342,7 +310,7 @@ needs the cost and fanout of a function call in some query. The
 arguments and results of the cost function are:\
 \
  <span style="font-family: monospace;">f</span>       is the full name
-the called Amos II function.\
+the called sa.amos function.\
  <span style="font-family: monospace;">bpat</span> is the binding
 pattern of the call as a [vector](#vector) of strings 'b' and 'f', e.g.
 {"f","b"} indicating which arguments in the call are bound or free,
@@ -363,7 +331,7 @@ will try some other capability or execution strategy.\
  The costs and fanouts are normally specified as part of the capability
 specifications for a multi-directional foreign function definition, as
 in the example. The costs can also be specified after the definition of
-a foreign function by using the following Amos II system function:\
+a foreign function by using the following sa.amos system function:\
 
      costhint(Charstring fn,Charstring bpat,Vector ch)->Boolean 
 
@@ -395,7 +363,7 @@ use:\
  It returns the cost estimates for resolvent *r* and their associated
 binding patterns.\
 \
- To obtain the estimated cost of executing an Amos II  function <span
+ To obtain the estimated cost of executing an sa.amos  function <span
 style="font-style: italic;">f</span> for a given binding pattern <span
 style="font-style: italic;">bp</span>, use\
 
@@ -703,7 +671,7 @@ residing in a relational database. Once the view has been defined the
 contents of the database can be used in AmosQL queries without any
 explicit calls to SQL.\
 \
- To regard a relational table as an Amos II type use:\
+ To regard a relational table as an sa.amos type use:\
 
      import_table(Relational r, Charstring table_name) -> Mapped_type
 
@@ -716,7 +684,7 @@ whose extent is defined by the rows of the table. Each instance of the
 mapped type corresponds to a row in the table. The name of the mapped
 type is constructed by concatenating the table name, the character `_`
 and the data source name, for example *Person\_db1*. Mapped type names
-are internally capitalized, as for other Amos II types.\
+are internally capitalized, as for other sa.amos types.\
 
 For each columns in the mapped relational database table
 *import\_table()* will generate a corresponding derived *wrapper
@@ -772,7 +740,7 @@ the desired name of the mapped type created, as alternative to the
 system generated concatenation of table and data source name. ``The
 parameter *updatable* gives an updatable mapped type. The parameter
 *supertypes``* is a [vector](#vector) of either type names or type
-objects, or a mixture of both. The effect is that Amos II will perceive
+objects, or a mixture of both. The effect is that sa.amos will perceive
 the mapped type as an immediate subtype of the supertypes.\
 
 There are also two other variants of *import\_table()*  <span
@@ -895,17 +863,17 @@ result can be generated, i.e. composite foreign keys are not supported.\
 Wrappers make data sources queryable. Some wrapper functionality is
 completely data source independent while other functionality is specific
 for a particular kind of data source. Therefore, to share wrapper
-functionality Amos II contains a type hierarchy of wrappers. In this
+functionality sa.amos contains a type hierarchy of wrappers. In this
 section we describe common functionality used for defining any kind of
 wrapper.\
 
 ### 6.3.1 Data sources
 
 Objects of type *Datasource* describe properties of different kinds of
-data sources accessible through Amos II. A wrapper interfacing a
+data sources accessible through sa.amos. A wrapper interfacing a
 particular external data manager is defined as a subtype of
 *Datasource*. For example, the types *Amos*, *Relational*, and *Jdbc*
-define interfaces to Amos II peers, relational databases, and relational
+define interfaces to sa.amos peers, relational databases, and relational
 data bases accessed through JDBC, respectively. These types are all
 subtypes of type *Datasource*. Each *instance* of a data source type
 represents a particular database of that kind, e.g. a particular
@@ -962,7 +930,7 @@ e.g.:\
 ### 6.3.3 Type translation
 
 Types in a specific data source are translated to corresponding types in
-Amos II using the following system functions:
+sa.amos using the following system functions:
 
 -   amos_type(Datasource ds, Charstring native_type_name) -> Type;
 
@@ -976,7 +944,7 @@ Amos II using the following system functions:
 
 
 
-The most common relational types *and* their Amos II counterparts are
+The most common relational types *and* their sa.amos counterparts are
 provided by default. Both functions are stored functions that can be
 updated as desired for future wrappers. <span
 style="font-family: Times New Roman;">\
