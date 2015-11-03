@@ -29,7 +29,7 @@ In all of the above cases, reach out to our support team at support@streamanalyz
 *This file was taken from https://github.com/middleman/middleman-heroku/blob/master/CONTRIBUTING.md and extended for use with the sa.amos/sa.engine documentation*
 
 [free-sw]: http://www.fsf.org/licensing/essays/free-sw.html
-[issues]: https://github.com/streamanalyze/documentation/issues
+[issues]: https://github.com/streamanalyze/sa.documentation/issues
 [gist]: https://gist.github.com/
 [fork]: http://help.github.com/fork-a-repo/
 [branch]: https://github.com/blog/1377-create-and-delete-branches
