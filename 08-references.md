@@ -1,5 +1,5 @@
-8 References
-============
+## References
+
 
 \[CR01\]K.Cassel and T.Risch: [An Object-Oriented Multi-Mediator
 Browser](http://www.it.uu.se/research/group/udbl/publ/goovipaper3.pdf%20).

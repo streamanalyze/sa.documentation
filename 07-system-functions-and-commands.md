@@ -1,8 +1,7 @@
-7 System functions and commands
-===============================
+## System functions and commands
 
-7.1 Comparison operators\
--------------------------
+
+### Comparison operators
 
 The built-in, infix comparison operators are: 
 
@@ -24,95 +23,68 @@ another object denotes set membership of that object. The comparison
 functions can be [overloaded](#overloaded-functions) for user defined
 types. 
 
-<span style="font-family: Times New Roman;"> </span>
-----------------------------------------------------
 
-7.2 Arithmetic functions
+## Arithmetic functions
 
-<span style="font-family: Times New Roman;"> </span>
-
+```
     abs(Number x) -> Number y
-
     div(Number x, Number y)   -> Number z Infix operator /
-
     max(Object x, Object y)   -> Object z
-
     minus(Number x, Number y) -> Number z Infix operator - 
-
     mod(Number x, Number y) -> Number z
-
     plus(Number x, Number y)  -> Number z Infix operator +
-
     times(Number x, Number y) -> Number z Infix operator * 
-
-    power(Number x, Number y) -> Number z Infix operator ^ 
-
-
-
-
-
-
-            iota(Integer l, Integer u)-> Bag of Integer z
-
+    power(Number x, Number y) -> Number z Infix operator ^
+    iota(Integer l, Integer u)-> Bag of Integer z
     sqrt(Number x) -> Number z
-
     integer(Number x) -> Integer i Round
             x to nearest integer
-
     real(Number x) -> Real r Convert x to real number
-
     roundto(Number x, Integer d) -> Number Round
             x to
             d decimals
-
     log10(Number x) -> Real y
+```
 
 
 
+*iota()* constructs a bag of integers between `l`and `u`. For example, to execute n times the AmosQL statement `print(1)`do: 
 
-*iota()* constructs a bag of integers between <span
-style="font-style: italic;">l</span> and <span
-style="font-style: italic;">u</span>. \
- For example, to execute n times the AmosQL statement 'print(1)' do: 
+```sql
+for each Integer i where i in iota(1,n) 
+         print(1);
+```
 
-    for each Integer i where i in iota(1,n) 
+### String functions
 
-            print(1);
+String concatenation is made using the `+` operator, e.g.
+`"ab" + "cd" + "ef";` returns `"abcdef"          
+"ab"+12+"de";` returns `"ab12de"
+1+2+"ab";` is illegal since the first argument of '+' must be a string.
+`"ab"+1+2;` returns `"ab12"` since `+` is left associative.
 
-<span style="font-family: Times New Roman;"> </span>
-----------------------------------------------------
+`char_length(Charstring)->Integer`
 
-7.3 String functions
+ Count the number of characters in string.
 
-<span style="font-family: Times New Roman;"> String concatenation is
-made using the '+' operator, e.g.\
- `"ab" + "cd" + "ef";`  returns
-`"abcdef"          "ab"+12+"de"; `returns
-`"ab12de"          1+2+"ab"; `is illegal since the first argument of '+'
-must be a string. `          "ab"+1+2; `returns `"ab12"` since '+' is
-left associative.\
-\
- `char_length(Charstring)->Integer`\
- Count the number of characters in string.</span>\
- <span style="font-family: Times New Roman;"> <span
-style="font-family: Times New Roman;">\
- `like(Charstring string, Charstring pattern) -> Boolean`\
- Test if string matches regular expression pattern where '\*' matches
-sequence of characters and '?' matches single character. For example:\
- `like("abc","??c")` returns TRUE\
- `like("ac","a*c")` returns TRUE\
- `like("ac","a?c")` fails\
- `like("abc","a[bd][dc]");` returns TRUE\
- `like("abc","a[bd][de]");` fails\
-\
+`like(Charstring string, Charstring pattern) -> Boolean`
+
+Test if string matches regular expression pattern where '\*' matches
+sequence of characters and '?' matches single character. For example:
+ `like("abc","??c")` returns TRUE
+ `like("ac","a*c")` returns TRUE
+ `like("ac","a?c")` fails
+ `like("abc","a[bd][dc]");` returns TRUE
+ `like("abc","a[bd][de]");` fails
+
  `like_i(Charstring string, Charstring pattern) -> Boolean`\
  Case insensitive *like()*
-`.                       locate(Charstring substr, Charstring str) -> Integer                    `The
-position of the first occurrence of substring *substr* in string *str.*\
-\
- <span style="font-family: monospace;"></span> </span>
-`lower(Charstring str)->Charstring         `\
- Lowercase string.\
+`.                       locate(Charstring substr, Charstring str) -> Integer`
+
+The position of the first occurrence of substring *substr* in string *str.*
+
+`lower(Charstring str)->Charstring`
+ Lowercase string.
  </span>\
  `ltrim(` `Charstring chars, Charstring str) -> Charstring     `\
  Remove characters in *chars* from beginning of *str*.\
