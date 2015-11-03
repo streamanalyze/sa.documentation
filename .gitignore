@@ -14,3 +14,17 @@ _book
 *.epub
 *.mobi
 *.pdf
+
+
+# Middleman Rules
+
+.bundle
+vendor/gems
+.DS_Store
+.mm-pid-*
+.rbenv-version
+.ruby-version
+.rvmrc
+.sass-cache
+bin
+build

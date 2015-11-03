@@ -9,10 +9,10 @@ See our [contributing guidelines](CONTRIBUTING.md) and our [code of conduct](COD
 Clone the repository, install needed gems and run Jekyll
 
 ```bash
-git clone git@github.com:codeship/documentation.git
+git clone git@github.com:streamanalyze/sa.documentation.git
 cd documentation
 bundle install
-bundle exec jekyll serve
+bundle exec middleman
 ```
 
-You can then access the site at [http://localhost:4000](http://localhost:4000)
+You can then access the site at [http://localhost:4567](http://localhost:4567)

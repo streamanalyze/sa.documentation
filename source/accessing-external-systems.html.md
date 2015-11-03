@@ -1,10 +1,6 @@
-6 Accessing external systems
-============================
+# Accessing external systems
 
-<span style="font-family: Times New Roman;"> </span>
-
-This chapter first describes <span style="font-style:
-          italic;">multi-directional foreign functions</span>
+This chapter first describes multi-directional foreign functions
 [\[LR92\]](#LR92), the basis for accessing external systems from Amos II
 queries. Then we describe how to query relational databases through Amos
 II. Finally some general types and functions used for defining wrappers
