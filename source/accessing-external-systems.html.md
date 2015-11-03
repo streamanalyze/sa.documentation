@@ -1,15 +1,15 @@
 # Accessing external systems
 
-This chapter first describes multi-directional foreign functions [\[LR92\]](#LR92), the basis for accessing external systems from sa.amos queries. Then we describe how to query relational databases through sa.amos. Finally some general types and functions used for defining wrappers of external sources are described.
+This chapter first describes multi-directional foreign functions[^LR92], the basis for accessing external systems from sa.amos queries. Then we describe how to query relational databases through sa.amos. Finally some general types and functions used for defining wrappers of external sources are described.
 
-sa.amos provides a number of primitives for accessing different external data sources by defining *wrappers* for each kind external sources. A wrapper is a software module for making it possible to query an external data source using AmosQL. The basic wrapper interface is based on user defined *multi-directional* foreign functions having various capabilities used to access external data sources in different ways [\[LR92\]](#LR92) depending on what variables are bound or free in an execution plan, the *binding patterns*. On top of the basic foreign function mechanism object oriented abstractions are defined through *mapped types* [\[FR97\]](#FR97). A number of important query rewrite techniques used in the system for scalable access to wrapped sources, in particular relational databases, are described in [\[FR97\]](#FR97). Rewrites for handling scalable execution of queries involving late bound function calls are described in [\[FR95\]](#FR95). Multi-database views are further described in [\[JR99a\]](#JR99a)[\[JR99b\]](#JR99b). The distributed query decomposer is described in [\[JR02\]](#JR02) and [\[RJK03\]](#KJR03).
+sa.amos provides a number of primitives for accessing different external data sources by defining *wrappers* for each kind external sources. A wrapper is a software module for making it possible to query an external data source using AmosQL. The basic wrapper interface is based on user defined *multi-directional* foreign functions having various capabilities used to access external data sources in different ways[^LR92] depending on what variables are bound or free in an execution plan, the *binding patterns*. On top of the basic foreign function mechanism object oriented abstractions are defined through *mapped types* [^FR97]. A number of important query rewrite techniques used in the system for scalable access to wrapped sources, in particular relational databases, are described in [^FR97]. Rewrites for handling scalable execution of queries involving late bound function calls are described in [^FR95]. Multi-database views are further described in [^JR99a] [^JR99b]. The distributed query decomposer is described in [^JR02] and [^RJK03].
 
 A general wrapper for [relational databases](#relational) using JDBC is predefined in sa.amos.
 
 ## Foreign and multi-directional functions
 -------------------------------------------
 
-The basis for accessing external systems from sa.amos is to define *foreign functions*. A foreign function allows subroutines defined in C/C++ [\[Ris12\]](#Ris00a), Lisp [\[Ris06\]](#Ris00b), or Java [\[ER00\]](#ER00) to be called from sa.amos queries. This allows access to external databases, storage managers, or computational libraries. A foreign function is defined by the following [function implementation](#fn-implementation):
+The basis for accessing external systems from sa.amos is to define *foreign functions*. A foreign function allows subroutines defined in C/C++ [^Ris12], Lisp [^Ris06], or Java [^ER00] to be called from sa.amos queries. This allows access to external databases, storage managers, or computational libraries. A foreign function is defined by the following [function implementation](#fn-implementation):
 
 ```
 foreign-body ::= simple-foreign-definition | multidirectional-definition
@@ -44,118 +44,54 @@ create function myabs(real x)->real y
 
  The syntax using [multidirectional definition](#multidirectional) provides for specifying different implementations of foreign functions depending on what variables are known for a call to the function in a query execution plan, which is called different [binding patterns](#binding-pattern). The simplified syntax using [simple-foreign-body](#simple-foreign) is mainly for quick implementations of functions without paying attention to different implementations based on different binding patterns. A foreign function can implement one of the following:
 
-1.  A `filter` which is a predicate, indicated by a foreign function whose result is of type `Boolean`, e.g. `<`, that succeeds when certain conditions over its results are satisfied.
-2.  A computation that produces a result given that the arguments are known, e.g. `+` or `sqrt`. Such a function has no argument nor result of type `Bag`.
-3.  A `generator` that has a result of type `Bag`. It produces the result as a bag by generating a stream of several  result tuples given the argument tuple, e.g. [`iota()`](#iota) or the function sending SQL statements to a relational database for evaluation where the result is a bag of tuples.
-4.  An <span style="font-style: italic;">aggregate function</span> has
-    one argument of type <span style="font-style: italic;">Bag</span>
-    but not result of type <span style="font-style: italic;">Bag</span>.
-    It iterates over the bag argument to compute some aggregate value
-    over the bag, e.g. <span
-    style="font-style: italic;">average()</span>.
-5.  A <span style="font-style: italic;">combiner has</span> has both one
-    or several arguments of type <span
-    style="font-style: italic;">Bag</span> and some result of type <span
-    style="font-style: italic;">Bag</span>. It combines one or several
-    bags to form a new bag. For example, basic join operators can be
-    defined as combiners.\
+1.  A *filter* which is a predicate, indicated by a foreign function whose result is of type `Boolean`, e.g. `<`, that succeeds when certain conditions over its results are satisfied.
+2.  A *computation* that produces a result given that the arguments are known, e.g. `+` or `sqrt`. Such a function has no argument nor result of type `Bag`.
+3.  A *generator* that has a result of type `Bag`. It produces the result as a bag by generating a stream of several  result tuples given the argument tuple, e.g. [`iota()`](#iota) or the function sending SQL statements to a relational database for evaluation where the result is a bag of tuples.
+4.  An *aggregate function* has one argument of type `Bag` but not result of type `Bag`. It iterates over the bag argument to compute some aggregate value over the bag, e.g. `average()`.
+5.  A *combiner* has both one or several arguments of type `Bag` and some result of type `Bag`. It combines one or several bags to form a new bag. For example, basic join operators can be defined as combiners.
 
-sa.amos functions in general are <span style="font-style:
-        italic;">multi-directional</span>. A multi-directional function
-can be executed also when the result of a function is given and some
-corresponding argument values are sought. For example, if we have a
-function\
+sa.amos functions in general are *multi-directional*. A multi-directional function can be executed also when the result of a function is given and some corresponding argument values are sought. For example, if we have a function.
 
-        parents(Person)-> Bag of Person
+```sql
+parents(Person)-> Bag of Person
+```
 
-we can ask these AmosQL queries:\
+we can ask these AmosQL queries:
 
-     parents(:p);  /* Result is the bag of parents of :p */
+```sql
+parents(:p); 
+/* Result is the bag of parents of :p */
+select c from Person c where :p in parents(c);
+/* Result is bag of children of :p */ 
+```
 
-     select c from Person c where :p in parents(c);
+It is often desirable to make foreign sa.amos functions multi-directional as well. As a very simple example, we may wish to ask these queries using the square root function `sqroots`:
 
-                    /* Result is bag of children of :p */ 
+```sql
+sqroots(4.0);
+/* Result is -2.0 and 2.0 */
+select x from Number x where sqroots(x)=4.0;
+/* result is 16.0 */
+sqroots(4.0)=2.0;
+/* Is the square root of 4 = 2 */
+```
 
-It is often desirable to make <span
-style="font-style: italic;">foreign</span> sa.amos functions
-multi-directional as well. As a very simple example, we may wish to ask
-these queries using the square root function <span
-style="font-family: monospace;">sqroots</span> above:\
+With [simple foreign functions](#simple-foreign) only the forward (non-inverse) function call is possible. Multi-directional foreign functions permit also the inverse to be called in queries.
 
-     sqroots(4.0);    /* Result is -2.0 and 2.0 */
+The benefit of multi-directional foreign functions is that a larger class of queries calling the function is executable, and that the system can make better query optimization. A multi-directional foreign function can have several [capabilities](#capability) implemented depending on the *binding pattern* of its arguments and results. The binding pattern is a string of b:s and f:s, indicating which arguments or results in a given situation are known or unknown, respectively.
 
-     select x from Number x where sqroots(x)=4.0;
+For example, `sqroots()` has the following possible binding patterns:
 
-                    /* result is 16.0 *
+1. If we know x but not r, the binding pattern is "bf" and the implementation should return r as the square root of x.
+2. If we know r but not x, the binding pattern in "fb" and the implementation should return x as r**2.
+3. If we know both r and x then the binding pattern is "bb" and the implementation should check that x = r**2.
 
-     sqroots(4.0)=2.0;
+Case 1 and 2 are implemented by multi-directional foreign function `sqroots()`. Case 3 need not be implemented as it is inferred by the system by first executing `r**2` and then checking that the result is equal to `x` (see [\[LR92\]](#LR92)).
 
-     /* Is the square root of 4 = 2 */
+To implement a multi-directional foreign function you first need to think of which binding patterns require implementations. In the `sqroots()` case one implementation handles the square root and the other one handles the square. The binding patterns will be `"bf"` for the square root and `"fb"` for the square. The following steps are required to define a foreign function:
 
-
-
-
-With [simple foreign functions](#simple-foreign) only the forward
-(non-inverse) function call is possible. Multi-directional foreign
-functions permit also the inverse to be called in queries.\
-\
- The benefit of multi-directional foreign functions is that a larger
-class of queries calling the function is executable, and that the system
-can make better query optimization. A multi-directional foreign function
-can have several [capabilities](#capability) implemented depending on
-the <span style="font-style: italic;">binding pattern</span> of its
-arguments and results. The binding pattern is a string of b:s and f:s,
-indicating which arguments or results in a given situation are known or
-unknown, respectively.\
-\
- For example, *sqroots()* has the following possible binding patterns:\
-\
- (1) If we know <span style="font-family: monospace;">x</span> but not
-<span style="font-family: monospace;">r</span>, the binding pattern is
-<span style="font-family: monospace;">"bf"</span> and the implementation
-should return <span style="font-family:
-        monospace;">r</span> as the square root of <span
-style="font-family: monospace;">x</span>.\
- (2) If we know <span style="font-family: monospace;">r</span> but not
-<span style="font-family: monospace;">x</span>, the binding pattern in
-<span style="font-family: monospace;">"fb"</span> and the implementation
-should return <span style="font-family:
-        monospace;">x</span> as <span
-style="font-family: monospace;">r\*\*2</span>.\
- (3) If we know both <span style="font-family: monospace;">r</span> and
-<span style="font-family: monospace;">x</span> then the binding pattern
-is <span style="font-family: monospace;">"bb"</span> and the
-implementation should check that <span style="font-family: monospace;">x
-= r\*\*2</span>.\
-  \
- Case (1) and (2) are implemented by multi-directional foreign function
-*sqroots()<span style="font-family: monospace;"></span>* above.\
- Case (3) need not be implemented as it is inferred by the system by
-first executing <span style="font-family: monospace;">r\*\*2</span> and
-then checking that the result is equal to <span
-style="font-family: monospace;">x</span> (see [\[LR92\]](#LR92)).\
-\
- To implement a multi-directional foreign function you first need to
-think of which binding patterns require implementations. In the <span
-style="font-style: italic;">sqroots()</span> case one implementation
-handles the square root and the other one handles the square. The
-binding patterns will be <span
-style="font-family: monospace;">"bf"</span> for the square root and
-<span style="font-family: monospace;">"fb"</span> for the square.\
-\
- The following steps are required to define a foreign function:\
-
-1.  <span style="font-style: italic;">Implement </span>each foreign
-    function capability using the interface of the
-    implementation language. For Java this is explained in
-    [\[ER00\]](#ER00)  and for C in  [\[Ris12\]](#Ris00a).
-2.  In case the foreign code implemented in C/C++ the implementation
-    must be implemented as a DLL (Windows) or a shared library (Unix)
-    and <span style="font-style: italic;">dynamically linked </span>to
-    the kernel by calling the function
-    *load\_extension("name-of-extension")*. There is an example of a
-    Visual Studio project (Windows) files or a Makefile (Unix) in folder
-    *demo* of the downloaded sa.amos version.\
+1. Implement each foreign function capability using the interface of the implementation language. For Java this is explained in [ER00] and for C in [^Ris12].
+2.  In case the foreign code implemented in C/C++ the implementation must be implemented as a DLL (Windows) or a shared library (Unix) and dynamically linked to the kernel by calling the function `load_extension("name-of-extension")`. There is an example of a Visual Studio project (Windows) files or a Makefile (Unix) in folder *demo* of the downloaded sa.amos version.
 3.  The exported initializer named xxx of the DLL/shared library
     extension must assign a <span style="font-style: italic;">symbolic
     name </span> to the foreign C functions which is referenced in the
@@ -164,7 +100,7 @@ style="font-family: monospace;">"bf"</span> for the square root and
     style="font-family:
                 monospace;"></span> in the example <span
     style="font-family: Times New Roman;">[above](#foreign-body)</span>)
-    [\[Ris12\]](#Ris00a).
+    [^Ris12].
 4.  Finally a multidirectional foreign function needs to be <span
     style="font-style: italic;">defined </span>through a foreign
     function definition in AmosQL as [above](#foreign-body). Here the
@@ -782,7 +718,7 @@ relationship between the two. Only entities are imported as types and
 special types are not generated for such relationship tables. A
 many-to-many relationship in a relational database corresponds to a
 function returning a *bag* in AmosQL, and can be imported using
-*import\_relation()* rather than *import\_table()* ``:
+`import_relation()` rather than `import_table()`:
 
     import_relation(Relational r,
 
@@ -806,20 +742,13 @@ function returning a *bag* in AmosQL, and can be imported using
 -   `updatable` - whether the function should be transparently updatable
     via `set`, `add`, and `remove`.
 
-For example, assume we have two entity types, *person* and *telephone*.
-Most of the time telephones are not regarded as entities in their own
-respect since nobody would care to know more about a telephone than its
-number. However, assume that also the physical location of the telephone
-is kept in the database, so telephones are an entity type of their own.
+For example, assume we have two entity types, *person* and *telephone*. Most of the time telephones are not regarded as entities in their own respect since nobody would care to know more about a telephone than its number. However, assume that also the physical location of the telephone is kept in the database, so telephones are an entity type of their own.
 
-A person can be reached through several telephones, and every telephone
-may be answered by several person. The schema looks as follows:
+A person can be reached through several telephones, and every telephone may be answered by several person. The schema looks as follows:
 
+```
   ------- -------- -------
-  `ssn`   `name`   `...`
-
-  \       \        \
-
+  ssn     name     ...
   ------- -------- -------
 
   :  `person`
@@ -882,7 +811,7 @@ relational database accessed trough JDBC are instances of type *Jdbc*.\
 ### <span style="font-family: Times New Roman;"> </span>6.3.2 Mapped types
 
 A *mapped type* is a type whose instances are identified by a *key*
-consisting of one or several other objects [\[FR97\]](#FR97). Mapped
+consisting of one or several other objects [^FR97]. Mapped
 types are needed when proxy objects corresponding to external values
 from some data source are created in a peer. For example, a wrapped
 relational database may have a table PERSON(SSN,NAME,AGE) where SSN is
@@ -949,3 +878,31 @@ provided by default. Both functions are stored functions that can be
 updated as desired for future wrappers. <span
 style="font-family: Times New Roman;">\
  </span>
+
+[^LR92]: [W. Litwin and T. Risch: Main Memory Oriented Optimization of OO Queries Using Typed Datalog with Foreign Predicates, IEEE Transactions on Knowledge and Data Engineering, Vol. 4, No. 6, December 1992](http://user.it.uu.se/~udbl/publ/tkde92.pdf).
+
+[^FR97]: [G. Fahl and T. Risch: Query Processing over Object Views of Relational Data, The VLDB Journal , Vol. 6 No. 4, November 1997, pp 261-281.](http://www.it.uu.se/research/group/udbl/publ/vldbj97.pdf)
+
+[^CR01]: [K.Cassel and T. Risch: An Object-Oriented Multi-Mediator Browser. Presented at 2nd International Workshop on User Interfaces to Data Intensive Systems, Zürich, Switzerland, May 31 - June 1, 2001](http://www.it.uu.se/research/group/udbl/publ/goovipaper3.pdf)
+
+[^ER00]: [D.Elin and T. Risch: Amos II Java Interfaces,Uppsala University, 2000.](http://user.it.uu.se/%7Etorer/publ/javaapi.pdf)
+
+[^FR95]: [S. Flodin and T. Risch, Processing Object-Oriented Queries with Invertible Late Bound Functions, Proc. VLDB Conf., Zürich, Switzerland, 1995.](http://user.it.uu.se/%7Etorer/publ/vldb95.pdf)
+
+[^FR97]: [G. Fahl and T. Risch: Query Processing over Object Views of Relational Data, The VLDB Journal , Vol. 6 No. 4, November 1997, pp 261-281.](http://www.it.uu.se/research/group/udbl/publ/vldbj97.pdf)
+
+[^JR99a]: V. Josifovski, T. Risch: Functional Query Optimization over Object-Oriented Views for Data Integration Journal of Intelligent Information Systems (JIIS), Vol. 12, No. 2-3, 1999.
+
+[^JR99b]: [V. Josifovski, T. Risch: Integrating Heterogeneous Overlapping Databases through Object-Oriented Transformations. In Proc. 25th Intl. Conf. On Very Large Databases, Edinburgh, Scotland, September 1999.](http://www.it.uu.se/research/group/udbl/publ/vldb99.pdf)
+
+[^JR02]: V. Josifovski, T. Risch: Query Decomposition for a Distributed Object-Oriented Mediator System. [Distributed and Parallel Databases J., Kluwer, May 2002.](http://www.springer.com/computer/database+management+%26+information+retrieval/journal/10619)
+
+[^KJR03]: T.Katchaounov, V. Josifovski, and T. Risch: Scalable View Expansion in a Peer Mediator System, Proc. 8th International Conference on Database Systems for Advanced Applications (DASFAA 2003), Kyoto, Japan, March 2003.
+
+[^Nas93]: J.Näs: Randomized optimization of object oriented queries in a main memory database management system, MSc thesis, LiTH-IDA-Ex 9325 Linköping University 1993.
+
+[^Ris12]: T. Risch: Amos II C Interfaces, Uppsala University, 2012.
+
+[^Ris06]: T. Risch: ALisp v2 User's Guide, Uppsala University, 2006.
+
+[^RJK03]: T. Risch, V. Josifovski, and T. Katchaounov: Functional Data Integration in a Distributed Mediator System, in P. Gray, L. Kerschberg, P. King, and A. Poulovassilis (eds.): Functional Approach to Data Management - Modeling, Analyzing and Integrating Heterogeneous Data, Springer, ISBN 3-540-00375-4, 2003.
