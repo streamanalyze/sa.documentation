@@ -7,8 +7,7 @@ set :markdown, tables: true,
                gh_blockcode: true,
                fenced_code_blocks: true,
                with_toc_data: true,
-               footnote_backlink: nil
-set :markdown_engine, :kramdown
+set :markdown_engine, :redcarpet
 
 configure :development do
   set :debug_assets, true

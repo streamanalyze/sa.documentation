@@ -7,7 +7,7 @@ gem 'middleman-autoprefixer'
 gem 'middleman-livereload'
 
 # Templating Engines
-gem 'kramdown'
+gem 'redcarpet'
 gem 'builder'
 gem 'sass'
 

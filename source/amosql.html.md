@@ -1,132 +1,82 @@
-2 AmosQL
-========
+# AmosQL
 
-In general the user may enter different kinds of AmosQL
-[statements](#statements) to the Amos top loop in order to instruct the
-system to do operations on the database:\
+In general the user may enter different kinds of AmosQL [statements](#statements) to the Amos top loop in order to instruct the system to do operations on the database:
 
-1.  First the database schema is created by [defining types](#types)
-    with associated properties.
-2.  Once the schema is defined the database can be populated by
-    [creating objects](#create-object) and their properties in terms of
-    the database schema.\
-3.  Once the database is populated [queries](#query-statement) may be
-    expressed to retrieve and analyze data from the database. Queries
-    return [collections](#collection-syntax) of objects, which can be
-    both unordered sets of objects or ordered sequences of objects.
-4.  A populated database may be [updated](#updates)to change
-    its contents.
-5.  [Procedural functions](#procedures) (stored procedures) may be
-    defined, which are AmosQL programs having side effects that may
-    modify the database.
+1.  First the database schema is created by [defining types](#types) with associated properties.
+2.  Once the schema is defined the database can be populated by [creating objects](#create-object) and their properties in terms of the database schema.
+3.  Once the database is populated [queries](#query-statement) may be expressed to retrieve and analyze data from the database. Queries return [collections](#collections) of objects, which can be both unordered sets of objects or ordered sequences of objects.
+4.  A populated database may be [updated](#updates) to change its contents.
+5.  [Procedural functions](#procedures) (stored procedures) may be defined, which are AmosQL programs having side effects that may modify the database.
 
 This section is organized as follows:
 
--   Before going into the details of the different kinds of AmosQL
-    statements, in [Section 2.1](#basic-constructs) the syntactic
-    notation is introduced along with descriptions of syntax and
-    semantics of the basic building blocks of the query language.
--   [Section 2.2](#types) describes how to create a simple database
-    schema by defining types and properties.\
--   [Section 2.3](#create-object) describes how to populate the database
-    by creating objects.
--   The concept of *queries* over a populated database is presented in
-    [Section 2.4](#query-statement).
--   Regular queries return unordered sets of data. In addition Amos II
-    provides the ability to specify *vector queries*, which return
-    ordered sequences of data, as described in [Section
-    2.5](#vector-queries).\
--   A central concept in Amos II is the extensive use of *functions* in
-    database schema definitions. There are several kinds of user-defined
-    functions supported by the system as described in [Section
-    2.6](#function-definitions).
--   [Section 2.7](#updates) describes how to *update* a
-    populated database.
--   [Section 2.8](#data-mining) describes primitives in AmosQL useful
-    for data mining, in particular different ways of grouping data and
-    of making operations of sequences and numerical vectors.
--   [Section 2.9](#accessing-files) describes functions available to
-    read/write data from/to files, such as CSV files.
--   [Section 2.10](#cursors) describes how to define *scans* making it
-    possible to iterate over very large query results.
+-   Before going into the details of the different kinds of AmosQL statements, in [basic constructs](#basic-constructs) the syntactic notation is introduced along with descriptions of syntax and semantics of the basic building blocks of the query language.
+-   [Defining Types](#defining-types) describes how to create a simple database schema by defining types and properties.
+-   [Section 2.3](#create-object) describes how to populate the database by creating objects.
+-   The concept of *queries* over a populated database is presented in [Section 2.4](#query-statement).
+-   Regular queries return unordered sets of data. In addition sa.amos provides the ability to specify *vector queries*, which return ordered sequences of data, as described in [Section 2.5](#vector-queries).
+-   A central concept in sa.amos is the extensive use of *functions* in database schema definitions. There are several kinds of user-defined functions supported by the system as described in [Section 2.6](#function-definitions).
+-   [Section 2.7](#updates) describes how to *update* a populated database.
+-   [Section 2.8](#data-mining) describes primitives in AmosQL useful for data mining, in particular different ways of grouping data and of making operations of sequences and numerical vectors.
+-   [Section 2.9](#accessing-files) describes functions available to read/write data from/to files, such as CSV files.
+-   [Section 2.10](#cursors) describes how to define *scans* making it possible to iterate over very large query results.
 
-2.1 Basic constructs
---------------------
+## Basic Constructs
 
-The basic building blocks of the AmosQL query language are described
-here.\
+The basic building blocks of the AmosQL query language are described here.
 
-### 2.1.1 Syntactic conventions
+### Syntactic conventions
 
-For the syntax we use BNF notation with the following special
-constructs:
+For the syntax we use BNF notation with the following special constructs:
 
-A ::= B C: A consists of B followed by C. \
- A ::= B | C, alternatively (B | C): A consists of B or C.\
- A ::= \[B\]: A consists of B or nothing.\
- A ::= B-list: A consists of a sequence of one or more Bs.\
- A ::= B-commalist: A consists of one or more Bs separated by commas.\
- 'xyz': The keyword xyz.
+```
+A ::= B C: A consists of B followed by C.
+A ::= B | C, alternatively (B | C): A consists of B or C.
+A ::= [B]: A consists of B or nothing.
+A ::= B-list: A consists of a sequence of one or more Bs.
+A ::= B-commalist: A consists of one or more Bs separated by commas.
+'xyz': The keyword xyz.
+```
 
-### 2.1.2 Statements
+### Statements
 
-*Statements* instruct Amos II to perform various kinds of operations on
-the database. AmosQL statements are always terminated by a semicolon
-(;). The following statements can be entered to the Amos II top loop:
+*Statements* instruct sa.amos to perform various kinds of operations on the database. AmosQL statements are always terminated by a semicolon (;). The following statements can be entered to the sa.amos top loop:
 
-            create-type-stmt |
+| Statement |
+|-----------|
+| create-type-stmt |
+| delete-type-stmt |
+| create-object-stmt |
+| delete-object-stmt |
+| create-function-stmt |
+| delete-function-stmt |
+| query
+| update-stmt |
+| add-type-stmt |
+| remove-type-stmt |
+| for-each-stmt |
+| set-interface-variable-stmt |
+| declare-interface-variable-stmt |
+| commit-stmt |
+| rollback-stmt |
+| open-cursor-stmt |
+| fetch-cursor-stmt |
+| close-cursor-stmt |
+| quit-stmt |
+| exit-stmt |
 
-            delete-type-stmt | 
-
-            create-object-stmt | 
-
-            delete-object-stmt |
-
-            create-function-stmt | 
-
-            delete-function-stmt |
-
-            query | 
-
-            update-stmt |
-
-            add-type-stmt |
-
-            remove-type-stmt |
-
-            for-each-stmt |
-
-            set-interface-variable-stmt | 
-
-     declare-interface-variable-stmt |
-
-     commit-stmt |
-
-     rollback-stmt |
-
-            open-cursor-stmt | 
-
-            fetch-cursor-stmt | 
-
-            close-cursor-stmt |
-
-     quit-stmt |
-
-     exit-stmt
-
-### 2.1.3 Identifiers
+### Identifiers
 
 *Identifiers* have the syntax:
 
-    identifier ::=
+```
+identifier ::=
+    ('_' | letter) [identifier-character-list] 
 
-             ('_' | letter) [identifier-character-list] 
+identifier-character ::=
+    alphanumeric | '_'
 
-     identifier-character ::=
-
-            alphanumeric | '_'
-
-
+```
 
     E.g.: MySalary
 
@@ -137,25 +87,16 @@ the database. AmosQL statements are always terminated by a semicolon
       x1234_b
 
 
-<span style="font-weight: bold;">Notice</span> that Amos II identifiers
-are NOT case sensitive; i.e. they are always internally capitalized. By
-contrast Amos II reserved keywords are always written with *lower case*
-letters.
+Notice that sa.amos identifiers are NOT case sensitive; i.e. they are always internally capitalized. By contrast sa.amos reserved keywords are always written with *lower case* letters.
 
-### 2.1.4 Variables
+### Variables
 
 Variables are of two kinds: *local variables* or *interface variables*:\
 \
  `   variable ::= local variable | interface-variable`\
 \
 
--   *Local variables* are identifiers for data values inside AmosQL
-    queries and functions. *Local variables* must be declared in
-    function signatures (see [Function
-    definitions](#function-definitions)), in from clauses (see
-    [Queries](#query-statement)), or by the `declare` statement (see
-    [procedural functions](#procedures)). Notice that variables are
-    **not** case sensitive.
+-   *Local variables* are identifiers for data values inside AmosQL queries and functions. *Local variables* must be declared in function signatures (see [Function definitions](#function-definitions)), in from clauses (see [Queries](#query-statement)), or by the `declare` statement (see [procedural functions](#procedures)). Notice that variables are **not** case sensitive.
 -   `            `*Interface variables* hold only **temporary** results
     during interactive sessions. Interface variables **cannot** be
     referenced in function bodies and they are **not** stored in
@@ -163,7 +104,7 @@ Variables are of two kinds: *local variables* or *interface variables*:\
     purpose is to hold temporary values in scripts and
     database interactions.
 
-### 2.1.5 Constants
+### Constants
 
 Constants can be integers, reals, strings, time stamps, booleans, or
 `nil`.\
@@ -171,7 +112,7 @@ Constants can be integers, reals, strings, time stamps, booleans, or
 
       constant ::=
 
-            integer-constant | real-constant | boolean-constant | 
+            integer-constant | real-constant | boolean-constant |
 
             string-constant | time-stamp | functional-constant
 
@@ -259,7 +200,7 @@ must be written as "a'\\"b".\
  A [simple value](#simple-value) is either a constant or a variable
 reference.\
 
-### 2.1.6 Expressions
+### Expressions
 
 *Expressions* are formulas expressed with the AmosQL syntax that can be
 evaluated by the system to produce a *value*. Complex expressions can be
@@ -288,9 +229,9 @@ form of AmosQL [queries](#query-statement), e.g.:\
  `  1+sqrt(25);`\
 \
 
-### 2.1.7 Collections
+### Collections
 
-*Collections* represent sets of objects. Amos II supports three kinds of
+*Collections* represent sets of objects. sa.amos supports three kinds of
 collections: bags, vectors, and key-value associations (records):\
 
 -   A <span style="font-style: italic;">bag </span>is a set where
@@ -310,7 +251,7 @@ Syntax:\
 
 The most common collection is *bags*, which are unordered sets of
 objects with duplicates allowed. The value of a query is usually a bag.
-When a query to the Amos II toploop returns a bag as result the elements
+When a query to the sa.amos toploop returns a bag as result the elements
 of the bag are printed on separate lines. For example: <span
 style="font-family: monospace;">\
 \
@@ -346,11 +287,9 @@ style="font-style: italic;">in</span>:\
 #### Vectors
 
 *Vectors* are sequences of objects of any kind. Curly brackets {}
-enclose vector elements, for example: <span style="font-family:
-      monospace;">\
-    set :v=**{**1,2,3**}**;</span> <span
-style="font-family: monospace;"> \
- </span> <span style="font-family: monospace;"></span>then <span
+enclose vector elements, for example:
+```
+    set :v=**{**1,2,3**}**;then <span
 style="font-family: monospace;">\
     :v;</span>\
  returns:\
@@ -371,7 +310,7 @@ the indexing *i* is from 0 and up. For example:\
 *Records*  represent dynamic associations between keys and values.  A
 record is a dynamic and associative array. Other commonly used terms for
 associative arrays are property lists, key-value pairs, dictionaries, or
-hash links. Amos II uses generalized JSON notation to construct records.
+hash links. sa.amos uses generalized JSON notation to construct records.
 For example the following expression assigns *:r* to a record where the
 key (property) 'Greeting' field has the value 'Hello, I am Tore' and the
 key 'Email' has the value 'Tore.Andersson@it.uu.se':\
@@ -385,7 +324,7 @@ notation *r\[f\]*, for example:\
  returns\
  `   'Hello, I am Tore'`\
 
-### 2.1.8 Comments
+### Comments
 
 A *comment* can be placed anywhere in an AmosQL statement outside
 [identifiers](#identifiers), constants, or variables. \
@@ -393,8 +332,7 @@ A *comment* can be placed anywhere in an AmosQL statement outside
 
     comment ::= '/*' character-list '*/'
 
-2.2 Defining types
-------------------
+## Defining types
 
 The <span style="font-style: italic;">create type </span>statement
 creates a new type stored in the database. Type and
@@ -1101,7 +1039,7 @@ Person p**);\
 
 
 The function *friends()* returns a bag of persons, on which the function
-*name()* is applied. The normal semantics in Amos II is that when a
+*name()* is applied. The normal semantics in sa.amos is that when a
 function (e.g. *name()*) is applied on a bag valued function (e.g.
 *friends()*) it will be *applied on each element* of the returned bag.
 In the example a bag of the names of the persons named Bill is returned.
@@ -1394,7 +1332,7 @@ The <span style="font-style: italic;"> create function</span> statement
 defines a new user function stored in the database. Functions can be one
 of the following kinds:
 
--   [*Stored functions*](#stored-function) are stored in the Amos II
+-   [*Stored functions*](#stored-function) are stored in the sa.amos
     database as a table.\
 -   [*Derived functions*](#derived-function) are defined by a single
     [query](#query-statement) that returns the result of the a function
@@ -1625,7 +1563,7 @@ This allows <span style="font-style:
 different argument types. Each specific implementation of an overloaded
 function is called a *resolvent*.
 
-For example, assume the following two Amos II function definitions
+For example, assume the following two sa.amos function definitions
 having the same <span style="font-style: italic;">generic</span>
 function name *less()<span style="font-family:
           monospace;"></span>*:
@@ -1716,7 +1654,7 @@ regular employee plus some manager bonus: 
 
 Now, suppose that we need a function that returns the gross incomes of
 all persons in the database, i.e. we use `MANAGER.INCOME->INTEGER` for
-managers and ` EMPLOYEE.INCOME->INTEGER` for non-manager. In Amos II
+managers and ` EMPLOYEE.INCOME->INTEGER` for non-manager. In sa.amos
 such a function is defined as:
 
      create function grossincomes()->Integer i 
@@ -1761,7 +1699,7 @@ By using casting statements one can avoid late binding.\
 
 ### 2.6.5 Second order functions\
 
-Amos II functions are internally represented as any other objects and
+sa.amos functions are internally represented as any other objects and
 stored in the database. Object representing functions can be used in
 functions and queries too. An object representing a function is called a
 <span style="font-style: italic;">functional</span>. Second order
@@ -2110,7 +2048,7 @@ function.
 2.7 Updates
 -----------
 
-Information stored in Amos II represent mappings between function
+Information stored in sa.amos represent mappings between function
 arguments and results. These mappings are either defined at object
 creation time ([Objects](#create-object)), or altered by one of the
 function *update statements:* *set*, *add*, or *remove*. The 
@@ -2221,7 +2159,7 @@ do either of the following:\
 
         remove married(:sam) = :eve;
 
-Not every function is updatable. Amos II defines a function to be
+Not every function is updatable. sa.amos defines a function to be
 updatable if it is a stored function, or if it is derived from a single
 updatable function with a join that includes all arguments. In
 particular inverses to stored functions are updatable. For example, the
@@ -2390,7 +2328,7 @@ the extent of the function is large.\
 2.8 Data mining primitives
 --------------------------
 
-Amos II provides primitives for advanced analysis, aggregation, and
+sa.amos provides primitives for advanced analysis, aggregation, and
 visualizations of data collections. This is useful for data mining
 applications, e.g. for clustering and identifying patterns in data
 collections. Primitives are provided for analyzing both unordered
@@ -2709,7 +2647,7 @@ same fashion as *scatter2p()* and *scatter2l()*.\
 2.9 Accessing data in files
 ---------------------------
 
-The file system where an Amos II server is running can be accessed with
+The file system where an sa.amos server is running can be accessed with
 a number of system functions:\
 \
  The function *pwd()* returns the path to the current working directory
