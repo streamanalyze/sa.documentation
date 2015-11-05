@@ -6,13 +6,13 @@ See our [contributing guidelines](CONTRIBUTING.md) and our [code of conduct](COD
 
 ### Setup
 
-Clone the repository, install needed gems and run Jekyll
+Clone the repository, install needed npm modules and run [Gitbook](https://github.com/GitbookIO/gitbook).
 
 ```bash
 git clone git@github.com:streamanalyze/sa.documentation.git
-cd documentation
-bundle install
-bundle exec middleman
+npm install -g gitbook-cli
+cd sa.documentation
+gitbook serve
 ```
 
-You can then access the site at [http://localhost:4567](http://localhost:4567)
+You can then access the site at <http://localhost:4000>

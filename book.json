@@ -6,5 +6,8 @@
             "Contact us / Support": "http://streamanalyze.com/contact/"
         }
     },
-    "pluginsConfig": {}
+    "pluginsConfig": {},
+    "structure": {
+        "readme": "introduction.md"
+    }
 }
