@@ -1,5 +1,3 @@
-# Referene TOC
-
 * [Getting Started](getting-started.md)
     * [Copy-Paste Tutorial](tutorial.md)
 * [AmosQL](amosql.md)
@@ -51,11 +49,11 @@
   * Accessing data in files
     * Reading and writing files
   * Scans
-* Procedural Functions
+* [Procedural Functions](procedural-functions.md)
   * Iterating over results
   * User update procedures
-* The SQL Processor
-* Peer Management
+* [The SQL Processor](sql-processor.md)
+* [Peer Management](peer-management.md)
   * Peer communication
   * Peer queries and views
 * [Accessing external systems](accessing-external-systems.md)
@@ -70,7 +68,7 @@
     * Data sources
     * Mapped types
     * Type translation
-* System functions and commands
+* [System functions and commands](system-functions-and-commands.md)
   * Comparison operators
   * Arithmetic functions
   * String functions
