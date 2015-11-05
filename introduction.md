@@ -14,11 +14,11 @@ This manual describes how to use the Amos II system and the AmosQL query languag
 
 This document is organized as follows:
 
--   [Chapter 1](#running) gives some basic information on how to download and get started running the system. It also mentions different subsystems available.
--   [Chapter 2](#amosql) describes the core of the AmosQL query language, including how to define database schemas, populate, query, and update the database.
--   [Chapter 3](#procedures) describes procedural extensions to AmosQL making it possible to implement algorithms that have side effects updating the database.
--   In addition to AmosQL the system can process also SQL (SQL-92) queries, as described in [Chapter 4](#SQL-processor).
--   The mechanisms for setting up federations of distributed Amos II peers are described in [Chapter 5](#peers).
--   Amos II has mechanisms to access external systems and to integrate and query external databases managed by different kinds of external data managers. The extensibility mechanisms are described in [Chapter 6](#mediatorfns).
--   [Chapter 7](#systemfunctions) documents built-in system functions. 
--   [Chapter 8](#references) gives some references to related documents.
+-   [Chapter 1](getting-started/README.md) gives some basic information on how to download and get started running the system. It also mentions different subsystems available.
+-   [Chapter 2](amosql/README.md) describes the core of the AmosQL query language, including how to define database schemas, populate, query, and update the database.
+-   [Chapter 3](procedural-functions/README.md) describes procedural extensions to AmosQL making it possible to implement algorithms that have side effects updating the database.
+-   In addition to AmosQL the system can process also SQL (SQL-92) queries, as described in [Chapter 4](sql-processor/README.md).
+-   The mechanisms for setting up federations of distributed Amos II peers are described in [Chapter 5](peer-management/README.md).
+-   Amos II has mechanisms to access external systems and to integrate and query external databases managed by different kinds of external data managers. The extensibility mechanisms are described in [Chapter 6](accessing-external-systems/README.md).
+-   [Chapter 7](system-functions/README.md) documents built-in system functions. 
+-   [Chapter 8](references/README.md) gives some references to related documents.

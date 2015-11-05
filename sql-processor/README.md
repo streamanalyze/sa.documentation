@@ -7,7 +7,7 @@ foreign function:\
 
     sql(Charstring query)->Bag of vector result
 
-<span style="font-family: Times New Roman;"> </span>
+
 
 To make it possible to use an Amos II function in SQL queries, its name
 must be prefixed with ' <span style="font-family:
@@ -30,7 +30,7 @@ the foreign function <span style="font-style:
 
 
 
-<span style="font-family: Times New Roman;"> </span>
+
 
 Then we can populate the tables by the following calls to the sql
 function:\
@@ -56,7 +56,7 @@ function:\
 
 
 
-<span style="font-family: Times New Roman;"> </span>
+
 
 Examples of SQL queries are:\
 
@@ -69,7 +69,7 @@ Examples of SQL queries are:\
 
 
 
-<span style="font-family: Times New Roman;"> </span>
+
 
 The parser is based on the SQL-92 version of SQL. <span
 style="font-family: Times New Roman;">Thus, the SQL processor allows an
@@ -82,7 +82,7 @@ The command line option\
 
      amos2 ... -q sql...
 
-<span style="font-family: Times New Roman;"> </span>
+
 
 will make Amos II accept SQL as query language in the top loop rather
 than AmosQL.\
