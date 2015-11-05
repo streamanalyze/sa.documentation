@@ -1,4 +1,4 @@
-## 3 Procedural functions
+# Procedural functions
 
 
 A *procedural function* is an

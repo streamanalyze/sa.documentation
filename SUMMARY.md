@@ -1,7 +1,8 @@
 # Referene TOC
 
-* Getting Started
-* AmosQL
+* [Getting Started](getting-started.md)
+    * [Copy-Paste Tutorial](tutorial.md)
+* [AmosQL](amosql.md)
   * Basic constructs
     * Syntactic conventions
     * Statements
@@ -57,7 +58,7 @@
 * Peer Management
   * Peer communication
   * Peer queries and views
-* Accessing external systems
+* [Accessing external systems](accessing-external-systems.md)
   * Foreign and multi-directional functions
     * Cost estimates
   * The relational database wrapper
@@ -87,3 +88,5 @@
   * Clustering
   * Unloading
   * Miscellaneous
+* [Contributing](CONTRIBUTING.md)
+* [Code of Conduct](CODE_OF_CONDUCT.md)

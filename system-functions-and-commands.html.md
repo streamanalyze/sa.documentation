@@ -1,7 +1,7 @@
-## System functions and commands
+# System functions and commands
 
 
-### Comparison operators
+## Comparison operators
 
 The built-in, infix comparison operators are: 
 
@@ -24,7 +24,7 @@ functions can be [overloaded](#overloaded-functions) for user defined
 types. 
 
 
-## Arithmetic functions
+### Arithmetic functions
 
 ```
     abs(Number x) -> Number y

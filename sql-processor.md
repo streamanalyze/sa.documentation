@@ -1,4 +1,4 @@
-## The SQL processor
+# The SQL processor
 
 Amos II databases can be manipulated using SQL as an alternative to
 AmosQL. The SQL preprocessor translates SQL commands to corresponding

@@ -1,0 +1,10 @@
+{
+    "gitbook": "2.x.x",
+    "plugins": [],
+    "links": {
+        "sidebar": {
+            "Contact us / Support": "http://streamanalyze.com/contact/"
+        }
+    },
+    "pluginsConfig": {}
+}
