@@ -178,11 +178,11 @@ costhint(Charstring fn, Charstring bpat, Function cfn) -> Boolean
 To find out what cost estimates are associated with a function use:
 
 ```
- costhints(Function r)-> Bag of (Charstring bpat, Object q)
+costhints(Function r)-> Bag of (Charstring bpat, Object q)
 ```
 
 It returns the cost estimates for resolvent `r` and their associated binding patterns. To obtain the estimated cost of executing an sa.amos function `f` for a given binding pattern `bp`, use\
 
 ```
-plan_cost(Function r, Charstring bp)-> (Number cost, Numbers fanout)`
+plan_cost(Function r, Charstring bp)-> (Number cost, Numbers fanout)
 ```
