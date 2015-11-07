@@ -3,7 +3,7 @@
     "plugins": ["anchors"],
     "links": {
         "sidebar": {
-            "Contact us / Support": "http://streamanalyze.com/contact/"
+            "Stream Analyze": "http://streamanalyze.com/"
         }
     },
     "pluginsConfig": {},
