@@ -1,6 +1,6 @@
 # Peer queries and views
 
-Once you have established connections to sa.amos peers you can define views of data from your peers. You first have to import the meta-data about selected types and functions from the peers. This is done by defining *proxy types* and *proxy functions* [\[RJK03\]](#RJK03) using the system function `import_types`:
+Once you have established connections to sa.amos peers you can define views of data from your peers. You first have to import the meta-data about selected types and functions from the peers. This is done by defining *proxy types* and *proxy functions* [^RJK03] using the system function `import_types`:
 
 `import_types(Vector of Charstring typenames,  Charstring p)-> Bag of Type pt`
 
@@ -18,4 +18,4 @@ Selects the `name` property of objects of type Person in peer `p1`.
 
 imports a function named `fn` from peer `p` returning proxy function `pf`.
 
-On top of the imported types object-oriented multi-peer views can be defined, as described in [\[RJK03\]](#RJK03) consisting of derived types [\[JR99a\]](#JR99a) whose extents are derived through queries intersecting extents of other types, and IUTs [\[JR99b\]](#JR99b) whose extents reconciles unions of other type extents. Notice that the implementation of IUTs is limited. (In particular the system flag `latebinding('OR');` must be set before IUTs can be used and this may cause other problems).
+On top of the imported types object-oriented multi-peer views can be defined, as described in [^RJK03] consisting of derived types [^JR99a] whose extents are derived through queries intersecting extents of other types, and IUTs [^JR99b] whose extents reconciles unions of other type extents. Notice that the implementation of IUTs is limited. (In particular the system flag `latebinding('OR');` must be set before IUTs can be used and this may cause other problems).

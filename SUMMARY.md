@@ -38,5 +38,6 @@
   * [Unloading](system-functions/unloading.md)
   * [Miscellaneous](system-functions/miscellaneous.md)
 * [References](references/README.md)
+* [Acknowledgments](acknowledgments/README.md)
 * [Contributing](CONTRIBUTING.md)
 * [Code of Conduct](CODE_OF_CONDUCT.md)

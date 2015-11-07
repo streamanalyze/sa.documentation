@@ -2,18 +2,14 @@
 
 There is a predefined wrapper for relational databases using the JDBC standard Java-based relational database interface. The JDBC wrapper is tested with [MySQL Connector](http://www.mysql.com/products/connector/j/) and Microsoft's SQLServer driver.
 
-An instance of type *Relational* ** represents a relational database and functions of type *Relational* implements the interface to relational databases. The general wrapper *Relational* is an *abstract* wrapper in the sense that it does not implement an interface a a specific relational DBMS therefore has no instances. Several of the database interface functions of type *Relational* are defined as [*abstract functions*](#abstract-functions). In the type hierarchy  there is a specific implemented wrapper for JDBC represented by type *Jdbc*. The type *Jdbc* has one instance for each relational database JDBC connection. The type hierarchy is currently:
+An instance of type *Relational* represents a relational database and functions of type *Relational* implements the interface to relational databases. The general wrapper *Relational* is an *abstract* wrapper in the sense that it does not implement an interface a a specific relational DBMS therefore has no instances. Several of the database interface functions of type *Relational* are defined as [*abstract functions*](#abstract-functions). In the type hierarchy  there is a specific implemented wrapper for JDBC represented by type *Jdbc*. The type *Jdbc* has one instance for each relational database JDBC connection. The type hierarchy is currently:
 
 ```
-     Datasource
-
+Datasource
      |
-
-     Relational
-
+Relational
      |
-
-     Jdbc
+    Jdbc
 ```
 
 If some other interface than JDBC (e.g. ODBC) is used for a relational database it would require the implementation of a new wrapper also being subtype to Relational. The use of abstract functions type checking to find equivalent implementations for different relational database interfaces.
