@@ -81,217 +81,108 @@ Case 1 and 2 are implemented by multi-directional foreign function `sqroots()`. 
 
 To implement a multi-directional foreign function you first need to think of which binding patterns require implementations. In the `sqroots()` case one implementation handles the square root and the other one handles the square. The binding patterns will be `"bf"` for the square root and `"fb"` for the square. The following steps are required to define a foreign function:
 
-1. Implement each foreign function capability using the interface of the implementation language. For Java this is explained in [ER00] and for C in [^Ris12].
+1. Implement each foreign function capability using the interface of the implementation language. For Java this is explained in [^ER00] and for C in [^Ris12].
 2.  In case the foreign code implemented in C/C++ the implementation must be implemented as a DLL (Windows) or a shared library (Unix) and dynamically linked to the kernel by calling the function `load_extension("name-of-extension")`. There is an example of a Visual Studio project (Windows) files or a Makefile (Unix) in folder *demo* of the downloaded sa.amos version.
-3.  The exported initializer named xxx of the DLL/shared library
-    extension must assign a <span style="font-style: italic;">symbolic
-    name </span> to the foreign C functions which is referenced in the
-    foreign function definition ( <span style="font-family:
-                monospace;"></span>sqrt and square <span
-    style="font-family:
-                monospace;"></span> in the example <span
-    style="font-family: Times New Roman;">[above](#foreign-body)</span>)
-    [^Ris12].
-4.  Finally a multidirectional foreign function needs to be <span
-    style="font-style: italic;">defined </span>through a foreign
-    function definition in AmosQL as [above](#foreign-body). Here the
-    implementor may associate a binding pattern and an optional [cost
-    estimate](#cost-estimate) with each capability. Normally the foreign
-    function definition is done separate from the actual code
-    implementing its capabilities, in an AmosQL script.
-5.  The system automatically realoads foreign functions in a saved
-    database image when the image is restarted.\
+3. The exported initializer named `xxx` of the DLL/shared library extension must assign a *symbolic name* to the foreign C functions which is referenced in the foreign function definition (`sqrt` and `square` in the example [above](#foreign-body)) [^Ris12].
+4. Finally a multidirectional foreign function needs to be *defined* through a foreign function definition in AmosQL as [above](#foreign-body). Here the implementor may associate a binding pattern and an optional [cost estimate](#cost-estimate) with each capability. Normally the foreign function definition is done separate from the actual code implementing its capabilities, in an AmosQL script.
+5. The system automatically reloads foreign functions in a saved database image when the image is restarted.
 
-A capability can also be defined as a select expression (i.e. query)
-executed for the given binding pattern. The variables marked bound (b)
-are inputs to the select expression and the result binds the free (f)
-variables. For example, *sqroots()* could also have been defined by:\
-\
+A capability can also be defined as a select expression (i.e. query) executed for the given binding pattern. The variables marked bound (b) are inputs to the select expression and the result binds the free (f) variables. For example, `sqroots()` could also have been defined by:
 
-`  create function sqroots(Number x)-> Bag of Number r              as multidirectional                 ("bf" foreign 'sqrts' cost {2,2}) /* capability by foreign function */                 ("fb" select r*r);                /* capability by query */            `\
- Notice here that *sqroots()* is defined as a foreign function when
-<span style="font-style: italic;">x</span> is known and <span
-style="font-style: italic;">r</span> computed, while it is a derived
-function when <span style="font-style: italic;">r</span> is known and
-<span style="font-style: italic;">x</span> computed. This kind of
-functionality is useful when different methods are used for computing a
-function and its inverses.\
-\
- A capability can be defined as a key to improve query optimization,
-e.g.\
-\
+```sql
+create function sqroots(Number x)-> Bag of Number r
+  as multidirectional
+     ("bf" foreign 'sqrts' cost {2,2}) /* capability by foreign function */
+     ("fb" select r*r);                /* capability by query */
+```
 
-`  create function sqroots(Number x)-> Bag of Number r              as multidirectional                 ("bf" foreign 'sqrts' cost {2,2}) /* not unique square root per x */                 ("fb" key select r*r);            /* unique square per r */                `\
- Be very careful not to declare a binding pattern as *key* unless it
-really is a key for the arguments and results of the function. In the
-case of <span style="font-style: italic;">sqroots()</span> the
-declaration says that if you know <span style="font-style:
-        italic;">r</span> you can uniquely determine <span
-style="font-style: italic;">x</span>. However, there is no key for
-binding pattern <span style="font-style: italic;">bf</span> since if you
-know <span style="font-style: italic;">x</span> there may be severeal
-(i.e. two) square roots, the positive and the negative. The key
-declaraions are used by the system to optimize queries. Wrong key
-declarations may result in wrong query results because the optimizer has
-assumed incorrect key uniqueness.\
-\
- An example of an advanced multidirectional function is the bult-in
-function *plus()* (operator +):\
- <span style="font-family: Times New Roman;"></span>
+Notice here that `sqroots()` is defined as a foreign function when `x` is known and `r` computed, while it is a derived function when `r` is known and `x` computed. This kind of functionality is useful when different methods are used for computing a function and its inverses. A capability can be defined as a key to improve query optimization, e.g:
 
-    create function plus(Number x, Number y) -> Number r
+```sql
+create function sqroots(Number x)-> Bag of Number r
+  as multidirectional
+     ("bf" foreign 'sqrts' cost {2,2}) /* not unique square root per x */
+     ("fb" key select r*r);            /* unique square per r */
+```
 
-     as multidirectional
+Be very careful not to declare a binding pattern as *key* unless it really is a key for the arguments and results of the function. In the case of `sqroots()` the declaration says that if you know `r` you can uniquely determine `x`. However, there is no key for binding pattern `bf` since if you know `x` there may be several (i.e. two) square roots, the positive and the negative. The key declarations are used by the system to optimize queries. Wrong key declarations may result in wrong query results because the optimizer has assumed incorrect key uniqueness.
 
-     ('bbf' key foreign 'plus--+') /* addition*/
+An example of an advanced multidirectional function is the bult-in function `plus()` (operator `+`):
 
-     ('bfb' key foreign 'plus-+-') /* subtraction */
-
+```sql
+create function plus(Number x, Number y) -> Number r
+  as multidirectional
+     ('bbf' key foreign 'plus--+')     /* addition*/
+     ('bfb' key foreign 'plus-+-')     /* subtraction */
      ('fbb' key select x where y+x=r); /* Addition is commutative */
+```
 
+For further details on how to define multidirectional foreign functions for different implementation languages see[^Ris12] [^ER00].
 
+## Cost estimates
 
+Different capabilities of multi-directional foreign functions often have different execution costs. In the `sqroots()` example the cost of computing the square root is higher than the cost of computing the square. When there are several alternative implementations of a multi-directional foreign function the cost-based query optimizer needs cost estimates that help it choose the most efficient implementation. In the example we might want to indicate that the cost of executing a square root is double as large as the cost of executing a square.
 
-<span style="font-family: Times New Roman;">For further details on how
-to define multidirectional foreign functions for different
-implementation languages see  [\[Ris12\]\[ER00\]](#Ris00a).\
- </span>
+Furthermore, the cost of executing a query depends on the expected size of the result from a function call. This is called the *fanout*(or *selectivity* for predicates) of the call for a given binding pattern. In the multi-directional foreign function `sqroots()` example the implementation *sqrts* usually has a fanout of 2, while the implementation *square* has a fanout of 1.
 
-### 6.1.1 Cost estimates
+For good query optimization each foreign function capability should have associated *costs* and *fanouts*:
 
-Different capabilities of multi-directional foreign functions often have
-different execution costs. In the *sqroots()* example the cost of
-computing the square root is higher than the cost of computing the
-square. When there are several alternative implementations of a
-multi-directional foreign function the cost-based query optimizer needs
-cost estimates that help it choose the most efficient implementation. In
-the example we might want to indicate that the cost of executing a
-square root is double as large as the cost of executing a square.\
-\
- Furthermore, the cost of executing a query depends on the expected size
-of the result from a function call. This is called the <span
-style="font-style: italic;">fanout</span> (or <span
-style="font-style: italic;">selectivity</span> for predicates) of the
-call for a given binding pattern. In the multi-directional foreign
-function *[sqroots()](#sqroots)* example the implementation *sqrts*
-<span style="font-family:
-        monospace;"></span> usually has a fanout of 2, while the
-implementation *square*
-has a fanout of 1.\
-\
- For good query optimization each foreign function capability should
-have associated *costs* and *fanouts*:\
+- The *cost* is an estimate of how expensive it is to completely execute (emit all tuples of) a foreign function for given arguments.
+- The *fanout* estimates the expected number of elements in the result stream (emitted tuples), given the arguments.
 
--   The <span style="font-style: italic;">cost </span>is an estimate of
-    how expensive it is to completely execute (emit all tuples of) a
-    foreign function for given arguments.
--   The *fanout* estimates the expected number of elements in the result
-    stream (emitted tuples), given the arguments.
+The cost and fanout for a multi-directional foreign function implementation can be either specified as a constant vector of two numbers (as in `sqroots()`) or as an sa.amos *cost* function returning the vector of cost and fanout for a given function call. The numbers normally need only be rough numbers, as they are used by the query optimizer to compare the costs of different possible execution plans to produce the optimal one. The number 1 for the cost of a foreign function should roughly be the cost to perform a cheap function call, such as `+` or `<`. Notice that these estimates are run a query optimization time, not when the query is executed, so the estimates must be based on meta-data about the multi-directional foreign function.
 
-The cost and fanout for a multi-directional foreign function
-implementation can be either specified as a constant vector of two
-numbers (as in *sqroots()*) or as an sa.amos <span
-style="font-style: italic;">cost function </span>returning the vector of
-cost and fanout for a given function call. The numbers normally need
-only be rough numbers, as they are used by the query optimizer to
-compare the costs of different possible execution plans to produce the
-optimal one. The number 1 for the cost of a foreign function should
-roughly be the cost to perform a cheap function call, such as '+' or
-'&lt;'. Notice that these estimates are run a query optimization time,
-not when the query is executed, so the estimates must be based on
-meta-data about the multi-directional foreign function.\
-\
- If the [simplified syntax](#simple-foreign) is used or no cost is
-specified the system tries to put reasonable default costs and fanouts
-on foreign functions, the <span style="font-style: italic;">default cost
-model</span>. The default cost model estimates the cost based on the
-signature of the function, index definitions, and some other heuristics.
-<span style="font-family: Times New Roman;">For example, the default
-cost model assumes aggregate functions are expensive to execute and
-combiners even more expensive. </span> <span
-style="font-family: Times New Roman;">If you have expensive foreign
-functions you are strongly advised to specify cost and fanout
-estimates.\
-\
- The cost function <span style="font-family: monospace;">cfn</span> is
-an sa.amos function with signature\
- </span>
+If the [simplified syntax](#simple-foreign) is used or no cost is specified the system tries to put reasonable default costs and fanouts on foreign functions, the default cost model. The default cost model estimates the cost based on the signature of the function, index definitions, and some other heuristics. For example, the default cost model assumes aggregate functions are expensive to execute and combiners even more expensive. If you have expensive foreign functions you are strongly advised to specify cost and fanout estimates.
 
-    create function <cfn>(Function f, Vector bpat, Vector args) 
+The cost function `cfn` is an sa.amos function with signature
 
-     -> (Integer cost, Integer fanout) as ...;
+```
+create function <cfn>(Function f, Vector bpat, Vector args)  
+                    -> (Integer cost, Integer fanout) as ...;
+/* e.g. */
 
-    e.g.
+create function typesofcost(Function f, Vector bpat, Vector args)
+                             -> (Integer cost, Integer fanout) as foreign ...;
+```
 
+The cost function is normally called at compile time when the optimizer needs the cost and fanout of a function call in some query. The arguments and results of the cost function are:
 
+`f` is the full name the called sa.amos function. `bpat` is the binding pattern of the call as a [vector](#vector) of strings `b` and `f`, e.g. `{"f","b"}` indicating which arguments in the call are bound or free, respectively.
 
-    create function typesofcost(Function f, Vector bpat, Vector args)
+`args` is a vector of actual variable names and constants used in the call.
 
-     -> (Integer cost, Integer fanout) as foreign ...;
+`cost` is the computed estimated cost to execute a call to `f` with the given binding pattern and argument list. The cost to access a tuple of a stored function (by hashing) is 2; other costs are calibrated accordingly.
 
+`fanout` is the estimated fanout of the execution, i.e. how many results are emitted from the execution.
 
+If the cost hint function does not return anything it indicates that the function is not executable in the given context and the optimizer will try some other capability or execution strategy.
 
+The costs and fanouts are normally specified as part of the capability specifications for a multi-directional foreign function definition, as in the example. The costs can also be specified after the definition of a foreign function by using the following sa.amos system function:
 
-The cost function is normally called at compile time when the optimizer
-needs the cost and fanout of a function call in some query. The
-arguments and results of the cost function are:\
-\
- <span style="font-family: monospace;">f</span>       is the full name
-the called sa.amos function.\
- <span style="font-family: monospace;">bpat</span> is the binding
-pattern of the call as a [vector](#vector) of strings 'b' and 'f', e.g.
-{"f","b"} indicating which arguments in the call are bound or free,
-respectively.\
- <span style="font-family: monospace;">args</span> is a vector of actual
-variable names and constants used in the call.\
- *cost* is the computed estimated cost to execute a call to f with the
-given binding pattern and argument list. The cost to access a tuple of a
-stored function (by hashing) is 2; other costs are calibrated
-accordingly.\
- *fanout* is the estimated fanout of the execution, i.e. how many
-results are emitted from the execution.\
-\
- If the cost hint function does not return anything it indicates that
-the function is not executable in the given context and the optimizer
-will try some other capability or execution strategy.\
-\
- The costs and fanouts are normally specified as part of the capability
-specifications for a multi-directional foreign function definition, as
-in the example. The costs can also be specified after the definition of
-a foreign function by using the following sa.amos system function:\
+```
+costhint(Charstring fn,Charstring bpat,Vector ch)->Boolean 
+```
 
-     costhint(Charstring fn,Charstring bpat,Vector ch)->Boolean 
+Example:
+```sql
+costhint("number.sqroots->number","bf",{4,2});
+costhint("number.sqroots->number","fb",{2,1});
+```
 
-e.g.\
+`fn` is the full name of the resolvent. `bpat` is the binding pattern string. `ch` is a [vector](#vector) with two numbers where the first number is the estimated cost and the second is the estimated fanout. A cost function `cfn` can be assigned to a capability with:
 
-     costhint("number.sqroots->number","bf",{4,2});
+```
+costhint(Charstring fn, Charstring bpat, Function cfn) -> Boolean
+```
 
-     costhint("number.sqroots->number","fb",{2,1});
+To find out what cost estimates are associated with a function use:
 
+```
+ costhints(Function r)-> Bag of (Charstring bpat, Object q)
+```
 
+It returns the cost estimates for resolvent `r` and their associated binding patterns. To obtain the estimated cost of executing an sa.amos function `f` for a given binding pattern `bp`, use\
 
-
-`fn` is the full name of the
-resolvent.\
- <span style="font-family: monospace;"> bpat</span> is the binding
-pattern string.\
- <span style="font-family: monospace;">ch </span>is a [vector](#vector)
-with two numbers where the first number is the estimated cost and the
-second is the estimated fanout.\
-\
- A cost function <span style="font-family: monospace;">cfn</span> can be
-assigned to a capability with:\
- <span style="font-family: monospace;">costhint(Charstring fn,
-Charstring bpat, Function cfn)  -&gt; Boolean\
-\
- </span>To find out what cost estimates are associated with a function
-use:\
- `   costhints(Function r)-> Bag of (Charstring bpat, Object q)`\
- It returns the cost estimates for resolvent *r* and their associated
-binding patterns.\
-\
- To obtain the estimated cost of executing an sa.amos  function <span
-style="font-style: italic;">f</span> for a given binding pattern <span
-style="font-style: italic;">bp</span>, use\
-
-`   plan_cost(Function r, Charstring bp)-> (Number cost, Numbers fanout)`\
+```
+plan_cost(Function r, Charstring bp)-> (Number cost, Numbers fanout)`
+```
