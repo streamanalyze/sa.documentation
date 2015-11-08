@@ -1,328 +1,230 @@
 # Queries
 
-*Queries* retrieve objects having specified properties from the
-database. A query can be one of the following:\
+*Queries* retrieve objects having specified properties from the database. A query can be one of the following:
 
-1.  It can be [calls](#function-call)to built-in or user
-    defined function.
-2.  It can be a [select statement](#select-statement) to search the
-    database for a set of objects having properties fulfilling a query
-    condition specified as a logical [predicate](#predicates).
-3.  If can be a vector selection statements
-    ([vselect-statement](#vselect)) to construct an ordered
-    sequence (vector) of objects fulfilling the query condition. 
-4.  It can be an [expression](#expressions).\
+1. It can be [calls](#function-call)to built-in or user defined function.
+2. It can be a [select statement](#select-statement) to search the database for a set of objects having properties fulfilling a query condition specified as a logical [predicate](#predicates).
+3. If can be a vector selection statements ([vselect-statement](#vselect)) to construct an ordered sequence (vector) of objects fulfilling the query condition. 
+4. It can be an [expression](#expressions).
 
-The syntax for a query is thus:\
-\
- `query ::= ` `   function-call |   `
-`              select-stmt |              vselect-stmt |              expression`\
+The syntax for a query is thus:
 
-### 2.4.1 Calling functions
+```
+query ::= function-call |
+          select-stmt |
+          vselect-stmt |
+          expression
+```
+
+## Calling functions
 
 A simple form of queries are calls to functions. Syntax:
+```
+function-call ::=
 
-    function-call ::=
+        function-name '(' [parameter-value-commalist] ')' |
 
-            function-name '(' [parameter-value-commalist] ')' |
+ expr infix-operator expr |
 
-     expr infix-operator expr |
+ tuple-expr
 
-     tuple-expr
-
-
-
-    infix-operator ::= '+' | '-' | '*' | '/' | '<' | '>' | '<=' | '>=' | '=' | '!=' | 'in'
+infix-operator ::= '+' | '-' | '*' | '/' | '<' | '>' | '<=' | '>=' | '=' | '!=' | 'in'
 
 
 
-    parameter-value ::= expr |
+parameter-value ::= expr |
 
-     '(' select-stmt ')' |
+ '(' select-stmt ')' |
 
-     tuple-expr
+ tuple-expr
 
+  tuple-expr ::= '(' expr-commalist ')'
 
+ E.g. sqrt(2.1);
 
+ 1+2;
 
-      tuple-expr ::= '(' expr-commalist ')'
+ 1+2 < 3+4;
 
+  "a" + 1;
+```
 
-
-
-
-     E.g. sqrt(2.1);
-
-     1+2;
-
-     1+2 < 3+4;
-
-      "a" + 1; 
-
-
-The built-in functions *plus()*, *minus()*, *times()*, and *div()*  have
-infix syntax +,-,\*,/ with the usual priorities. \
- For example:
-
-     (income(:eve) + income(:ham)) * 0.5;
-
+The built-in functions `plus()`, `minus()`, `times()`, and `div()` have infix syntax `+,-,*,/` with the usual priorities. For example:
+```
+(income(:eve) + income(:ham)) * 0.5;
+```
 is equivalent to:
+```
+times(plus(income(:eve),income(:ham)),0.5);
+```
 
-     times(plus(income(:eve),income(:ham)),0.5);
+The `+` operator is defined for both numbers and strings. For strings it implements string concatenation. The result of a function call can be saved temporarily in an interface variable, for example:
 
-The '+' operator is defined for both numbers and strings. For strings it
-implements string concatenation.\
-
-The result of a function call can be saved temporarily in an interface
-variable, for example:
-
-     set :inca = income(:adam);
-
+```
+set :inca = income(:adam);
+```
 then the query `:inca;` returns `2300`.
 
 Also bag valued function calls can be saved in variables, for example:
+```
+set :pb = parents(:cain);
+```
 
-     set :pb = parents(:cain);
+In this case the value of :pb is a [bag](#bags). To get the elements of the bag, use the `in` function. For example:
+```
+in(:pb);
+```
+[Tuple expressions](#tuple-expr) can be used to assign the result of functions returning [tuples](#tuple-result), for example:
+```
+set (:m,:f)=parents2(:cain);
+```
+In a function call, the types of the actual parameters must be the same as, or subtypes of, the types of the corresponding formal parameters.
 
-In this case the value of :pb is a [bag](#bags). To get the elements of
-the bag, use the *in* function. For example:
+## The select statement
 
-     in(:pb);
-
-[Tuple expressions](#tuple-expr) can be used to assign the result of
-functions returning [tuples](#tuple-result), for example:
-
-     set (:m,:f)=parents2(:cain);
-
-In a function call, the types of the actual parameters must be the same
-as, or subtypes of, the types of the corresponding formal parameters.\
-
-### 2.4.2 The select statement
-
-The *select statement* provides the most flexible way to specify
-queries.
+The *select statement* provides the most flexible way to specify queries.
 
 Syntax:
+```
+select-stmt ::=
 
-    select-stmt ::=
+        'select' ['distinct']
 
-            'select' ['distinct']
+[select-clause]
 
-     [select-clause]
+                [into-clause]
 
-                    [into-clause] 
+                [from-clause]
 
-                    [from-clause]
+                [where-clause]
 
-                    [where-clause]
+[group-by-clause]
 
-     [group-by-clause]
+[order-by-clause]
 
-     [order-by-clause]
+[limit-clause]
 
-     [limit-clause]
+select-clause ::= expr-commalist
 
-    select-clause ::= expr-commalist
+into-clause ::=
 
-    into-clause ::= 
+        'into' variable-commalist
 
-            'into' variable-commalist 
+from-clause ::=
 
+        'from' variable-declaration-commalist
 
+  variable-declaration ::=
 
-    from-clause ::= 
+        type-spec local-variable
 
-            'from' variable-declaration-commalist 
+  where-clause ::=
 
+       'where' predicate-expression
 
+  group-by-clause ::=
 
+ 'group by' expression-commalist
 
-      variable-declaration ::= 
+  order-by-clause ::=
 
-            type-spec local-variable
+ 'order by' expression ['asc' | 'desc']
 
+  limit-clause ::=
 
+ 'limit' expression
+```
+The *select statement* returns an unordered set of objects selected from the database. Duplicates are allowed in the result set of a query, i.e. the result is a [bag](#bags). In case you need to construct an ordered sequence of objects rather than a bag you can use the [vector selection statement](#vselect).
 
+The *select-clause* in a select statement defines the objects to be retrieved based on bindings of local variables declared in the *from-clause* and filtered by the *where-clause*. The select clause is often a comma-separated list of expressions to retrieve a bag of *tuples* of objects from the database. For example:
+```sql
+select name(p), income(p)
+from Person p
+where income(p)>2500;
+```
 
-      where-clause ::=
+The *from-clause* declares data types of local variables used in the query. For example:
+```sql
+select name(p), income(p)
+from Person p
+  where age(p)>20;
+```
 
-           'where' predicate-expression
+Notice that variables in AmosQL can be bound to *objects of any type*, AmosQL `*.*` This is different from SQL select statements where all variables must be bound to *tuples only*. AmosQL is based on *domain calculus* while SQL select expressions are based on *tuple calculus*.
 
+If a function is applied on the result of a function returning a bag of values, the outer function is applied **on each element** of that bag, the bag is *flattened*. This is called *Daplex semantics*. For example, in the following query, if there are more than one parents per parent generation of Cush there will be several names (e.g. Noah and Ruth) returned:
 
-
-
-      group-by-clause ::=
-
-     'group by' expression-commalist
-
-
-
-
-      order-by-clause ::=
-
-     'order by' expression ['asc' | 'desc']
-
-
-
-
-      limit-clause ::=
-
-     'limit' expression
-
-
-The *select statement* returns an unordered set of objects selected from
-the database. Duplicates are allowed in the result set of a query, i.e.
-the result is a [bag](#bags). In case you need to construct an ordered
-sequence of objects rather than a bag you can use the [vector selection
-statement](#vselect).\
-\
- The *select-clause* in a select statement defines the objects to be
-retrieved based on bindings of local variables declared in the
-*from-clause* and filtered by the *where-clause*. The select clause is
-often a comma-separated list of expressions to retrieve a bag of
-*tuples* of objects from the database. For example:\
-
-     select name(p), income(p)
-
-     from Person p
-
-     where income(p)>2500;
-
-
-The *from-clause* declares data types of local variables used in the
-query. For example:
-
-     select name(p), income(p)
-      from Person p
-                where age(p)>20;
-
-Notice that variables in AmosQL can be bound to *objects of any type*,
-AmosQL*.* This is different from SQL select statements where all
-variables must be bound to *tuples only*. AmosQL is based on *domain
-calculus* while SQL select expressions are based on *tuple calculus*.
-
-If a function is applied on the result of a function returning a bag of
-values, the outer function is applied **on each element** of that bag,
-the bag is *flattened*. This is called *Daplex semantics*. For example,
-in the following query, if there are more than one parents per parent
-generation of Cush there will be several names (e.g. Noah and Ruth)
-returned:
-
+```sql
      select name(parents(parents(q))) from Person q where name(q)= "Cush";
-
+```
 returns the bag:
+```
+"Noah" "Ruth"
+```
 
-     "Noah" "Ruth"
+The *where-clause* gives selection criteria for the search. The where-clause is specified as a [predicate](#predicate-expressions). For example:
+```sql
+select name(p), income(p)
+from Person p
+where age(p)>20;
+```
 
-The *where-clause* ** gives selection criteria for the search. The
-where-clause is specified as a [predicate](#predicate-expressions). For
-example:\
+To retrieve the results of [tuple valued functions](#tuple-result) in queries, use [tuple expressions](#tuple-expr), e.g.
+```sql
+select name(m), name(f) from Person m, Person p where (m,f) = parents2(p);
+```
 
-     select name(p), income(p)
+Duplicates are removed from the result only when the keyword `distinct` is specified, in which case a set (rather than a bag) is returned from the selection.
 
-      from Person p
+For example, this query returns the set of different names in the database:
 
-      where age(p)>20;
+`select distinct name(p) from Person p where age(p)>20;`
 
+The optional *group-by-clause* groups and summarizes (aggregates) the result. A select statement with a group-by-class is called a [grouped selection](#grouped-selection). For example:
+```sql
+ select name(p), sum(income(p))
+   from Person p
+ where age(p) > 20
+ group by name(p);
+ ```
 
-<span style="text-decoration: underline;"></span>
+The optional *order-by-clause* sorts the result ascending `('asc', default)` or descending `('desc')`. A select statement with an order-by-clause is called an [ordered selection](#ordered-selections). For example:
 
-To retrieve the results of [tuple valued functions](#tuple-result) in
-queries, use [tuple expressions](#tuple-expr), e.g.
+```sql
+select name(p), income(p)
+  from Person p
+where age(p) > 20
+  order by income(p) desc;
+```
 
-     select name(m), name(f) from Person m, Person p where (m,f) = parents2(p);
+The optional *limit-clause* limits the number of returned values from the select statement. It is often used together with ordered selections to specify [top-k queries](#top-k-queries). For example:
+```sql
+select name(p), income(p)
+  from Person p
+where age(p) > 20
+  order by income(p) desc
+limit 10;
+```
 
-Duplicates are removed from the result only when the keyword 'distinct'
-is specified, in which case a set (rather than a bag) is returned from
-the selection.\
+The optional *into-clause* specifies variables to be bound to the result. For example:
+```sql
+select p into :e from Person p where name(p) = 'Eve';
+```
 
-For example, this query returns the set of different names in the
-database:
+This query retrieves into the environment variable `:eve2` the Person whose name is `Eve`. __NOTICE__ that if the result bag contains more than one object the *into* variable(s) will be bound only to the *first* object in the bag. In the example, if more that one person is named Eve the first one found will be assigned to `:e`.
 
-     select distinct name(p) from Person p where age(p)>20;
-
-The optional *group-by-clause* groups and summarizes (aggregates) the
-result. A select statement with a group-by-class is called a [grouped
-selection](#grouped-selection). For example:
-
-     select name(p), sum(income(p))
-
-      from Person p
-
-     where age(p) > 20
-
-     group by name(p);
-
-
-The optional *order-by-clause* sorts the result ascending ('asc',
-default) or descending ('desc'). A select statement with an
-order-by-clause is called an [ordered selection](#ordered-selections).
-For example:\
-
-     select name(p), income(p)
-
-      from Person p
-
-     where age(p) > 20
-
-     order by income(p) desc;
-
-
-The optional *limit-clause* limits the number of returned values from
-the select statement. It is often used together with ordered selections
-to specify [top-k queries](#top-k-queries). For example:
-
-     select name(p), income(p)
-
-      from Person p
-
-     where age(p) > 20
-
-     order by income(p) desc
-
-     limit 10;
-
-
-The optional <span style="font-style: italic;">into-clause</span>
-specifies variables to be bound to the result.  <span
-style="font-weight: bold;"></span>
-
-For example:
-
-     select p into :e from Person p where name(p) = 'Eve';
-
-This query retrieves into the environment variable <span
-style="font-style: italic;">:eve2</span> the Person whose name is ``
-<span style="font-style: italic;">'Eve'</span>.\
- <span style="font-weight: bold;">\
- NOTICE </span> that if the result bag contains more than one object the
-<span style="font-style: italic;">into </span>variable(s) will be bound
-only to the <span style="font-style: italic;">first</span> object in the
-bag. In the example, if more that one person is named Eve the first one
-found will be assigned to *:e*.\
-\
- If you wish to assign the entire result from the select statement in a
-variable, enclose it in parentheses. The result will be a [bag](#Bags).
-The elements of the bag can then be extracted with the <span
-style="font-style: italic;">in()</span> function or the infix *in*
-operator:
-
-     set :r = (select p from Person p where name(p) = 'Eve');
-
+If you wish to assign the entire result from the select statement in a variable, enclose it in parentheses. The result will be a [bag](#Bags). The elements of the bag can then be extracted with the `in()` function or the infix *in* operator:
+```sql
+set :r = (select p from Person p where name(p) = 'Eve');
+```
 Inspect *:r* with one of these equivalent queries:
-
+```
      in(:r); select p from Person p where p in :r;
+```
+## Predicates
 
-### 2.4.3 Predicates
-
-The [where clause](#where-clause) in a select statement specifies a
-selection filter as a logical predicate over variables. A predicate is
-an expression returning a boolean including logical [comparison
-operators](#infix-functions)and functions with boolean results. The
-boolean operators <span style="font-style: italic;">and </span>and <span
-style="font-style: italic;">or</span> can be used to combine boolean
-values. The general syntax of a predicate expression is:
-
+The [where clause](#where-clause) in a select statement specifies a selection filter as a logical predicate over variables. A predicate is an expression returning a boolean including logical [comparison operators](#infix-functions)and functions with boolean results. The boolean operators <span style="font-style: italic;">and </span>and <span style="font-style: italic;">or</span> can be used to combine boolean values. The general syntax of a predicate expression is:
+```
     predicate-expression ::=
 
             predicate-expression 'and' predicate-expression | 
@@ -363,14 +265,6 @@ values. The general syntax of a predicate expression is:
 
        count(select friends(x) from Person x where child(x)) < 5
 
-
-
-
-
-
-
-
-
       The boolean operator
         and has precedence over
         or. Negation is handled by the quantifier function notany().
@@ -387,23 +281,21 @@ values. The general syntax of a predicate expression is:
 
 
       (a<2 and a>3) or (b<3 and b>2)
-
- <span
-style="font-family: monospace;"></span>
+```
 
 The comparison operators (=, !=, &lt;, &lt;=, and &gt;=) are treated as
-binary [predicates](#predicates). You can compare objects of any type.\
+binary [predicates](#predicates). You can compare objects of any type.
 
 Predicates are also allowed in the result of a select expression. For
-example, the query:\
+example, the query:
         <span style="font-family:
         monospace;">select age(:p1) &lt; 20 and
-home(:p1)="Uppsala";</span>\
+home(:p1)="Uppsala";</span>
  returns <span style="font-style: italic;">true</span> if person <span
 style="font-style: italic;">:p1</span> is younger than 20 and lives in
-Uppsala.\
+Uppsala.
 
-### 2.4.4 Grouped selections
+## Grouped selections
 
 When analyzing data it is often necessary to group data, for example to
 get the sum of the salaries of employees per department. Such
@@ -411,78 +303,78 @@ regroupings are specified though the *group-by-clause*. It specifies on
 which expressions in the select clause the data should be grouped and
 summarized.  A *grouped selection* is a select statement with a
 [group-by-clause](#group-by-clause) specified. The execution semantics
-of a grouped selection is different than for regular queries.\
+of a grouped selection is different than for regular queries.
 
-For example:\
+For example:
  `    ` `select name(d), sum(salary(p))` `        `
 `       from Department d, Person p   ` `        `
-`      where dept(p)=d` `        ` `      group by name(d);`\
-\
+`      where dept(p)=d` `        ` `      group by name(d);`
+
  Here the *group-by-clause* specifies that the result should be grouped
 on the name of the departments in the database. After the grouping, for
 each department *d* the salaries of the persons *p* working at that
 department should be summed using the [aggregate
-function](#aggregate-functions) *sum()*.\
+function](#aggregate-functions) *sum()*.
 
 An element of a [select-clause](#select-clause) of a grouped selection
-must be one of:\
+must be one of:
 
 1.  An element in the *group key* specified by the group-by-clause,
     which is *name(d)* in the example. The result is grouped on each
     group key. In the example the grouping is made over each department
-    name so the group key is specified as *name(d)*.\
+    name so the group key is specified as *name(d)*.
 2.  A call to an [aggregate function](#aggregate-functions), which is
     *sum()* in the example. The aggregate function is applied for the
     set of bindings specified by the group key. In the example the
     aggregate function *sum()* is applied on the set of values of
     *salary(p)* for the persons *p* working in department *d*, i.e.
-    where *dept(p)=d*.\
+    where *dept(p)=d*.
 
 In general aggregate functions such as *sum(), avg(), stdev(), min(),
 max(), count()* are applied on collections (bags) of values, rather than
 single objects.
 
-Contrast the above query to the regular (non-grouped) query:\
+Contrast the above query to the regular (non-grouped) query:
 
 `    ` `select name(d), sum(salary(p))` `        `
 `       from Department d, Person p   ` `        `
-`      where dept(p)=d` `;`\
+`      where dept(p)=d` `;`
 
 Without the grouping the aggregate function *sum()* is applied on the
 salary of each person *p*, rather than the collection of salaries
-corresponding to the group key *name(p)* in the grouped selection.\
+corresponding to the group key *name(p)* in the grouped selection.
 
 The group key need not be part of the result. For example the following
 query returns the sum of the salaries for all departments without
-revealing the department names:\
+revealing the department names:
  `    ` `select sum(salary(p))` `        `
 `       from Department d, Person p   ` `        `
-`      where dept(p)=d` `        ` `      group by name(d);`\
+`      where dept(p)=d` `        ` `      group by name(d);`
 
-### 2.4.5 Ordered selections\
+## Ordered selections
 
 The [order-by-clause](#order-by-clause) specifies that the result should
 be (partially) sorted by the specified *sort key*. The sort order is
-descending when *desc* is specified and ascending otherwise.\
+descending when *desc* is specified and ascending otherwise.
 
 For example, the following query sorts the result descending based on
 the sort key *salary(p)*:
 
-`  select name(p), salary(p)          from Person p         order by name(p) desc;          `\
- The sort key does not need to be part of the result.\
+`  select name(p), salary(p)          from Person p         order by name(p) desc;          `
+ The sort key does not need to be part of the result.
 
 For example, the following query list the salaries of persons in
 descending order without associating any names with the salaries:
 
 ` select salary(p)         from Person p        order by name(p) desc;        `
 
-### 2.4.6 Top-k queries
+## Top-k queries
 
 A *top-k query* is a query returning the first few tuples in a larger
 set of tuples based on some ranking. The
 [order-by-clause](#order-by-clause) and [limit-clause](#limit-clause)
 can be combined to specify top-k queries. For example, the following
-query returns the names and salaries of the 10 highest income earners:\
+query returns the names and salaries of the 10 highest income earners:
 
 `  select name(p), salary(p)          from Person p         order by name(p) desc         limit 10;        `
 
@@ -491,22 +383,22 @@ query retrieves the *:k+3* lowest income earners, where *:k* is a
 variable bound to a numeric value:
 
 `  select name(p), salary(p)          from Person p         order by name(p)         limit :k+3;`
-[](#generalized-aggregate-functions)\
+[](#generalized-aggregate-functions)
 
-### 2.4.7 Aggregation over subqueries\
+## Aggregation over subqueries
 
-[Aggregate functions](#aggregate-functions) can be used in two ways:\
+[Aggregate functions](#aggregate-functions) can be used in two ways:
 
 1.  They can be used in [grouped selections](#grouped-selection).
-2.  They can be applied on *subqueries*.\
+2.  They can be applied on *subqueries*.
 
 In the second case, the subqueries are specified as nested select
-expressions returning [bags](#bags), for example:\
+expressions returning [bags](#bags), for example:
 
 <span style="font-family: monospace;">   avg(**select income(p) from
-Person p**);\
- </span>\
- Consider the query:\
+Person p**);
+ </span>
+ Consider the query:
 
         select name(friends(p))
 
@@ -524,7 +416,7 @@ This is called [Daplex semantics](#daplex-semantics).
 
 <span style="text-decoration: underline;"></span>Aggregate functions
 work differently. They are applied <span style="font-style: italic;">on
-the entire</span> bag. For example:\
+the entire</span> bag. For example:
 
         count(friends(:p));
 
@@ -533,11 +425,11 @@ on the subquery of all friends of <span
 style="font-style: italic;">:p</span>. The system uses a rule that
 arguments are converted (coerced) into a subquery when an argument of
 the calling function <span style="font-style:
-        italic;">(e.g. count</span>) is declared *Bag of*.\
+        italic;">(e.g. count</span>) is declared *Bag of*.
 
 Local variables in queries may be declared as bags, which means that the
 variable is bound to a subquery that can be used as arguments to
-aggregate functions. For example:\
+aggregate functions. For example:
 
      select sum(b), avg(b), stdev(b)
 
@@ -549,7 +441,7 @@ aggregate functions. For example:\
 
 
 Elements in subqueries can be accessed with the *in* operator. For
-example:\
+example:
 
      select name(p), count(b)
 
@@ -560,22 +452,22 @@ example:\
      and p in b;
 
 The query returns the names of all persons paired with the number of
-persons in the database.\
+persons in the database.
 
 Variables may be assigned to bags by assigning values of functions
-returning bags, for example:\
+returning bags, for example:
  `   set :f = friends(:p);         count(:f);        `
 
 Bags are not explicitly stored in the database, but are generated when
 needed, for example when they are used in aggregate functions or *in*.
-For example:\
- `   set :bigbag = iota(1,10000000);`\
+For example:
+ `   set :bigbag = iota(1,10000000);`
  assigns *:bigbag* to a bag of 10^7^ numbers. The bag is not explicitly
 created though. Instead its elements are generated when needed, for
-example when executing:\
- `   count(:bigbag);`\
-\
- To compare that two bags are equal use:\
+example when executing:
+ `   count(:bigbag);`
+
+ To compare that two bags are equal use:
 
      bequal(Bag x, Bag y) -> Boolean
 
@@ -583,26 +475,20 @@ example when executing:\
 <span style="font-weight: bold;">Notice</span> that *bequal()*
 materializes its arguments before doing the equality computation, which
 may occupy a lot of temporary space in the database image if the bags
-are large.\
+are large.
 
 
+See [Aggregate functions](#aggregate-functions) for a details on
+aggregate functions.
 
-
-###
-
-See [7.4 Aggregate functions](#aggregate-functions) for a details on
-aggregate functions.\
-
-### 2.4.8 Quantifiers
-
-###
+## Quantifiers
 
 The function <span style="font-style: italic;">some() </span>implements
-logical exist over a subquery:\
+logical exist over a subquery:
 
     some(Bag sq) -> Boolean
 
-for example\
+for example
 
      select name(p)
 
@@ -610,14 +496,14 @@ for example\
 
       where some(parents(p));
 
-\
+
  The function <span style="font-style: italic;">notany()</span> tests if
 a subquery <span style="font-style: italic;">sq</span> returns empty
-result, i.e. negation <span style="font-style: italic;"></span>:\
+result, i.e. negation <span style="font-style: italic;"></span>:
 
     notany(Bag sq) -> Boolean
 
-For example:\
+For example:
 
      select name(p)
 
