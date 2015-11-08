@@ -230,9 +230,9 @@ bag-constr ::= bag(expr-commalist)
         bag(1,:x+2)
 
 vector-constr ::= '{' expr-comma-list '}'
-  E.g.: {1,2,3}
-        {{1,2},{3,4}}
-        {1,name(:p),1+sqrt(:a)}
+  E.g.: { 1,2,3 }
+        { {1,2},{3,4} }
+        { 1,name(:p),1+sqrt(:a) }
 
 record-constr ::= '{' key-value-comma-list '}'
 key-value ::= string-constant ':' expr

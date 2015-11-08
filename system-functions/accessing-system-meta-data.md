@@ -123,8 +123,8 @@ Returns vector describing arguments of signature of resolvent `r`. Each element 
 
 ```
 arguments(#'timespan');  
---> {{#[OID 371 "TIMEVAL"],"TV1","nonkey"},
-     {#[OID 371 "TIMEVAL"],"TV2","nonkey"}}
+--> { {#[OID 371 "TIMEVAL"],"TV1","nonkey"},
+     {#[OID 371 "TIMEVAL"],"TV2","nonkey"} }
 ```
 
 ```
