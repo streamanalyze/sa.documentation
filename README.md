@@ -1,3 +1,6 @@
+# sa.amos documentation
+[![Codeship Status for streamanalyze/sa.documentation](https://codeship.com/projects/60eec820-662d-0133-2128-72bdfd530753/status?branch=master)](https://codeship.com/projects/113715)
+
 ## Contributing
 
 See our [contributing guidelines](CONTRIBUTING.md) and our [code of conduct](CODE_OF_CONDUCT.md)
@@ -16,7 +19,7 @@ npm install
 gitbook serve
 ```
 
-### Setup (Windows). 
+### Setup (Windows).
 
 1. Make asure you have a NodeJS runtime installed. If not, download the installer from <https://nodejs.org/en/>
 2. Install the package and make sure you have the NPM package manager selected.
