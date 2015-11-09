@@ -8,7 +8,7 @@ Several distributed sa.amos peers can collaborate in a federation. The documenta
 
 sa.engine enables wrappers to be defined for different kinds of data sources and external storage managers accessed to make them queryable. A predefined wrapper for relational databases allows queries combining relational data with other kinds of data accessible through sa.amos.
 
-This manual describes how to use the Amos II system and the AmosQL query language. The principles of sa.amos and AmosQL are described in the document [\[RJK03\]](#RJK03).
+This manual describes how to use the Amos II system and the AmosQL query language. The principles of sa.amos and AmosQL are described in the document [^RJK03].
 
 ## Organization of documentation
 
