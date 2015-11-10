@@ -4,11 +4,11 @@ The order of the objects in the bag returned by a regular [select statement](#se
 
 If it is required to maintain the order of a set of data values the data type *Vector* has to be used. The collection datatype *Vector* represent ordered collections of any kinds of objects; the simplest and most common case of a vector is a numerical vector of numbers. In case the order of a query result is significant you can specify *vector queries* which preserves the order in query result by returning vectors, rather than the bags returned by regular select statements. This is particularly important when working with numerical vectors. A vector query can be one of the following:
 
-1.  It can be a [vector construction](#vector-construction) expression that creates a new vector from other objects.
-2.  It can be a [vector indexing](#vector-index) expression that accesses vector elements by their indexes.
-3.  It can be a regular [select statement](#select-statement) returning a set of constructed vectors.
-4.  It can be a [vselect statement](#vselect), which returns an ordered vector rather than an unordered bag as the regular select statement.
-5.  It can be a call to some [vector function](#vector-function) returning vectors as result.
+1. It can be a [vector construction](#vector-construction) expression that creates a new vector from other objects.
+2. It can be a [vector indexing](#vector-index) expression that accesses vector elements by their indexes.
+3. It can be a regular [select statement](#select-statement) returning a set of constructed vectors.
+4. It can be a [vselect statement](#vselect), which returns an ordered vector rather than an unordered bag as the regular select statement.
+5. It can be a call to some [vector function](#vector-function) returning vectors as result.
 
 ## Vector construction
 

@@ -223,7 +223,7 @@ Inspect *:r* with one of these equivalent queries:
 ```
 ## Predicates
 
-The [where clause](#where-clause) in a select statement specifies a selection filter as a logical predicate over variables. A predicate is an expression returning a boolean including logical [comparison operators](#infix-functions)and functions with boolean results. The boolean operators <span style="font-style: italic;">and </span>and <span style="font-style: italic;">or</span> can be used to combine boolean values. The general syntax of a predicate expression is:
+The [where clause](#where-clause) in a select statement specifies a selection filter as a logical predicate over variables. A predicate is an expression returning a boolean including logical [comparison operators](#infix-functions)and functions with boolean results. The boolean operators `and` and `or` can be used to combine boolean values. The general syntax of a predicate expression is:
 ```
     predicate-expression ::=
 
@@ -234,10 +234,6 @@ The [where clause](#where-clause) in a select statement specifies a selection fi
             '(' predicate-expression ')' | 
 
             expr
-
-
-
-
 
         Examples of predicates:
 
@@ -251,17 +247,13 @@ The [where clause](#where-clause) in a select statement specifies a selection fi
 
      home(p) = "Uppsala" and name(p) = "Kalle"
 
-
        name(x) = "Carl" and child(x)
 
-
        x < 5 or x > 6 and 5 < y
-
 
        1+y <= sqrt(5.2)
 
      parents2(p) = (m,f)
-
 
        count(select friends(x) from Person x where child(x)) < 5
 
@@ -274,239 +266,187 @@ The [where clause](#where-clause) in a select statement specifies a selection fi
 
      a<2 and a>3 or b<3 and b>2
 
-
-
       is equivalent to
-
-
 
       (a<2 and a>3) or (b<3 and b>2)
 ```
 
-The comparison operators (=, !=, &lt;, &lt;=, and &gt;=) are treated as
+The comparison operators (=, !=, >, <=, and >=) are treated as
 binary [predicates](#predicates). You can compare objects of any type.
 
 Predicates are also allowed in the result of a select expression. For
 example, the query:
-        <span style="font-family:
-        monospace;">select age(:p1) &lt; 20 and
-home(:p1)="Uppsala";</span>
- returns <span style="font-style: italic;">true</span> if person <span
-style="font-style: italic;">:p1</span> is younger than 20 and lives in
-Uppsala.
+```
+select age(:p1) < 20 and home(:p1)="Uppsala";
+```
+returns `true` if person `:p1` is younger than 20 and lives in Uppsala.
 
 ## Grouped selections
 
-When analyzing data it is often necessary to group data, for example to
-get the sum of the salaries of employees per department. Such
-regroupings are specified though the *group-by-clause*. It specifies on
-which expressions in the select clause the data should be grouped and
-summarized.  A *grouped selection* is a select statement with a
-[group-by-clause](#group-by-clause) specified. The execution semantics
-of a grouped selection is different than for regular queries.
+When analyzing data it is often necessary to group data, for example to get the sum of the salaries of employees per department. Such regroupings are specified though the `group-by-clause`. It specifies on which expressions in the select clause the data should be grouped and summarized.  A *grouped selection* is a select statement with a [group-by-clause](#group-by-clause) specified. The execution semantics of a grouped selection is different than for regular queries.
 
 For example:
- `    ` `select name(d), sum(salary(p))` `        `
-`       from Department d, Person p   ` `        `
-`      where dept(p)=d` `        ` `      group by name(d);`
+```
+select name(d), sum(salary(p))
+  from Department d, Person p
+where dept(p)=d
+group by name(d);
+```
 
- Here the *group-by-clause* specifies that the result should be grouped
-on the name of the departments in the database. After the grouping, for
-each department *d* the salaries of the persons *p* working at that
-department should be summed using the [aggregate
-function](#aggregate-functions) *sum()*.
+Here the *group-by-clause* specifies that the result should be grouped on the name of the departments in the database. After the grouping, for each department `d` the salaries of the persons `p` working at that department should be summed using the [aggregate function](#aggregate-functions) `sum()`.
 
-An element of a [select-clause](#select-clause) of a grouped selection
-must be one of:
+An element of a [select-clause](#select-clause) of a grouped selection must be one of:
 
-1.  An element in the *group key* specified by the group-by-clause,
-    which is *name(d)* in the example. The result is grouped on each
-    group key. In the example the grouping is made over each department
-    name so the group key is specified as *name(d)*.
-2.  A call to an [aggregate function](#aggregate-functions), which is
-    *sum()* in the example. The aggregate function is applied for the
-    set of bindings specified by the group key. In the example the
-    aggregate function *sum()* is applied on the set of values of
-    *salary(p)* for the persons *p* working in department *d*, i.e.
-    where *dept(p)=d*.
+1. An element in the *group key* specified by the group-by-clause, which is `name(d)` in the example. The result is grouped on each group key. In the example the grouping is made over each department name so the group key is specified as `name(d)`.
+2. A call to an [aggregate function](#aggregate-functions), which is `sum()` in the example. The aggregate function is applied for the set of bindings specified by the group key. In the example the aggregate function `sum()` is applied on the set of values of `salary(p)` for the persons `p` working in department `d`, i.e. where `dept(p)=d`.
 
-In general aggregate functions such as *sum(), avg(), stdev(), min(),
-max(), count()* are applied on collections (bags) of values, rather than
-single objects.
+In general aggregate functions such as `sum()`, `avg()`, `stdev()`, `min()`, `max()`, `count()` are applied on collections (bags) of values, rather than single objects.
 
 Contrast the above query to the regular (non-grouped) query:
 
-`    ` `select name(d), sum(salary(p))` `        `
-`       from Department d, Person p   ` `        `
-`      where dept(p)=d` `;`
+```sql
+select name(d), sum(salary(p))
+  from Department d, Person p
+where dept(p)=d;
+```
 
-Without the grouping the aggregate function *sum()* is applied on the
-salary of each person *p*, rather than the collection of salaries
-corresponding to the group key *name(p)* in the grouped selection.
+Without the grouping the aggregate function `sum()` is applied on the salary of each person `p`, rather than the collection of salaries corresponding to the group key `name(p)` in the grouped selection.
 
-The group key need not be part of the result. For example the following
-query returns the sum of the salaries for all departments without
-revealing the department names:
- `    ` `select sum(salary(p))` `        `
-`       from Department d, Person p   ` `        `
-`      where dept(p)=d` `        ` `      group by name(d);`
+The group key need not be part of the result. For example the following query returns the sum of the salaries for all departments without revealing the department names:
+```
+select sum(salary(p))
+  from Department d, Person p
+  where dept(p)=d   
+  group by name(d);
+```
 
 ## Ordered selections
 
-The [order-by-clause](#order-by-clause) specifies that the result should
-be (partially) sorted by the specified *sort key*. The sort order is
-descending when *desc* is specified and ascending otherwise.
+The [order-by-clause](#order-by-clause) specifies that the result should be (partially) sorted by the specified *sort key*. The sort order is descending when *desc* is specified and ascending otherwise.
 
-For example, the following query sorts the result descending based on
-the sort key *salary(p)*:
+For example, the following query sorts the result descending based on the sort key `salary(p)`:
 
-`  select name(p), salary(p)          from Person p         order by name(p) desc;          `
- The sort key does not need to be part of the result.
+```sql
+select name(p), salary(p)
+ from Person p
+order by name(p) desc;
+```
+The sort key does not need to be part of the result.
 
-For example, the following query list the salaries of persons in
-descending order without associating any names with the salaries:
-
-` select salary(p)         from Person p        order by name(p) desc;        `
+For example, the following query list the salaries of persons in descending order without associating any names with the salaries:
+```sql
+select salary(p)
+from Person p
+order by name(p) desc;
+```
 
 ## Top-k queries
 
-A *top-k query* is a query returning the first few tuples in a larger
-set of tuples based on some ranking. The
-[order-by-clause](#order-by-clause) and [limit-clause](#limit-clause)
-can be combined to specify top-k queries. For example, the following
-query returns the names and salaries of the 10 highest income earners:
+A *top-k query* is a query returning the first few tuples in a larger set of tuples based on some ranking. The order-by-clause](#order-by-clause) and [limit-clause](#limit-clause) can be combined to specify top-k queries. For example, the following query returns the names and salaries of the 10 highest income earners:
+```sql
+select name(p), salary(p)
+from Person p
+order by name(p) desc
+limit 10;
+```
 
-`  select name(p), salary(p)          from Person p         order by name(p) desc         limit 10;        `
-
-The limit can be any numerical expression.For example, the following
-query retrieves the *:k+3* lowest income earners, where *:k* is a
-variable bound to a numeric value:
-
-`  select name(p), salary(p)          from Person p         order by name(p)         limit :k+3;`
-[](#generalized-aggregate-functions)
+The limit can be any numerical expression.For example, the following query retrieves the `:k+3` lowest income earners, where `:k` is a variable bound to a numeric value:
+```sql
+select name(p), salary(p)
+from Person p
+order by name(p)
+limit :k+3;
+```
 
 ## Aggregation over subqueries
 
 [Aggregate functions](#aggregate-functions) can be used in two ways:
 
-1.  They can be used in [grouped selections](#grouped-selection).
-2.  They can be applied on *subqueries*.
+1. They can be used in [grouped selections](#grouped-selection).
+2. They can be applied on *subqueries*.
 
-In the second case, the subqueries are specified as nested select
-expressions returning [bags](#bags), for example:
+In the second case, the subqueries are specified as nested select expressions returning [bags](#bags), for example:
 
-<span style="font-family: monospace;">   avg(**select income(p) from
-Person p**);
- </span>
- Consider the query:
+```
+avg(select income(p) from Person p);
+```
+Consider the query:
+```
+select name(friends(p))
+  from Person p
+where name(p)= "Bill";
+```
 
-        select name(friends(p))
+The function `friends()` returns a bag of persons, on which the function `name()` is applied. The normal semantics in sa.amos is that when a function (e.g. `name()`) is applied on a bag valued function (e.g. `friends()`) it will be *applied on each element* of the returned bag. In the example a bag of the names of the persons named Bill is returned. This is called [Daplex semantics](#daplex-semantics).
 
-     from Person p
+Aggregate functions work differently. They are applied on the entire bag. For example:
+```
+count(friends(:p));
+```
+In this case `count()` is applied on the subquery of all friends of `:p`. The system uses a rule that arguments are converted (coerced) into a subquery when an argument of the calling function(e.g. `count`) is declared *Bag of*.
 
-     where name(p)= "Bill";
+Local variables in queries may be declared as bags, which means that the variable is bound to a subquery that can be used as arguments to aggregate functions. For example:
 
+```
+select sum(b), avg(b), stdev(b)
+from Bag of Integer b
+where b = (select income(p)
+from Person p);
+```
 
-The function *friends()* returns a bag of persons, on which the function
-*name()* is applied. The normal semantics in sa.amos is that when a
-function (e.g. *name()*) is applied on a bag valued function (e.g.
-*friends()*) it will be *applied on each element* of the returned bag.
-In the example a bag of the names of the persons named Bill is returned.
-This is called [Daplex semantics](#daplex-semantics).
+Elements in subqueries can be accessed with the *in* operator. For example:
+```
+select name(p), count(b)
+  from Bag of Integer b, Person p
+  where b = (select p from Person p)
+  and p in b;
+```
 
-<span style="text-decoration: underline;"></span>Aggregate functions
-work differently. They are applied <span style="font-style: italic;">on
-the entire</span> bag. For example:
+The query returns the names of all persons paired with the number of persons in the database. Variables may be assigned to bags by assigning values of functions returning bags, for example:
 
-        count(friends(:p));
+```
+set :f = friends(:p);
+count(:f);
+```
 
-In this case <span style="font-style: italic;">count() </span>is applied
-on the subquery of all friends of <span
-style="font-style: italic;">:p</span>. The system uses a rule that
-arguments are converted (coerced) into a subquery when an argument of
-the calling function <span style="font-style:
-        italic;">(e.g. count</span>) is declared *Bag of*.
+Bags are not explicitly stored in the database, but are generated when needed, for example when they are used in aggregate functions or *in*. For example:
+```
+set :bigbag = iota(1,10000000);
+```
+assigns *:bigbag* to a bag of 10^7^ numbers. The bag is not explicitly created though. Instead its elements are generated when needed, for example when executing:
+```
+count(:bigbag);
+```
 
-Local variables in queries may be declared as bags, which means that the
-variable is bound to a subquery that can be used as arguments to
-aggregate functions. For example:
+To compare that two bags are equal use:
+```
+bequal(Bag x, Bag y) -> Boolean
+```
 
-     select sum(b), avg(b), stdev(b)
+**Notice** that *bequal()* materializes its arguments before doing the equality computation, which may occupy a lot of temporary space in the database image if the bags are large.
 
-     from Bag of Integer b
-
-     where b = (select income(p)
-
-     from Person p);
-
-
-Elements in subqueries can be accessed with the *in* operator. For
-example:
-
-     select name(p), count(b)
-
-     from Bag of Integer b, Person p
-
-     where b = (select p from Person p)
-
-     and p in b;
-
-The query returns the names of all persons paired with the number of
-persons in the database.
-
-Variables may be assigned to bags by assigning values of functions
-returning bags, for example:
- `   set :f = friends(:p);         count(:f);        `
-
-Bags are not explicitly stored in the database, but are generated when
-needed, for example when they are used in aggregate functions or *in*.
-For example:
- `   set :bigbag = iota(1,10000000);`
- assigns *:bigbag* to a bag of 10^7^ numbers. The bag is not explicitly
-created though. Instead its elements are generated when needed, for
-example when executing:
- `   count(:bigbag);`
-
- To compare that two bags are equal use:
-
-     bequal(Bag x, Bag y) -> Boolean
-
-
-<span style="font-weight: bold;">Notice</span> that *bequal()*
-materializes its arguments before doing the equality computation, which
-may occupy a lot of temporary space in the database image if the bags
-are large.
-
-
-See [Aggregate functions](#aggregate-functions) for a details on
-aggregate functions.
+See [Aggregate functions](#aggregate-functions) for a details on aggregate functions.
 
 ## Quantifiers
 
-The function <span style="font-style: italic;">some() </span>implements
-logical exist over a subquery:
-
-    some(Bag sq) -> Boolean
-
+The function `some()` implements logical exist over a subquery:
+```
+some(Bag sq) -> Boolean
+```
 for example
+```
+select name(p)
+from Person p
+ where some(parents(p));
+```
 
-     select name(p)
-
-     from Person p
-
-      where some(parents(p));
-
-
- The function <span style="font-style: italic;">notany()</span> tests if
-a subquery <span style="font-style: italic;">sq</span> returns empty
-result, i.e. negation <span style="font-style: italic;"></span>:
-
-    notany(Bag sq) -> Boolean
-
+The function `notany()` tests if a subquery sq returns empty result, i.e. negation
+```
+notany(Bag sq) -> Boolean
+```
 For example:
-
-     select name(p)
-
-     from Person p
-
-     where notany(select parents(p) where age(p)>65);
+```
+select name(p)
+from Person p
+where notany(select parents(p) where age(p)>65);
+```

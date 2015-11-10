@@ -12,8 +12,8 @@ This section is organized as follows:
 
 -   Before going into the details of the different kinds of AmosQL statements, in [basic constructs](#basic-constructs) the syntactic notation is introduced along with descriptions of syntax and semantics of the basic building blocks of the query language.
 -   [Defining Types](#defining-types) describes how to create a simple database schema by defining types and properties.
--   [Section 2.3](#create-object) describes how to populate the database by creating objects.
--   The concept of *queries* over a populated database is presented in [Section 2.4](#query-statement).
+-   [Creating Objects](#create-object) describes how to populate the database by creating objects.
+-   The concept of *queries* over a populated database is presented in [the Queries section](#query-statement).
 -   Regular queries return unordered sets of data. In addition sa.amos provides the ability to specify *vector queries*, which return ordered sequences of data, as described in [Section 2.5](#vector-queries).
 -   A central concept in sa.amos is the extensive use of *functions* in database schema definitions. There are several kinds of user-defined functions supported by the system as described in [Section 2.6](#function-definitions).
 -   [Section 2.7](#updates) describes how to *update* a populated database.
