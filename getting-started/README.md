@@ -1,7 +1,7 @@
 # Getting started
 
 
-Download the sa.amos zip from <http://www.it.uu.se/research/group/udbl/amos/>. Unpack the zip file to a directory for sa.amos, `<privdir>`. The following files are needed in `<privdir>/bin;`: `amos2.exe amos2.dll amos2.dmp`
+Unpack the zip file to a directory for sa.amos, `<privdir>`. The following files are needed in `<privdir>/bin;`: `amos2.exe amos2.dll amos2.dmp`
 
 sa.amos is ready to run in `<privdir>/bin` by the command:
 
