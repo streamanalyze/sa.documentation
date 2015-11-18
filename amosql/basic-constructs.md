@@ -69,7 +69,9 @@ are always written with *lower case* letters.
 
 ## Variables
 
-Variables are of two kinds: *local variables* or *interface variables*:
+Variables are of two kinds: *local variables* or *interface variables*. 
+
+Syntax:
 ```
 variable ::= 
      local variable | interface-variable
@@ -109,8 +111,9 @@ Examples:
 ```
 
 The user can declare an interface variable to be of a particular type
-by the interface variable declare statement:
+by the interface variable declare statement. 
 
+Syntax:
 ```
 interface-variable-declare-stmt ::= 
       'declare' interface-variable-declaration-commalist
@@ -125,8 +128,9 @@ Example:
 
 Interface variables can be assigned either by the into-clause of the
 select statement or by the interface variable assignment statement
-*set*:
+*set*. 
 
+Syntax:
 ```
 set-interface-variable-stmt ::= 
       'set' interface-variable '=' expr
@@ -140,8 +144,8 @@ Examples
 ## Constants
 
 Constants can be integers, reals, strings, time stamps, booleans, or nil.
-Syntax:
 
+Syntax:
 ```
 constant ::=
       integer-constant | real-constant | boolean-constant |
@@ -149,13 +153,7 @@ constant ::=
 
 integer-constant ::=
       ['-'] digit-list
-```
-Examples:
-```
-   123
-   -123
-``` 
-``` 
+
 real-constant ::=
       decimal-constant | scientific-constant
 
@@ -167,21 +165,28 @@ scientific-constant ::=
 
 ```
 Examples:
-``` 
+```
+   123
+   -123
    1.2
    -1.0
    2.3E2
    -2.4e-21
 ``` 
+
+Boolean contsant represent logical values. 
+
+Syntax:
 ``` 
 boolean-constant ::=
       'true' | 'false'
 ``` 
-
 The constant *false* is equivalent to nil casted to type *Boolean*. The
 only legal boolean value that can be stored in the database is true
 and a boolean value is regarded as false if it is not in the database
-(called close world assumption).  
+(called close world assumption).
+
+String have syntax:  
 ```
 string-constant ::=
         string-separator character-list string-separator
@@ -203,6 +208,9 @@ escape character inside the string, replacing the succeeding
 character. For example the string `'ab"\'` can also be written as
 `"ab\"\\"`, and the string `a'"b` must be written as `"a'\"b"`.
 
+A [simple value](#simple-value) is either a constant or a variable reference.
+
+Syntax:
 ```
 simple-value ::= constant | variable
 ```
@@ -213,7 +221,6 @@ Examples:
    123
    "Hello World"
 ```
-A [simple value](#simple-value) is either a constant or a variable reference.
 
 ## Expressions
 
@@ -222,6 +229,7 @@ be evaluated by the system to produce a *value*. Complex expressions
 can be built up in terms of other expression. Expressions are basic
 building blocks in all kinds of AmosQL statements.  
 
+Syntax:
 ```
 expr ::=
       simple-value | function-call | collection-constr | casting |
@@ -240,14 +248,13 @@ Examples:
 ```
 
 The value of an expression is computed if the expression is entered to
-the sa.amos top loop, e.g.:
-
+the sa.amos top loop. Example:
 ```
    1+5*sqrt(6);
 ```
 
 Notice that Boolean expressions, [predicates](#predicates), either
-return *true*, or nothing if the expression is not true. For example:
+return *true*, or nothing if the expression is not true. Example:
 
 ```
    1<2 or 3<2;
@@ -257,7 +264,7 @@ return *true*, or nothing if the expression is not true. For example:
 ```
 
 Entering simple expressions followed by a semicolon is the simplest
-form of AmosQL [queries](#query-statement), e.g.:
+form of AmosQL [queries](#query-statement). Example:
 
 ```
    1+sqrt(25);
@@ -273,8 +280,9 @@ collections: bags, vectors, and key-value associations (records):
 - A `record` is an associative array of key-value pairs.
 
 Collections are constructed by collection constructor
-expressions. Syntax:
+expressions. 
 
+Syntax:
 ```
 collection-constr ::= 
       bag-constr | vector-constr | record-constr
@@ -355,7 +363,9 @@ notation `r[f]`, for example:
 
 ## Comments
 
-A *comment* can be placed anywhere in an AmosQL statement outside [identifiers](#identifiers), constants, or variables. Syntax:
+A *comment* can be placed anywhere in an AmosQL statement outside [identifiers](#identifiers), constants, or variables. 
+
+Syntax:
 ```
 comment ::= 
        '/*' character-list '*/'
