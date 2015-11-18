@@ -1,12 +1,16 @@
 {
     "gitbook": "2.x.x",
-    "plugins": ["anchors"],
+    "plugins": ["anchors","gtm"],
     "links": {
         "sidebar": {
             "Stream Analyze": "http://streamanalyze.com/"
         }
     },
-    "pluginsConfig": {},
+    "pluginsConfig": {
+        "gtm": {
+            "token": "GTM-NSVCNH"
+        }
+    },
     "structure": {
         "readme": "introduction.md"
     }
