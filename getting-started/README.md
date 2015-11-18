@@ -2,8 +2,8 @@
 
 
 Unpack the zip file to a directory for sa.amos, `<privdir>`. The
-following files are needed in `<privdir>/bin;`: `amos2.exe amos2.dll
-amos2.dmp`
+following files are needed in `<privdir>/bin;`: `sa.amos.exe sa.amos.dll
+sa.amos.dmp`
 
 sa.amos is ready to run in `<privdir>/bin` by the command:
 
@@ -35,7 +35,7 @@ where `n` is a *generation number*. The generation number is increased
 every time an AmosQL statement that updates the database is executed
 in the sa.amos top loop.
 
-Typically you start by defining  meta-data (a schema) as
+Typically you start by defining meta-data (a schema) as
 [types](#types) and properties of types represented as
 [functions](#function-definitions). For example, the following
 statement create a type named `Person` having two property functions
@@ -83,7 +83,7 @@ will restore the database to the state it had at generation number
 2. A rollback without arguments undoes all database changes of the
 current transaction. The statement `commit` makes changes
 permanent, i.e. all updates so far cannot be rolled back any more
-and the generation numbering starts over from 1. 
+and the generation numbering starts over from 1.
 
 For example:
 ```
@@ -125,10 +125,14 @@ tutorial on object-oriented database design with sa.amos in
 
 Whe you download the system you also get a 32-bits Java engine (Java
 Virtual machine, JVM).  The JVM can be loaded into sa.amos by
-executing the command: ...  [sa.amos] 1> enable_java(); ...  Once Java
+executing the command:
+```
+[sa.amos] 1> enable_java(); ...
+```
+Once Java
 is enabled the sa.amos kernel can call code written in Java. You can
 define sa.amos [foreign functions](#foreign-functions) in Java (the
-*callout* interface). 
+*callout* interface).
 
 ## Back-end relational databases
 
