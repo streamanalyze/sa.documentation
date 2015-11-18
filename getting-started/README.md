@@ -42,7 +42,7 @@ statement create a type named `Person` having two property functions
 `name()` and `income()`:
 
 ```
-[sa.amos] n> create type Person properties (name Charstring, income Number);
+[sa.amos] 1> create type Person properties (name Charstring, income Number);
 ```
 
 When the meta-data is defined you usually *populate* the database by
@@ -50,7 +50,7 @@ When the meta-data is defined you usually *populate* the database by
 
 For example:
 ```
-[sa.amos] n> create Person(name,income) instances
+[sa.amos] 2> create Person(name,income) instances
  ("Bill",100),
  ("John",250),
  ("Ulla",380),
@@ -60,14 +60,14 @@ For example:
 When the database is populated you can [query](#query-statement) it, e.g.:
 
 ```
-[sa.amos] n> select income(p) from
+[sa.amos] 3> select income(p) from
         Person p where name(p)="Ulla";
 ```
 
 Usually you load AmosQL definitions from a script file rather than entering them on the command line, e.g.
 
 ```
-[sa.amos] n> < 'mycode.amosql';
+[sa.amos] 4> < 'mycode.amosql';
 ```
 
 ### Transactions
@@ -76,7 +76,7 @@ Database changes can be undone by using the `rollback` statement with
 a generation number as argument. For example, the statement:
 
 ```
-[sa.amos] n> rollback 2;
+[sa.amos] 5> rollback 2;
 ```
 
 will restore the database to the state it had at generation number
@@ -86,10 +86,9 @@ permanent, i.e. all updates so far cannot be rolled back any more
 and the generation numbering starts over from 1. 
 
 For example:
-Â 
 ```
-[sa.amos] n> commit;
-[sa.amos] n> ...
+[sa.amos] 2> commit;
+[sa.amos] 1> ...
 ```
 
 ### Saving and quitting
@@ -98,7 +97,7 @@ When your sa.amos database is defined and populated, it can be saved
 on disk with the AmosQL statement:
 
 ```
-[sa.amos] n> save "foo.dmp";
+[sa.amos] 1> save "foo.dmp";
 ```
 
 In a later session you can connect to the saved database by starting
@@ -111,7 +110,7 @@ sa.amos.exe foo.dmp
 To shut down sa.amos orderly first save the database and then type:
 
 ```
-[sa.amos] n> quit;
+[sa.amos] 1> quit;
 ```
 
 __This is all you need to know to get started with sa.amos.__
