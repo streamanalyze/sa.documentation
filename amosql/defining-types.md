@@ -5,7 +5,6 @@ The `create type` statement creates a new type stored in the database.
 Syntax:
 ```
 create-type-stmt ::=
-
       'create type' type-name ['under' type-name-commalist]
 
                     ['properties' '(' attr-function-commalist ')']
@@ -17,6 +16,21 @@ type-name ::= identifier
 
 attr-function ::= 
       generic-function-name type-spec ['key']
+
+generic-function-name ::= identifier
+```
+Examples:
+```
+   create type Course properties
+   (name Charstring key);
+
+   create type Person properties
+   (name Charstring key,
+    income Number,
+    parents Bag of Person);
+
+   create type Student under Person properties
+   (courses Bag of Course);
 ```
 
 Type names are **not** case sensitive and the type names are always
@@ -26,14 +40,6 @@ unique in the database.
 
 The `attr-function-commalist` clause is optional, and provides a way
 to define properties of the new type, for example:
-
-```
-   create type Person properties
-        (name Charstring,
-         income Number,
-         age Number,
-         parents Bag of Person);
-```
 
 Each property is a [function](#function-definitions) having a single
 argument and a single result. The argument type of a property function
