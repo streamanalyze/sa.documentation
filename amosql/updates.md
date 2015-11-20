@@ -217,13 +217,7 @@ Since inverse functions are [updatable](#updates) the function
 
 Any variable in a stored function can be specified as key, which will
 restrict the updates the stored functions to maintain key uniqueness
-for the argument or result of the stored function. For example, the
-cardinality constraints on the following function `distance()`
-prohibits more than one distance between two cities:
-```sql
-   create function distance(City x key, City y  key) ->  Integer d
-     as stored;
-```
+for the argument or result of the stored function. 
 
 Cardinality constraints can also be specified for foreign functions,
 which is important for optimizing queries involving foreign

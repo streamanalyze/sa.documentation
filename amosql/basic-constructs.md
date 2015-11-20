@@ -36,9 +36,9 @@ statement ::=
       declare-interface-variable-stmt |
       commit-stmt                     |
       rollback-stmt                   |
-      open-cursor-stmt                |
-      fetch-cursor-stmt               |
-      close-cursor-stmt               |
+      open-stmt                       |
+      fetch-stmt                      |
+      close-stmt                      |
       quit-stmt                       |
       exit-stmt
 ```
