@@ -28,7 +28,7 @@
     * The vselect statement
     * Accessing vector elements
     * Vector functions
-  * [Defining Functions](amosql/defining-functions.md)
+  * [Functions](amosql/defining-functions.md)
     * Stored functions
     * Derived functions
     * Overloaded functions

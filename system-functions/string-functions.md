@@ -1,73 +1,90 @@
 # String functions
 
-String concatenation is made using the `+` operator, e.g.
+String concatenation is made using the `+` operator. Examples:
 ```
-"ab" + "cd" + "ef";  returns "abcdef"
-"ab"+12+"de"; returns "ab12de"
-1+2+"ab"; is illegal since the first argument of '+' must be a string.
-"ab"+1+2; returns "ab12" since '+' is left associative.
+   "ab" + "cd" + "ef";  returns "abcdef"
+   "ab"+12+"de"; returns "ab12de"
+   1+2+"ab"; is illegal since the first argument of '+' must be a string.
+   "ab"+1+2; returns "ab12" since '+' is left associative.
 ```
-```
-char_length(Charstring)->Integer
-```
-Count the number of characters in string.
 
+Count the number of characters in string:
 ```
-like(Charstring string, Charstring pattern) -> Boolean
+   char_length(Charstring)->Integer
 ```
-Test if string matches regular expression pattern where `*` matches sequence of characters and `?` matches single character. For example:
+
+Test if string matches regular expression pattern where `*` matches
+sequence of characters and `?` matches single character:
 ```
-like("abc","??c") returns TRUE
-like("ac","a*c") returns TRUE
-like("ac","a?c") fails
-like("abc","a[bd][dc]"); returns TRUE
-like("abc","a[bd][de]"); fails
+   like(Charstring string, Charstring pattern) -> Boolean
 ```
+Examples:
 ```
-like_i(Charstring string, Charstring pattern) -> Boolean
+   like("abc","??c") returns TRUE
+   like("ac","a*c") returns TRUE
+   like("ac","a?c") fails
+   like("abc","a[bd][dc]"); returns TRUE
+   like("abc","a[bd][de]"); fails
 ```
-Case insensitive `like()`.
+
+Case insensitive `like()`:
 ```
-locate(Charstring substr, Charstring str) -> Integer
+   like_i(Charstring string, Charstring pattern) -> Boolean
 ```
-The position of the first occurrence of substring `substr` in string `str`.
+
+The position of the first occurrence of substring `substr` in string `str`:
 ```
-lower(Charstring str)->Charstring
+   locate(Charstring substr, Charstring str) -> Integer
 ```
-Lowercase string.
+
+Lowercase string:
 ```
-ltrim( Charstring chars, Charstring str) -> Charstring
+   lower(Charstring str)->Charstring
 ```
-Remove characters in `chars` from beginning of `str`.
+
+Remove characters in `chars` from beginning of `str`:
 ```
-not_empty(Charstring s) -> Boolean
+   ltrim( Charstring chars, Charstring str) -> Charstring
 ```
-Returns `true` if string `s` contains only whitespace characters (space, tab, or new line).
+
+Return `true` if string `s` contains only whitespace characters
+(space, tab, or new line):
 ```
-replace(Charstring str, Charstring from_str, Charstring to_str) -> Charstring
+   not_empty(Charstring s) -> Boolean
 ```
-Returns the string str with all occurrences of the string from_str replaced by the string to_str. `replace()` is case sensitive.
+
+Return the string `str` with all occurrences of the string `from_str`
+replaced by the string `to_str`. `replace()` is case sensitive.
 ```
-rtrim(Charstring chars, Charstring str) -> Charstring
+   replace(Charstring str, Charstring from_str, Charstring to_str) -> Charstring
 ```
-Remove characters in chars from end of str.
+
+Remove characters in chars from end of str:
 ```
-stringify(Object x)->Charstring s
+   rtrim(Charstring chars, Charstring str) -> Charstring
 ```
-Convert any object x into a string.
+
+Convert any object x into a string:
 ```
-substring(Charstring string,Integer start, Integer end)->Charstring
+   stringify(Object x)->Charstring s
 ```
-Extract substring from given character positions. First character has position 0.
+
+Extract substring from given character positions. First character has position 0:
 ```
-trim(Charstring chars, Charstring str) -> Charstring
+   substring(Charstring string,Integer start, Integer end)->Charstring
 ```
-Remove characters in chars from beginning and end of str.
+
+Remove characters in `chars` from beginning and end of `str`.
 ```
-unstringify(Charstring s) -> Object x
+   trim(Charstring chars, Charstring str) -> Charstring
 ```
-Convert string s to object x. Inverse of stringify().
+
+Convert string `s` to object `x`. Inverse of `stringify()`:
 ```
-upper(Charstring s)->Charstring
+   unstringify(Charstring s) -> Object x
 ```
-Uppercase string s. 
+
+Uppercase string s:
+```
+   upper(Charstring s)->Charstring
+```

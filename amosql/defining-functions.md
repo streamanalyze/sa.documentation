@@ -1,4 +1,4 @@
-# Defining functions
+# Functions
 
 The *create function* statement defines a new user function stored in
 the database. Functions can be one of the following kinds:
