@@ -31,6 +31,6 @@ The parser is based on the SQL-92 version of SQL. Thus, the SQL processor allows
 
 The command line option
 ```
-sa.amos ... -q sql...
+   sa.amos ... -q sql...
 ```
 will make sa.amos accept SQL as query language in the top loop rather than AmosQL.
