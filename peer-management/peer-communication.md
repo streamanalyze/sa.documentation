@@ -27,7 +27,7 @@ running on the given `host`.Signals error if peer with same name already registe
    reregister(Charstring name)->Charstring
    reregister(Charstring name, Charstring host)->Charstring
 ```
-Same as `register()` but first unregisters another registered peer having same name rather than signaling error. Good when restarting a peer registered in name server after failure so the failed peer will be unregistered.  
+Same as `register()` but first unregisters another registered peer having same name rather than signaling error. Good when restarting a peer registered in name server after failure so the failed peer will be unregistered.
 <br><br>
 ```
    this_amosid()->Charstring name
@@ -37,7 +37,7 @@ returns the `name` of the peer where the call is issued. Returns the string `"NI
 ```
    other_peers()->Bag of Charstring name
 ```
-returns the `name`s of the other peers in the federation managed by the name server.
+returns the names of the other peers in the federation managed by the name server.
 <br><br>
 ```
    ship(Charstring peer, Charstring cmd)-> Bag of Vector
@@ -53,7 +53,7 @@ calls the sa.amos function named `fn` with argument list `args` in `peer`. The r
    send(Charstring peer, Charstring cmd)-> Charstring peer
 ```
 sends the AmosQL command `cmd` for asynchronous execution in the named peer without waiting for the result to be returned. Errors are handled at the other peer and not shipped back.
-
+<br><br>
 ```
    send_call(Charstring peer, Charstring fn, Vector args)-> Boolean
 ```
