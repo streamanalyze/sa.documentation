@@ -1,104 +1,140 @@
 # Temporal functions
 
-sa.amos supports three data types for referencing `Time`, `Timeval`, and `Date`. Type `Timeval` is for specifying absolute time points including year, month, and time-of-day.
+sa.amos supports three data types for referencing `Time`, `Timeval`,
+and `Date`. Type `Timeval` is for specifying absolute time points
+including year, month, and time-of-day. It is internally represented
+as number of mictoseconds since 1970-01-01.
 
-The type `Date` specifies just year and date, and type `Time` specifies time of day. A limitation is that the internal operating system representation is used for representing `Timeval` values, which means that one cannot specify value too far in the past or future.
+The type `Date` specifies just year and date, and type `Time`
+specifies time of day. A limitation is that the internal operating
+system representation is used for representing `Timeval` values, which
+means that one cannot specify value too far in the past or future.
 
-Constants of type `Timeval` are written as `|year-month-day/hour:minute:second|`, e.g. `|1995-11-15/12:51:32|`.  
-Constants of type `Time` are written as `|hour:minute:second|`, e.g. `|12:51:32|`.  
-Constants of type `Date` are written as `|year-month-day|`, e.g. `|1995-11-15|`.  
+Constants of type `Timeval` are written as
+`|year-month-day/hour:minute:second|`, e.g. `|1995-11-15/12:51:32|`.
+Constants of type `Time` are written as `|hour:minute:second|`,
+e.g. `|12:51:32|`.  Constants of type `Date` are written as
+`|year-month-day|`, e.g. `|1995-11-15|`.
 
 The following functions exist for types Timeval, Time, and Date:
+
+The current absolute time:
 ```
-now() -> Timeval
+   now() -> Timeval
 ```
-The current absolute time.
+
+The number of seconds since 1970-01-01
 ```
-time() -> Time
+   rnow() -> Real
 ```
-The current time-of-day.
+
+The number of seconds since the system was started:
 ```
-clock() -> Real
+   clock() -> Real
 ```
-The number of seconds since the system was started.
+
+Compute difference in seconds between two time values `t1` and `t2`:
 ```
-date() -> Date
+   real(t1) - real(t2)
 ```
-The current year and date.
+
+The current time-of-day:
 ```
-timeval(Integer year,Integer month,Integer day,
-        Integer hour,Integer minute,Integer second) -> Timeval
+   time() -> Time
 ```
-Construct Timeval.
+
+The current year and date:
 ```
-time(Integer hour,Integer minute,Integer second) -> Time
+   date() -> Date
 ```
-Construct Time.
+
+Construct a Timeval:
 ```
-date(Integer year,Integer month,Integer day) -> Date
+   timeval(Integer year,Integer month,Integer day,
+           Integer hour,Integer minute,Integer second) -> Timeval
 ```
-Construct Date.
+
+Construct a Time:
 ```
-time(Timeval) -> Time
+   time(Integer hour,Integer minute,Integer second) -> Time
 ```
-Extract Time from Timeval.
+
+Construct a Date:
 ```
-date(Timeval) -> Date
+   date(Integer year,Integer month,Integer day) -> Date
 ```
+
+Extract Time from Timeval:
+```
+   time(Timeval) -> Time
+```
+
 Extract Date from Timeval.
 ```
-date_time_to_timeval(Date, Time) -> Timeval
+   date(Timeval) -> Date
 ```
-Combine Date and Time to Timeval.
+
+Combine Date and Time to Timeval:
 ```
-year(Timeval) -> Integer
+   date_time_to_timeval(Date, Time) -> Timeval
 ```
-Extract year from Timeval.
+
+Extract year from Timeval:
 ```
-month(Timeval) -> Integer
+   year(Timeval) -> Integer
 ```
-Extract month from Timeval.
+
+Extract month from Timeval:
 ```
-day(Timeval) -> Integer
+   month(Timeval) -> Integer
 ```
-Extract day from Timeval.
+
+Extract day from Timeval:
 ```
-hour(Timeval) -> Integer
+   day(Timeval) -> Integer
 ```
-Extract hour from Timeval.
+
+Extract hour from Timeval:
 ```
-minute(Timeval) -> Integer
+   hour(Timeval) -> Integer
 ```
-Extract minute from Timeval.
+
+Extract minute from Timeval:
 ```
-second(Timeval) -> Integer
+   minute(Timeval) -> Integer
 ```
-Extract second from Timeval.
+
+Extract second from Timeval:
 ```
-year(Date) -> Integer
+   second(Timeval) -> Integer
 ```
-Extract year from Date.
+
+Extract year from Date:
 ```
-month(Date) -> Integer
+   year(Date) -> Integer
 ```
-Extract month from Date.
+
+Extract month from Date:
 ```
-day(Date) -> Integer
+   month(Date) -> Integer
 ```
-Extract day from Date.
+
+Extract day from Date:
 ```
-hour(Time) -> Integer
+   day(Date) -> Integer
 ```
-Extract hour from Time.
+
+Extract hour from Time:
 ```
-minute(Time) -> Integer
+   hour(Time) -> Integer
 ```
-Extract minute from Time.
+
+Extract minute from Time:
 ```
-second(Time) -> Integer
+   minute(Time) -> Integer
 ```
-Extract second from Time.
+
+Extract second from Time:
 ```
-timespan(Timeval, Timeval) -> (Time, Integer usec)
+   second(Time) -> Integer
 ```
-Compute difference in Time and microseconds between two time values

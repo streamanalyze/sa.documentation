@@ -129,10 +129,21 @@ executing the command:
 ```
 [sa.amos] 1> enable_java(); ...
 ```
-Once Java
-is enabled the sa.amos kernel can call code written in Java. You can
+Once Java is enabled the sa.amos kernel can call code written in Java. You can
 define sa.amos [foreign functions](#foreign-functions) in Java (the
 *callout* interface).
+
+## Graphical database browser
+
+The multi-database browser GOOVI [^CR01] is a graphical browser for
+sa.amos written as a Java application. You can start the GOOVI browser
+from the sa.amos top loop when Java is enabled by calling the AmosQL
+function:
+``` 
+[sa.amos] n> goovi(); 
+``` 
+It will start the browser in the main
+thread. When you close the browser you return to the sa.amos top loop.
 
 ## Back-end relational databases
 
@@ -146,18 +157,4 @@ the section [Relational database wrapper](#relational).
 The system is interfaced with the programming language C (and
 C++). Foreign AmosQL functions can be implemented in C[^Ris12].
 
-## Lisp interface
-
-There is a built-in interpreter for a subset of the programming
-language CommonLisp in sa.amos, aLisp [^Ris06]. The system can be
-accessed and extended using `aLisp`.
-
-## Graphical database browser
-
-The multi-database browser GOOVI [^CR01] is a graphical browser for
-sa.amos written as a Java application. You can start the GOOVI browser
-from the sa.amos top loop when Java is enabled by calling the AmosQL
-function
-
-``` [sa.amos] n> goovi(); ``` It will start the browser in the main
-thread. When you close the browser you return to the sa.amos top loop.
+ 

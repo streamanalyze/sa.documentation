@@ -25,11 +25,6 @@ __What folder is my current working direcory?__
 pwd();
 ```
 
-__What is the Java CLASSPATH OS environment variable?__
-
-```sql
-getenv("CLASSPATH");
-```
 __Call built-in arithmetic functions__
 
 ```sql

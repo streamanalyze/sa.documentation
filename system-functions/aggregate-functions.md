@@ -1,192 +1,184 @@
 # Aggregate functions
 
-Aggregate functions are functions with one argument declared as a bag and that return a single result:
-
+Aggregate functions are functions with one argument declared as a bag
+and that return a single result:
 ```
-aggfn(Bag of Type1 x) -> Type2
-```
-
-The following are examples of predefined [aggregate functions](#aggregate-functions):
-
-```
-sum(Bag of Number x) -> Number
-count(Bag of Object x) -> Integer
-avg(Bag of Number x) -> Real
-stdev(Bag of Number x) -> Real
-max(Bag of Object x) -> Object
-min(Bag of Object x) -> Object
+    aggfn(Bag of Type1 x) -> Type2
 ```
 
-Aggregate functions can be used in [subqueries or bags](#grouped-selection). The overloaded function *in()* implement the infix operator `in`. It extracts each element from a collection:
+The following are examples of predefined [aggregate
+functions](#aggregate-functions):
+```
+   sum(Bag of Number x) -> Number
+   count(Bag of Object x) -> Integer
+   avg(Bag of Number x) -> Real
+   stdev(Bag of Number x) -> Real
+   max(Bag of Object x) -> Object
+   min(Bag of Object x) -> Object
+```
+
+Aggregate functions can be used in [subqueries or
+bags](#grouped-selection). The overloaded function *in()* implement
+the infix operator `in`. It extracts each element from a collection:
 
 ```
-in(Bag of Object b) -> Bag
-in(Vector v) -> Bag
+   in(Bag of Object b) -> Bag
+   in(Vector v) -> Bag
 ```
-
-For example:
-
+Example:
 ```
-in({1,2,2}); =>
-1
-2
-2
+   in({1,2,2});
+```
+returns the bag
+```
+   1
+   2
+   2
 ```
 
 Number of objects in a bag:
-
 ```
-count(Bag of Object b) -> Integer
+   count(Bag of Object b) -> Integer
 ```
-For example:
-```
-count(iota(1,100000)); =>
-100000
-```
+For example `count(iota(1,100000));` returns `100000`.
 
 Sum elements in bags of numbers:
 ```
-sum(Bag of Number b) -> Number
-``` 
-For example:
+   sum(Bag of Number b) -> Number
 ```
-sum(iota(1,100000)); =>
-705082704
-```
+For example `sum(iota(1,100000));` returns `705082704`.
+
 Average value in a bag of numbers:
 ```
-avg(Bag of Number b) -> Real
+  avg(Bag of Number b) -> Real
 ```
-For example:
-```
-avg(iota(1,100000)); =>
-50000.5
-```
+For example `avg(iota(1,100000));` returns `50000.5`.
+
 Standard deviation of values in a bag of numbers:
 ```
-stdev(Bag of Number b) -> Real
+   stdev(Bag of Number b) -> Real
 ```
-For example:
+For example `stdev(iota(1,100000));` returns `28867.6577966877`.
+
+Largest object in a bag:
 ```
-stdev(iota(1,100000)); =>
-28867.6577966877
+   max(Bag of TP b) -> TP r
+   maxagg(Bag of Tp b) -> TP r 
 ```
-Largest object in a bag: 
-```
-max(Bag of TP b) -> TP r
-maxagg(Bag of Tp b) -> TP r
-```
-The type of the result is the same as the type of elements of argument bag. For example:
-```
-max(bag(3,4,2))+2; =>
-6
-```
+The type of the result is the same as the type of elements of argument bag. 
 `maxagg()` is an alias for `max()`.
 
- Smallest number in a bag: 
-```
-min(Bag of TP b) -> TP r
-minagg(Bag of Tp b) -> TP r
-```
-The type of the result is the same as the type of elements of argument bag. For example:
-```
-minagg(bag(3,4,2))+2; =>
-4
-```
+For example `max(bag(3,4,2))+2;` returns `6`.
 
+Smallest number in a bag:�
+```
+   min(Bag of TP b) -> TP r
+   minagg(Bag of Tp b) -> TP r
+```
+The type of the result is the same as the type of elements of argument bag. 
 `minagg()` is an alias for `min()`:
 
-The aggregate function `concatagg()` makes a string of the elements in a bag `b`:
-```
-concatagg(Bag of Object b)-> Charstring s
-```
-For example:
-```
-concatagg(bag("ab ",2,"cd ")); =>
-"ab2cd "
+For example `minagg(bag(3,4,2))+2;` returns `4`.
 
-concatagg(inject(bag("ab ",2,"cd "),", ")); =>
-"ab,2,cd "
+Make a string of the elements in a bag:
 ```
+  concatagg(Bag of Object b)-> Charstring s
+```
+Examples:
+<br>
+`concatagg(bag("ab ",2,"cd "));` returns the string `"ab2cd "`.
+<br>
+`concatagg(inject(bag("ab ",2,"cd "),", "));` returns the string `"ab,2,cd "`.
+
 
 ## Generalized aggregate functions
 
-Normal aggregate functions return only single values. In sa.amos they may return collections as well, which is called *generalized aggregate functions*.
+Normal aggregate functions return only single values. In sa.amos they
+may return collections as well, which is called *generalized aggregate
+functions*.
 
-The generalized aggregate function `unique()` removes duplicates from a bag `b`. It implements the keyword `distinct` in select statements.
-
-`unique(Bag of TP b) -> Bag of TP r`
-
-The type of the result bag is the same as the type of elements of argument bag. For example:
+The generalized aggregate function `unique()` removes duplicates from
+a bag. It implements the keyword `distinct` in select statements.
 ```
-unique(bag(1,2,1,4)); =>
-1
-2
-4
+   unique(Bag of TP b) -> Bag of TP r
 ```
-
-The generalized aggregate function `exclusive()` extract non-duplicated elements from a bag `b`: 
+The type of the result bag is the same as the type of elements of argument bag. 
+For example `unique(bag(1,2,1,4));` returns the bag:
 ```
-exclusive(Bag of TP b) -> Bag of TP r
-```
-The type of the result bag is the same as the type of elements of argument bag. For example:
-```
-exclusive(bag(1,2,1,4)); =>
-2
-4
-```
-The generalized aggregate function `inject()` inserts `x` between elements in a bag `b`:
-```
-inject(Bag of Object b, Object x) -> Bag of Object r
-```
-For example:
-```
-inject(bag(1,2,3),0); =>
-1
-0
-2
-0
-3
+   1
+   2
+   4
 ```
 
-The generalized aggregate functions `topk()` and `leastk()` return the `k` highest and lowest elements in a bag of key-value pairs `p`:
-
+The generalized aggregate function `exclusive()` extract
+non-duplicated elements from a bag:�
 ```
-topk(Bag b, Number k) -> Bag of (Object rk, Object value)
-leastk(Bag b, Number k) -> Bag of (Object rk, Object value)
+   exclusive(Bag of TP b) -> Bag of TP r
+```
+The type of the result bag is the same as the type of elements of `b`. 
+
+For example `exclusive(bag(1,2,1,4));` returns the bag:
+```
+   2
+   4
 ```
 
-If the tuples in *b* have only one attribute (the `rk`attribute) the `value` will be `nil`. The [limit clause](#limit-clause) of select statements provide a more general way to do this, do these functions are normally not used. For example:
-
+The generalized aggregate function `inject()` inserts `x` between
+elements in a bag `b`:
 ```
-topk(iota(1, 100), 3);
+   inject(Bag of Object b, Object x) -> Bag of Object r
+```
+For example `inject(bag(1,2,3),0);` returns the bag
+```
+   1
+   0
+   2
+   0
+   3
+```
+
+The generalized aggregate functions `topk()` and `leastk()` return the
+`k` highest and lowest elements in a bag of key-value pairs `p`:
+```
+   topk(Bag b, Number k) -> Bag of (Object rk, Object value)
+   leastk(Bag b, Number k) -> Bag of (Object rk, Object value)
+```
+
+If the tuples in *b* have only one attribute (the `rk`attribute) the
+`value` will be `nil`. The [limit clause](#limit-clause) of the select
+statements provide a more general way to do this, so these functions
+are normally not used. For example:
+
+Examples:
+```
+   topk(iota(1, 100), 3);
 ```
 returns
 ```
-(98,NIL)
-(99,NIL)
-(100,NIL)
+   (98,NIL)
+   (99,NIL)
+   (100,NIL)
 ```
-whereas
+<br>
 ```
-topk((select i, v[i-1]
-      from Integer i, Vector v
-     where i in iota(1, 5)
-       and v={"", "", "", "fourth", "fifth"}), 3);
-```
-returns
-```
-(3,"")
-(4,"fourth")
-(5,"fifth")
-```
-For example:
-```
-leastk(iota(1, 100), 3);
+   topk((select i, v[i-1]
+           from Integer i, Vector v
+          where i in iota(1, 5)
+            and v={"", "", "", "fourth", "fifth"}), 3);
 ```
 returns
 ```
-(3,NIL)
-(2,NIL)
-(1,NIL)
+   (3,"")
+   (4,"fourth")
+   (5,"fifth")
+```
+<br>
+```
+   leastk(iota(1, 100), 3);
+```
+returns
+```
+   (3,NIL)
+   (2,NIL)
+   (1,NIL)
 ```

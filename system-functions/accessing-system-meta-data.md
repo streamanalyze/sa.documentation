@@ -1,143 +1,172 @@
 # Accessing system meta-data
 
-The data that the system internally uses for maintaining the database is exposed to the query language as well and can be queried in terms of types and functions as other data. For example:
+The data that the system internally uses for maintaining the database
+is exposed to the query language as well and can be queried in terms
+of types and functions as other data. For example:
 
-- The types and functions used in a database are accessible through system functions. It is possible to search the database for types and functions and how they relate.
--   The goovi browser available from javaamos by calling the system function `goovi()` presents the database graphically. It is written completely as an application Java program using AmosQL queries as the only interface to the sa.amos kernel.
+- The types and functions used in a database are accessible through
+system functions. It is possible to search the database for types and
+functions and how they relate.
+
+- The goovi browser presents the database graphically. It is started
+by calling the system function `goovi()`. 
 
 ## Type meta-data
 
+All types in the database:
 ```
-alltypes() -> Bag of Type`
+   alltypes() -> Bag of Type`
 ```
-Returns all types in the database.
 
+The types immediately below/above type `t` in the type hierarchy:
 ```
-subtypes(Type t) -> Bag of Type s
-supertypes(Type t) -> Bag of Type s
+   subtypes(Type t) -> Bag of Type s
+   supertypes(Type t) -> Bag of Type s
 ```
-Returns the types immediately below/above type `t` in the type hierarchy.
 
+All types above `t` in the type hierarchy.
 ```
-allsupertypes(Type t) -> Bag of Type s`
+   allsupertypes(Type t) -> Bag of Type s`
 ```
-Returns all types above `t` in the type hierarchy.
 
+The set of types to which an object belongs:
 ```
-typesof(Object o) -> Bag of Object t
+   typesof(Object o) -> Bag of Object t
 ```
-Returns the type set of an object.
 
+The most specific type of an object:
 ```
-typeof(Object o) -> Type t
+   typeof(Object o) -> Type t
 ```
-Returns the most specific type of an object.
 
+The type named `nm`: 
 ```
-typenamed(Charstring nm) -> Type t
+   typenamed(Charstring nm) -> Type t
 ```
-Returns the type named `nm`. Notice that type names are in upper case.
+Notice that type names are in upper case.
 
+The name of the type `t`.
 ```
-name(Type t) -> Charstring nm
+   name(Type t) -> Charstring nm
 ```
-Returns the name of the type `t`.
 
+The [generic](#overloaded-functions) functions having a single
+argument of type `t` and a single result:
 ```
-attributes(Type t) -> Bag of Function g
+   attributes(Type t) -> Bag of Function g
 ```
-Returns the [generic](#overloaded-functions) functions having a single argument of type `t` and a single result.
 
+The resolvents having a single argument of type `t` and a single result:
 ```
-methods(Type t) -> Bag of Function r
+   methods(Type t) -> Bag of Function r
 ```
-Returns the resolvents having a single argument of type *t* and a single result.
 
+The number of objects of type `t` and all its subtypes.
 ```
-cardinality(Type t) -> Integer c
+   cardinality(Type t) -> Integer c
 ```
-Returns the number of object of type `t` and all its subtypes.
 
+Test if the object `o` has the name `nm`:
 ```
-objectname(Object o, Charstring nm) -> Boolean
+   objectname(Object o, Charstring nm) -> Boolean
 ```
-Returns `true` if the object `o` has the name `nm`.
 
 ## Function meta-data
 
+All functions in the database:
 ```
-allfunctions() -> Bag of Function
-```
-Returns all functions in the database.
-
-```
-functionnamed(Charstring nm) -> Function
-```
-Returns the object representing the function named `nm`. Useful for [second order functions](#second-order-functions).
-
-```
-theresolvent(Charstring nm) -> Function
-```
-Returns the single [resolvent](#overloaded-functions) of a generic function named `nm`. If there is more than one resolvent for `nm` an error is raised. If `fn` is the name of a resolvent its functional is returned. The notation [#'...'](#functional-constant) is syntactic sugar for `theresolvent('...')`.
-
-```
-name(Function f) -> Charstring
-```
-Returns the name of the function `f`.
-
-```
-signature(Function f)  -> Bag of Charstring
-```
-Returns the signature of `f`. If `f` is a generic function the signatures of its resolvents are returned.
-
-```
-kindoffunction(Function f) -> Charstring
+   allfunctions() -> Bag of Function
 ```
 
-Returns the kind of the function `f` as a string. The result can be one of 'stored', 'derived', 'foreign' or 'overloaded'.
+The object representing the function named `nm`:
+```
+   functionnamed(Charstring nm) -> Function
+```
+Useful for [secondorder functions](#second-order-functions).
 
+The *one and only* [resolvent](#overloaded-functions) of a generic
+function named `nm`:
 ```
-generic(Function f) -> Function
+   theresolvent(Charstring nm) -> Function
 ```
-Returns the [generic](#overloaded-functions) function of a resolvent.
+If there is more than one resolvent for `nm` an
+error is raised. If `fn` is the name of a resolvent its functional is
+returned. The notation [#'...'](#functional-constant) is syntactic
+sugar for `theresolvent('...')`.
 
-```
-resolvents(Function g) -> Bag of Function
-```
-Returns the resolvents of an [overloaded](#overloaded-functions) function `g`.
 
+The name of the function `f`:
 ```
-resolvents(Charstring fn) -> Bag of Function
-```
-Returns the resolvents of an overloaded function named `fn`.
-
-```
-resolventtype(Function f) -> Bag of Type`
-```
-Returns the types of only the *first* argument of the resolvents of function resolvent `f`.
-
-```
-arguments(Function r) -> Bag of Vector`
-```
-Returns vector describing arguments of signature of resolvent `r`. Each element in the vector is a triplet (vector) describing one of the arguments with structure `{type,name,uniqueness}` where `type` is the type of the argument, `name` is the name of the argument, and `uniqueness` is either `key` or `nonkey` depending on the declaration of the argument. For example:
-
-```
-arguments(#'timespan');  
---> { {#[OID 371 "TIMEVAL"],"TV1","nonkey"},
-     {#[OID 371 "TIMEVAL"],"TV2","nonkey"} }
+   name(Function f) -> Charstring
 ```
 
+The signature of function `f`:
 ```
-results(Function r) -> Bag of Vector
+   signature(Function f) -> Bag of Charstring
 ```
-Analogous to arguments for result (tuple) of function.
+If `f` is a generic function the signatures of its resolvents are
+returned.
 
-```
-arity(Function f) -> Integer
-```
-Returns the number of arguments of function.
 
+The kind of the function `f` as a string:
 ```
-width(Function f) -> Integer
+   kindoffunction(Function f) -> Charstring
 ```
-returns the width of the result tuple of function `f`.
+The result can be one of 'stored', 'derived', 'foreign' or
+'overloaded'
+
+Yhe [generic](#overloaded-functions) function of a resolvent:
+```
+   generic(Function f) -> Function
+```
+
+The resolvents of an [overloaded](#overloaded-functions) function `g`:
+```
+   resolvents(Function g) -> Bag of Function
+```
+
+The resolvents of an overloaded function named `fn`:
+```
+   resolvents(Charstring fn) -> Bag of Function
+```
+
+The types of only the *first* argument of the resolvents of function resolvent `f`:
+```
+   resolventtype(Function f) -> Bag of Type`
+```
+
+A vector describing arguments of signature of resolvent `r`:
+```
+   arguments(Function r) -> Bag of Vector`
+```
+Each element in the vector is a triplet (vector) describing one of the
+arguments with structure `{type,name,uniqueness}` where `type` is the
+type of the argument, `name` is the name of the argument, and
+`uniqueness` is either `key` or `nonkey` depending on the declaration
+of the argument. 
+
+Example:
+```
+    arguments(#'timespan');
+```
+returns the vector of vectors
+```
+   { {#[OID 371 "TIMEVAL"],"TV1","nonkey"},
+     {#[OID 371 "TIMEVAL"],"TV2","nonkey"} }`
+```
+
+Analogous to `arguments(f)` the function `results(f)` returns a description of the results of function `f`:
+```
+   results(Function r) -> Bag of Vector
+```
+
+The number of arguments of function `f`:
+```
+   arity(Function f) -> Integer
+```
+
+The width of the result tuple of function `f`:
+```
+   width(Function f) -> Integer
+```
+

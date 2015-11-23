@@ -1,26 +1,32 @@
 # Extents
 
-The local sa.amos database can be regarded as a set of *extents*. There are two kinds of extents:
+The local sa.amos database can be regarded as a set of
+*extents*. There are two kinds of extents:
 
 ## Type Extents
 
 *Type extents* represent surrogate objects belonging to a particular type.
 
-The *deep extent* of a type is defined as the set of all surrogate objects belonging to that type and to all its descendants in the type hierarchy. The deep extent of a type is retrieved with:
+The *deep extent* of a type is defined as the set of all surrogate
+objects belonging to that type and to all its descendants in the type
+hierarchy. The deep extent of a type is retrieved with:
 ```
-extent(Type t)->Bag of Object
+   extent(Type t)->Bag of Object
 ```
 For example, to count how many functions are defined in the database call:
 ```
-count(extent(typenamed("function ")));
+   count(extent(typenamed("function ")));
 ```
+
 To get all surrogate objects in the database call:
 ```
-extent(typenamed("object "))
+   extent(typenamed("object "))
 ```
 The function `allobjects();` does the same.
 
-The *shallow extent* of a type is defined as all surrogate objects belonging only to that type but *not* to any of its descendants. The shallow extent is retrieved with:
+The *shallow extent* of a type is defined as all surrogate objects
+belonging only to that type but *not* to any of its descendants. The
+shallow extent is retrieved with:
 ```
 shallow_extent(Type t) -> Bag of Object
 ```
@@ -33,16 +39,24 @@ returns nothing since type `Object` has no own instances.
 
 ## Function Extents
 
-*Function extents* represent the state of stored functions. The extent of a function is the bag of tuples mapping its argument(s) to the corresponding result(s). The function `extent()` returns the extent of the function `fn`. The extent tuples are returned as a bag of vectors. The function can be any kind of function.
+*Function extents* represent the state of stored functions. The extent
+of a function is the bag of tuples mapping its argument(s) to the
+corresponding result(s). The function `extent()` returns the extent of
+the function `fn`. The extent tuples are returned as a bag of
+vectors. The function can be any kind of function.
 ```
-extent(Function fn) -> Bag of Vector
+   extent(Function fn) -> Bag of Vector
 ```
 For example:
 ```
-extent(#'coercers');
+   extent(#'coercers');
 ```
 
-For stored functions the extent is directly stored in the local database. The example query thus returns the state of all stored functions. The state of the local database is this state plus the deep extent of type `Object`.
-The extent is always defined for stored functions and can also be computed for derived functions through their function definitions. The extent of a derived function may not be computable, *unsafe*, in which case the extent function returns nothing. The extent of a foreign function is always empty.
+The extent is always defined for stored functions. It can also be
+computed for derived functions through their function definitions. The
+extent of a derived function may not be computable, *unsafe*, in which
+case the extent function returns nothing. The extent of a foreign
+function is always empty.
 
-The extent of a generic function is the union of the extents of its resolvents.
+The extent of a generic function is the union of the extents of its
+resolvents.
