@@ -41,3 +41,7 @@ T. Risch: ALisp v2 User's Guide, Uppsala University, 2006.
 
 #### RJK03
 T. Risch, V. Josifovski, and T. Katchaounov: Functional Data Integration in a Distributed Mediator System, in P. Gray, L. Kerschberg, P. King, and A. Poulovassilis (eds.): Functional Approach to Data Management - Modeling, Analyzing and Integrating Heterogeneous Data, Springer, ISBN 3-540-00375-4, 2003.
+
+#### Sample Link
+
+This is a sample link to [Java Interface](../getting-started/README.md#java-interface) in [Getting Started](../getting-started/README.md#java-interface)

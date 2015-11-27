@@ -36,8 +36,8 @@ every time an AmosQL statement that updates the database is executed
 in the sa.amos top loop.
 
 Typically you start by defining meta-data (a schema) as
-[types](#types) and properties of types represented as
-[functions](#function-definitions). For example, the following
+[types](../amosql/defining-types.md) and properties of types represented as
+[functions](../amosql/defining-functions.md). For example, the following
 statement create a type named `Person` having two property functions
 `name()` and `income()`:
 
@@ -46,7 +46,7 @@ statement create a type named `Person` having two property functions
 ```
 
 When the meta-data is defined you usually *populate* the database by
-[creating objects](#create-object) and [updating functions](#updates).
+[creating objects](../amosql/creating-objects.md) and [updating functions](../amosql/updates.md).
 
 For example:
 ```
@@ -139,9 +139,9 @@ The multi-database browser GOOVI [^CR01] is a graphical browser for
 sa.amos written as a Java application. You can start the GOOVI browser
 from the sa.amos top loop when Java is enabled by calling the AmosQL
 function:
-``` 
-[sa.amos] n> goovi(); 
-``` 
+```
+[sa.amos] n> goovi();
+```
 It will start the browser in the main
 thread. When you close the browser you return to the sa.amos top loop.
 
@@ -156,5 +156,3 @@ the section [Relational database wrapper](#relational).
 
 The system is interfaced with the programming language C (and
 C++). Foreign AmosQL functions can be implemented in C[^Ris12].
-
- 
