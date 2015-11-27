@@ -44,4 +44,4 @@ T. Risch, V. Josifovski, and T. Katchaounov: Functional Data Integration in a Di
 
 #### Sample Link
 
-This is a sample link to [Java Interface](../getting-started/README.md#java-interface) in [Getting Started](../getting-started/README.md#java-interface)
+This is a sample link to [Java Interface](../getting-started/README.md#java-interface) in [Getting Started](../getting-started/README.md)
