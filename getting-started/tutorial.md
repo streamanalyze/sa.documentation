@@ -8,21 +8,32 @@ __Documentation of function `sqrt()`__
 ```sql
 doc("sqrt");
 ```
-__Documentation of all functions whose names contain the string `nearest`:__
+__Documentation of all functions whose names contain the string `max`:__
 
 ```sql
-doc(apropos("nearest"));
+doc(apropos("max"));
 ```
 
-__Source code of all functions whose names contain the string `nearest`__
+__Source code of all functions whose names contain the string `max`__
 ```sql
-sourcecode(apropos("nearest"));
+sourcecode(apropos("max"));
+```
+
+__What system version am I running?__
+
+```sql
+system_version();
 ```
 
 __What folder is my current working direcory?__
 
 ```sql
 pwd();
+```
+__What is the home folder of the system I am currently running?__
+
+```sql
+startup_dir();
 ```
 
 __Call built-in arithmetic functions__
@@ -31,6 +42,8 @@ __Call built-in arithmetic functions__
 1+2+3;
 
 sqrt(1+2+3);
+
+max(1,2);
 ```
 
 __Vector arithmetics__
@@ -380,33 +393,31 @@ __Alternatively 'in' operator__
 
 ```sql
 select x from Number x where x in :b;
-set :b = iota(1,100000);
 ```
 
 __Aggregate functions over bags__
 
 ```sql
+set :b = iota(1,100000);
+
 count(:b);
 sum(:b);
 avg(:b);
 stdev(:b);
 maxagg(:b);
 minagg(:b);
+
 sum(select n
       from Number n
      where n in :b
      limit 20);
 ```
 
-__Smaller bag__
-
-```sql
-set :b2 = iota(1,30);
-```
-
 __Aggregation over bags__
 
 ```sql
+set :b2 = iota(1,30);
+
 sum(select x from Number x where x in :b2 and x>7);
 
 set :b3 = (select x from Number x where x in :b2 and x > 7);
@@ -425,7 +436,7 @@ set :v0 = vselect i from Number i where i in iota(1,10) order by i;
 :v0;
 ```
 
-__Set :v to the square root of elements in :v__
+__Set :v to the square root of elements in :v0__
 
 ```sql
 set :v = vselect sqrt(i) from Number i where i in :v0 order by i;
@@ -441,7 +452,7 @@ vavg(:v);
 vstdev(:v);
 ```
 
-__The 'in' operator extracts values from vectors__
+__The 'in' operator converts vector to bag__
 
 ```sql
 select n

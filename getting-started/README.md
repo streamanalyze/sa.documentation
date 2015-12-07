@@ -57,11 +57,12 @@ For example:
  ("Eva", 280);
 ```
 
-When the database is populated you can [query](#query-statement) it, e.g.:
+When the database is populated you can [query](../amosql/queries.md) it, e.g.:
 
 ```
-[sa.amos] 3> select income(p) from
-        Person p where name(p)="Ulla";
+[sa.amos] 3> select income(p) 
+               from Person p 
+              where name(p)="Ulla";
 ```
 
 Usually you load AmosQL definitions from a script file rather than entering them on the command line, e.g.
@@ -130,7 +131,7 @@ executing the command:
 [sa.amos] 1> enable_java(); ...
 ```
 Once Java is enabled the sa.amos kernel can call code written in Java. You can
-define sa.amos [foreign functions](#foreign-functions) in Java (the
+define sa.amos [foreign functions](../accessing-external-systems/foreign-and-multi-directional-functions.md) in Java (the
 *callout* interface).
 
 ## Graphical database browser
@@ -150,9 +151,9 @@ thread. When you close the browser you return to the sa.amos top loop.
 sa.amos includes a interface to relational databases using JDBC when
 Java is enabled. Relational databases can be accessed and queried in
 terms of AmosQL using this interface. The interface is described in
-the section [Relational database wrapper](#relational).
+the section [Relational database wrapper](../accessing-external-systems/the-relational-database-wrapper.md).
 
 ## C interface
 
 The system is interfaced with the programming language C (and
-C++). Foreign AmosQL functions can be implemented in C[^Ris12].
+C++). Foreign AmosQL functions can be implemented in C [Ris12](<http://user.it.uu.se/~torer/publ/externalC.pdf>).
