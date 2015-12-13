@@ -22,7 +22,7 @@ The following aggregate function are predefined:
    sum(Bag of Number b) -> Number             sum of elements
 ```
 
-Descriptions:
+###Descriptions:
 
 __Compute the average of the elements in a bag:__
 ```
@@ -88,7 +88,7 @@ The following generalized aggregate functions are predefined:
    tuples(Bag of Object b) -> Bag of Vector                    Return elements as vectors
 ```
 
-Descriptions:
+###Descriptions:
 
 __Extract non-duplicated elements from a bag:__
 ```

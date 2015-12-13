@@ -52,12 +52,8 @@ functions supported by the system as described in [Section
 - [Section 2.7](updates.md) describes how to *update* a populated
 database.
 
-- [Section 2.8](data-mining-primitives.md) describes primitives in AmosQL useful
-for data mining, in particular different ways of grouping data and of
-making operations of sequences and numerical vectors.
-
-- [Section 2.9](accessing-data-in-files.md) describes functions available to
+- [Section 2.8](accessing-data-in-files.md) describes functions available to
 read/write data from/to files, such as CSV files.
 
-- [Section 2.10](scans.md) describes how to define *scans* making it
+- [Section 2.9](scans.md) describes how to define *scans* making it
 possible to iterate over very large query results.

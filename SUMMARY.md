@@ -9,7 +9,6 @@
   * [Functions](amosql/defining-functions.md)
   * [Second order functions](amosql/second-order-functions.md)
   * [Updates](amosql/updates.md)
-  * [Data mining primitives](amosql/data-mining-primitives.md)
   * [Accessing data in files](amosql/accessing-data-in-files.md)
   * [Scans](amosql/scans.md)
 * [Procedural Functions](procedural-functions/README.md)

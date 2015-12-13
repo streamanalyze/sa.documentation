@@ -10,7 +10,7 @@ function.
 database for a set of objects having properties fulfilling a query
 condition specified as a logical [predicate](#predicate-expression).
 
-3. If can be a [vector selection statements](vector-queries.md) to construct an ordered sequence (vector) of objects fulfilling the query condition.
+3. It can be a [vector selection statements](vector-queries.md) to construct an ordered sequence (vector) of objects fulfilling the query condition.
 
 4. It can be a general [expression](basic-constructs.md#general-expression).
 
@@ -248,6 +248,32 @@ when a function (e.g. `name()`) is applied on a bag valued function
 returned bag. In the example a bag of the names of the persons named
 Bill is returned. 
 
+### <a name="in-operator"> The *in* operator
+
+If a function returns a bag the elements of that bag can be accessed using the `in` operator. 
+
+Example:
+
+```sql
+   select name(p)
+     from Person p, Person q
+    where p in friends(q)
+      and name(q) = "Tore";
+```
+Elements in subqueries specified as nested select expressions
+can also be accessed with the `in` operator. 
+
+Example:
+```sql
+   select name(p), count(b)
+     from Bag of Integer b, Person p
+    where b = (select p from Person p)
+      and p in b;
+```
+The query returns the names of all persons paired with the number of
+persons in the database. 
+
+
 ### <a name="tuple-expression"> Tuple expressions
 
 To retrieve the results of [tuple valued functions](defining-functions.md#tuple-result) in queries, use *tuple expression* (syntax: `tuple-expr`).
@@ -369,17 +395,28 @@ needed, for example when passed to the aggregate function `count()`:
    count(:bigbag);
 ```
 
-## <a name="ordered-selection"> Ordered selections
-The optional `order-by-clause` sorts the result ascending `asc`
-(default) or descending `desc`. A select statement with an
-order-by-clause is called an *ordered selection*. 
+## <a name="order-by"> Ordered selections
+The `order-by-clause` specifies that the result
+should be sorted by the specified *sort key*. The sort order is
+descending when `desc` is specified and ascending otherwise.
+A select statement with an
+order-by-clause is called an *ordered selection*.
 
-Example:
+For example, the following query sorts the result descending based on
+the sort key `salary(p)`:
+
 ```sql
-   select name(p), income(p)
+   select name(p), salary(p)
      from Person p
-    where age(p) > 20
-    order by income(p) desc;
+    order by salary(p) desc;
+```
+
+The sort key does not need to be part of the result.
+For example, the following query list the salaries of persons in descending order without associating any names with the salaries:
+```sql
+   select salary(p)
+     from Person p
+    order by name(p) desc;
 ```
 
 
@@ -389,7 +426,7 @@ When analyzing data it is often necessary to group data, for example
 to get the sum of the salaries of employees per department. Such
 regroupings are specified though the optional `group-by-clause`. It specifies
 on which [expression](basic-constructs.md#general-expression) in the select clause the data should be grouped
-and summarized. This is called a *grouped selection*.  
+and summarized. This is called a *grouped selection*.
 
 Example:
 ```sql
@@ -452,28 +489,6 @@ without revealing the department names:
     group by name(d);
 ```
 
-## <a name="order-by"> Ordered selections
-
-The `order-by-clause` specifies that the result
-should be sorted by the specified *sort key*. The sort order is
-descending when `desc` is specified and ascending otherwise.
-
-For example, the following query sorts the result descending based on
-the sort key `salary(p)`:
-
-```sql
-   select name(p), salary(p)
-     from Person p
-    order by name(p) desc;
-```
-
-The sort key does not need to be part of the result.
-For example, the following query list the salaries of persons in descending order without associating any names with the salaries:
-```sql
-   select salary(p)
-     from Person p
-    order by name(p) desc;
-```
 
 ## <a name="top-k-queries"> Top-k queries
 
@@ -503,38 +518,7 @@ variable bound to a numeric value:
     limit :k+3;
 ```
 
-xxxxxxx
-
-Elements in subqueries can be accessed with the `in` operator. 
-
-Example:
-```sql
-   select name(p), count(b)
-     from Bag of Integer b, Person p
-    where b = (select p from Person p)
-      and p in b;
-```
-The query returns the names of all persons paired with the number of
-persons in the database. 
-
-To compare that two bags are equal use the function *bequal()*.
-
-Signature:
-```
-bequal(Bag x, Bag y) -> Boolean
-```
-
-Example:
-```sql
-   bequal(bag(1,2,3),bag(3,2,1));
-```
-returns true.
-
-**Notice** that *bequal()* materializes its arguments before doing the
-equality computation, which may occupy a lot of temporary space in the
-database image if the bags are large.
-
-## Quantifiers
+## <a name="quantifier-function"> Quantifiers
 
 The function `some()` implements logical exist over a subquery. 
 

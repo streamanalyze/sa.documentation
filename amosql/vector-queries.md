@@ -119,6 +119,32 @@ Example:
 ```
 returns the vector `{-4,-3,-2,-1,0,1,2,3,4,5}`
 
+
+[Vector functions](../system-functions/vector-functions.md) and operators can be used in queries.
+
+Example:
+```sql
+   select lambda
+     from Number lambda
+    where {1, 2} - lambda = {11, 12};
+```
+returns `-10`.
+
+If the equation has no solution, the query will have no result:
+```sql
+   select lambda
+     from Number lambda
+    where {1, 3} - lambda = {11, 12};
+```
+
+By contrast, note that this query:
+```sql
+   select lambda
+     from Vector of Number lambda
+    where {1, 2} - lambda = {11, 12};
+```
+returns `{-10,-10}`.
+
 ## <a name="vector-index"> Accessing vector elements
 
 Vector elements can be accessed using the `vector-indexing` syntax:
@@ -158,4 +184,3 @@ bound to the interface variables `:u` and `:v`:
       from Integer i
      order by i;
 ```
-

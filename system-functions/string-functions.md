@@ -29,7 +29,7 @@ The following functions operate on strings (type `Charstring`):
    upper(Charstring s)->Charstring                          Uppercase string
 ```
 
-Descriptions:
+### Descriptions:
 
 __Count the number of characters in string:__
 ```
