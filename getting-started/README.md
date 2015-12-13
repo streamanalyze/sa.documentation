@@ -1,9 +1,7 @@
 # Getting started
 
 
-Unpack the zip file to a directory for sa.amos, `<privdir>`. The
-following files are needed in `<privdir>/bin;`: `sa.amos.exe sa.amos.dll
-sa.amos.dmp`
+Unpack the zip file to a directory for sa.amos, `<privdir>`. 
 
 sa.amos is ready to run in `<privdir>/bin` by the command:
 
@@ -71,8 +69,8 @@ Usually you load AmosQL definitions from a script file rather than entering them
 [sa.amos] 4> < 'mycode.amosql';
 ```
 
-### Domain calculus
-<a name="domain-calculus"> **Notice** that variables in AmosQL can be bound to *objects of any type*. This is different from select statements in SQL  where all variables must be bound to *tuples only*. AmosQL is based on *domain calculus* while SQL select statements are based on *tuple calculus*.
+### <a name="domain-calculus"> Domain calculus
+**Notice** that variables in AmosQL can be bound to *objects of any type*. This is different from select statements in SQL  where all variables must be bound to *tuples only*. AmosQL is based on *domain calculus* while SQL select statements are based on *tuple calculus*.
 
 
 
