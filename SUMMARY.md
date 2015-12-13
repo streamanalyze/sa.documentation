@@ -29,7 +29,6 @@
   * [Aggregate functions](system-functions/aggregate-functions.md)
   * [Vector functions](system-functions/vector-functions.md)
   * [Temporal functions](system-functions/temporal-functions.md)
-  * [Sorting functions](system-functions/sorting-functions.md)
   * [Accessing system meta-data](system-functions/accessing-system-meta-data.md)
   * [Searching source code](system-functions/searching-source-code.md)
   * [Extents](system-functions/extents.md)

@@ -1,15 +1,19 @@
 # Aggregate functions
 
 [Aggregate functions](../amosql/queries.md#aggregate-function) compute
-a single result from the elements in a bag. They are functions with
-one argument declared as a bag and that return a single result:
+a single result from the elements in a bag. 
+
+[Generalized aggregate functions](#generalized-aggregate-function) return new bags and collections for given argument bags. They can also have more that one bag argument.
+
+Basic aggregate functions have
+one of its arguments declared as a bag and return a single result:
 ```
     aggfn(Bag of Type1 x) -> Type2
 ```
 
 Aggregate functions can be used in [group by queries](../amosql/queries.md#group-by).
 
-The following aggregate function are predefined:
+The following basic aggregate function are predefined:
 ```
    avg(Bag of Number b) -> Real               average of elements
    concatagg(Bag of Object b) -> Charstring   concatenate elements
@@ -72,23 +76,35 @@ __Sum the elements in a bag:__
 ```
 For example `sum(iota(1,100000));` returns `705082704`.
 
-## Generalized aggregate functions
+## <a name="generalized-aggregate-function"> Generalized aggregate functions
 
 Normal aggregate functions return only single values. In sa.amos they
 may return collections as well, which is called *generalized aggregate
-functions*.
+functions*. Generalized aggregate functions can furthermofe have more that one bag arguments.
 
 The following generalized aggregate functions are predefined:
 ```
+   bequal(Bag b1, Bag b2) -> Boolean                           Test equality of bags
    exclusive(Bag of TP b) -> Bag of TP r                       Non-duplicated elements
    inject(Bag b, Object x) -> Bag of Object r                  Insert x between elements
-   leastk(Bag b, Number k) -> Bag of (Object rk, Object value) The k smallest keys and values
-   topk(Bag b, Number k) -> Bag of (Object rk, Object value)   The k largest keys and values
    unique(Bag of TP b) -> Bag of TP r                          Remove duplicates
    tuples(Bag of Object b) -> Bag of Vector                    Return elements as vectors
 ```
 
 ###Descriptions:
+
+__Test that two bags are equal:__
+```
+bequal(Bag x, Bag y) -> Boolean
+```
+
+Example:
+
+`bequal(bag(1,2,3),bag(3,2,1));` returns `TRUE`;
+
+**Notice** that *bequal()* materializes its arguments before doing the
+equality computation, which may occupy a lot of temporary space in the
+database image if the bags are large.
 
 __Extract non-duplicated elements from a bag:__
 ```
@@ -129,50 +145,9 @@ For example `inject(bag(1,2,3),0);` returns the bag
 The query
 `concatagg(inject(bag("ab",2,"cd"),", "));` returns the string `"ab,2,cd"`.
 
-__Compute the k smallest key-value pairs in bag:__
-```
-leastk(Bag b, Number k) -> Bag of (Object rk, Object value)
-```
-The `k` highest and lowest key-value pairs are computed in a bag of
-key-value pairs `p`. The [limit clause](../amosql/queries.md#top-k-queries) of
-select statements provide a more general way to do this, so
-`leastk()` is normally not used. See also explanation of `topk()` below.
-
-__Compute the k largest key-value pairs in a bag:__
-```
-topk(Bag b, Number k) -> Bag of (Object rk, Object value)
-```
-The [limit clause](../amosql/queries.md#top-k-queries) of
-select statements provide a more general way to do this, so
-`topk()` is normally not used.
-If the tuples in `b` have only one attribute (the `rk` attribute) the
-`value` will be `nil`. 
-For example:
-```
-topk(iota(1, 100), 3);
-```
-returns
-```
-(98,NIL)
-(99,NIL)
-(100,NIL)
-```
-whereas
-```
-topk((select i, v[i-1]
-      from Integer i, Vector v
-     where i in iota(1, 5)
-       and v={"", "", "", "fourth", "fifth"}), 3);
-```
-returns
-```
-(3,"")
-(4,"fourth")
-(5,"fifth")
-```
-
 __Convert the tuples in a bag to vectors:__
 ```
    tuples(Bag b) -> Bag of Vector
 ```
+
 
