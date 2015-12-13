@@ -1,7 +1,7 @@
 # Creating objects
 
 The `create-object` statement populates the database by creating
-objects and as instance(s) of a given [type](#types) and all its
+objects and as instance(s) of a given [type](defining-types.md) and all its
 supertypes.
 
 Syntax:
@@ -27,12 +27,12 @@ Example:
                 ("Eve",3900,40);
 ```
 
-The attributes can be any [updatable](#updates) AmosQL function having
+The attributes can be any [updatable](updates.md) AmosQL function having
 the created type as its only argument, here `name()` and `age()`. One
 object will be created for each initializer. Each initializer includes
 a comma-separated list of initial values for the specified attribute
 functions. Initial values are specified as
-[expressions](#expressions);
+[expressions](basic-constructs.md#expressions);
 
 Example:
 
@@ -44,7 +44,7 @@ Example:
 The types of the initial values must match the declared result types
 of the corresponding functions.
 
-Each initializer can have an optional [variable name](#variables)
+Each initializer can have an optional [variable name](basic-constructs.md#variables)
 which will be bound to the new object. The variable name can
 subsequently be used as a reference to the object.
 
@@ -56,10 +56,10 @@ Example:
 
 Then the query `income(:pelle);` returns `3386`
 
-Notice that [interface variables](#interface-variables) such as
+Notice that [interface variables](basic-constructs.md#variables) such as
 `:pelle` are temporary and not saved in the database.
 
-[Bag valued functions](#Bags) are initialized using the syntax
+[Bag valued functions](basic-constructs.md#bags) are initialized using the syntax
 `bag(e1,...)` (syntax [`bag-expr`](#bag-constr)),
 
 Example:

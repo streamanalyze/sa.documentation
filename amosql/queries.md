@@ -3,18 +3,16 @@
 *Queries* retrieve objects having specified properties from the
 database. A query can be one of the following:
 
-1. It can be [calls](#function-call)to built-in or user defined
+1. It can be [calls](#function-calls) to a built-in or user defined
 function.
 
 2. It can be a [select statement](#select-statement) to search the
 database for a set of objects having properties fulfilling a query
-condition specified as a logical [predicate](#predicates).
+condition specified as a logical [predicate](#predicate-expression).
 
-3. If can be a vector selection statements
-([vselect-statement](#vselect)) to construct an ordered sequence
-(vector) of objects fulfilling the query condition.
+3. If can be a [vector selection statements](vector-queries.md) to construct an ordered sequence (vector) of objects fulfilling the query condition.
 
-4. It can be an [expression](#expressions).
+4. It can be a general [expression](basic-constructs.md#general-expression).
 
 Syntax:
 ```
@@ -24,7 +22,7 @@ query ::= function-call |
           expression
 ```
 
-## Function calls
+## <a name="function-calls"> Function calls
 
 A simple form of queries are calls to functions. 
 
@@ -45,6 +43,7 @@ parameter-value ::=
 
 tuple-expr ::= '(' expr-commalist ')'
 ```
+
 Examples:
 ```
    sqrt(2.1);
@@ -54,7 +53,7 @@ Examples:
 ```
 
 The built-in functions `plus()`, `minus()`, `times()`, and
-`div()` have infix syntax `+,-,*,/` with the usual priorities.
+`div()` have infix syntax `+,-,*,/` with the usual priorities.
 
 Example:
 ```
@@ -75,14 +74,14 @@ Example:
 ```
 then the query `:inca;` returns `2300`.
 
-Also bag valued function calls can be saved in variables.
+Also [bag](basic-constructs.md#bag-expression) valued function calls can be saved in variables.
 
 Example:
 ```
    set :pb = parents(:cain);
 ```
 
-In this case the value of `:pb` is a [bag](#bags). To get the elements
+In this case the value of `:pb` is a [bag](basic-constructs.md#bag-expression). To get the elements
 of the bag, use the `in` function.
 
 Example:
@@ -90,19 +89,11 @@ Example:
    in(:pb);
 ```
 
-[Tuple expressions](#tuple-expr) can be used to assign the result of
-functions returning [tuples](#tuple-result).
-
-Example:
-```
-   set (:m,:f)=parents2(:cain);
-```
-
 In a function call, the types of the actual parameters must be the
 same as, or subtypes of, the types of the corresponding formal
 parameters.
 
-## The select statement
+## <a name="select-statement"> The select statement
 
 The *select statement* provides the most flexible way to specify queries.
 
@@ -142,16 +133,32 @@ limit-clause ::=
       'limit' expression
 ```
 
-The *select statement* returns an unordered set of objects selected
-from the database. Duplicates are allowed in the result set of a
-query, i.e. the result is a [bag](#bags). In case you need to
-construct an ordered sequence of objects rather than a bag you can use
-the [vector selection statement](#vselect).
+The `select` statement returns an unordered [bag](basic-constructs.md#bag-expression) of objects selected from the database. Duplicates are allowed in the result.
 
-The `select-clause` in a select statement defines the objects to be
-retrieved based on bindings of local variables declared in the
+For example, the result of the following query will contain duplicates if names of persons in the database are not unique:
+```sql
+   select name(p) 
+     from Person p 
+    where age(p)>20;`
+```
+<a name="distinct-clause"> 
+
+Duplicates are removed from the query result when the keyword `distinct` is specified. By specifying `distinct` the result from a `select` statment is a set rather than a [bag](basic-constructs.md#bag-expression).
+
+For example, this query returns the set of different names in the database:
+```sql
+   select distinct name(p) 
+     from Person p 
+    where age(p)>20;`
+```
+
+In case you need to construct an ordered sequence of objects rather than a bag you can use the [vector selection statement](vector-queries.md).
+
+<a name="select-clause">
+
+The `select-clause` in a `select` statement defines the objects to be retrieved based on bindings of local variables declared in the
 `from-clause` and filtered by the `where-clause`. The select clause is
-often a comma-separated list of expressions to retrieve a bag of
+often a comma-separated list of [expressions](basic-constructs.md#general-expression) to retrieve a bag of
 *tuples* of objects from the database. 
 
 Example:
@@ -161,148 +168,20 @@ Example:
      from Person p
     where income(p)>2500;
 ```
+<a name="from-clause">
 
 The `from-clause` declares data types of local variables used in the query. 
+<a name="where-clause">
 
-Example:
-```sql
-   select name(p), income(p)
-     from Person p
-    where age(p)>20;
-```
+The `where-clause` gives selection criteria for the search. The where clause is specified as a *predicate*.
 
-**Notice** that variables in AmosQL can be bound to *objects of any type*.
-This is different from select statements in SQL  where all
-variables must be bound to *tuples only*. AmosQL is based on *domain
-calculus* while SQL select statements are based on *tuple calculus*.
 
-If a function is applied on the result of a function returning a bag
-of values, the outer function is applied **on each element** of that
-bag, the bag is *flattened*. This is called *Daplex semantics*. For
-example, in the following query, if there are more than one parents
-per parent generation of Cush there will be several names (e.g. Noah
-and Ruth) returned:
+### <a name="predicate-expression"> Predicates
 
-```sql
-     select name(parents(parents(q))) 
-       from Person q 
-      where name(q)= "Cush";
-```
-returns the bag:
-```
-   "Noah" 
-   "Ruth"
-```
-
-The `where-clause` gives selection criteria for the search. The
-where clause is specified as a [predicate](#predicate-expressions).
-
-Example:
-```sql
-   select name(p), income(p)
-     from Person p
-    where age(p)>20;
-```
-
-To retrieve the results of [tuple valued functions](#tuple-result) in
-queries, use [tuple expressions](#tuple-expr).
-
-Example:
-```sql
-   select name(m), name(f) 
-     from Person m, Person p 
-    where (m,f) = parents2(p);
-```
-
-Duplicates are removed from the result only when the keyword
-`distinct` is specified.
-
-For example, this query returns the set of different names in the database:
-```sql
-   select distinct name(p) 
-     from Person p 
-    where age(p)>20;`
-```
-
-The optional `group-by-clause` groups and aggregates the
-result. A select statement with a group-by-class is called a [grouped
-selection](#grouped-selection).
-
-Example:
-```sql
-   select name(p), sum(income(p))
-     from Person p
-    where age(p) > 20
-    group by name(p);
-```
-
-The optional `order-by-clause` sorts the result ascending `asc`
-(default) or descending `desc`. A select statement with an
-order-by-clause is called an [ordered
-selection](#ordered-selections). 
-
-Example:
-```sql
-   select name(p), income(p)
-     from Person p
-    where age(p) > 20
-    order by income(p) desc;
-```
-
-The optional `limit-clause` limits the number of returned values from
-the select statement. It is often used together with ordered
-selections to specify [top-k queries](#top-k-queries).
-
-Example:
-```sql
-   select name(p), income(p)
-     from Person p
-    where age(p) > 20
-    order by income(p) desc
-    limit 10;
-```
-
-The optional `into-clause` specifies variables to be bound to the result. 
-
-Example:
-```sql
-   select p into :e 
-     from Person p 
-    where name(p) = 'Eve';
-```
-
-This query retrieves into the environment variable `:eve2`, which the
-object of type `Person` whose name is `Eve`.
-
-**Notice** that if the result bag contains more
-than one object the *into* variable(s) will be bound only to the
-*first* object in the bag. In the example, if more that one person is
-named Eve only the first one found will be assigned to `:e`.
-
-If you wish to assign the entire result from the select statement to a
-variable, enclose it in parentheses. The result will be a
-[bag](#Bags). The elements of the bag can then be extracted with the
-`in()` function or the infix `in` operator.
-
-Example:
-```sql
-   set :r = (select p 
-               from Person p  
-              where name(p) = 'Eve');
-```
-
-Inspect `:r` with one of these equivalent queries:
-```sql
-    in(:r); 
-   select p from Person p where p in :r;
-```
-
-## Predicates
-
-The [where clause](#where-clause) in a select statement specifies a
+The `where clause` in a select statement specifies a
 selection filter as a logical predicate over variables. A predicate is
-an expression returning a boolean value, which can be logical values
-[comparison operators](#infix-functions) and functions returning boolean
+an [expression](basic-constructs.md#general-expression) returning a boolean value, which can be logical values
+comparison operators (`>, *, +` etc.) and functions returning boolean
 results. The boolean operators `and` and `or` can be used to combine
 boolean values. 
 
@@ -340,7 +219,7 @@ is equivalent to
 ```
 
 The comparison operators (=, !=, >, <=, and >=) are treated as
-binary [predicates](#predicates). You can compare objects of any type.
+binary predicates. You can compare objects of any type.
 
 Predicates are allowed in the result of a select expression. 
 
@@ -351,14 +230,177 @@ select age(:p1) < 20 and home(:p1)="Uppsala";
 The query returns `true` if person `:p1` is younger than 20 and lives
 in Uppsala.
 
-## Grouped selections
+### <a name="daplex-semantics"> Nested function calls
+
+If a function is applied on the result of a function returning a bag of values, the outer function is applied **on each element** of that bag, the bag is *flattened*. This is called **Daplex semantics**. 
+
+For example, consider the query:
+```sql
+   select name(friends(p))
+     from Person p
+    where name(p)= "Bill";
+```
+
+The function `friends()` returns a bag of persons, on which the
+function `name()` is applied. The normal semantics in sa.amos is that
+when a function (e.g. `name()`) is applied on a bag valued function
+(e.g. `friends()`) it will be *applied on each element* of the
+returned bag. In the example a bag of the names of the persons named
+Bill is returned. 
+
+### <a name="tuple-expression"> Tuple expressions
+
+To retrieve the results of [tuple valued functions](defining-functions.md#tuple-result) in queries, use *tuple expression* (syntax: `tuple-expr`).
+
+Example:
+```sql
+   select name(m), name(f) 
+     from Person m, Person p 
+    where (m,f) = parents2(p);
+```
+
+Tuple expressions can also be used to assign the result of functions returning tuples.
+
+Example:
+```
+   set (:m,:f)=parents2(:cain);
+```
+
+### <a name="into-clause"> Into clause
+
+The optional `into-clause` specifies variables to be bound to the result. 
+
+Example:
+```sql
+   select p into :e 
+     from Person p 
+    where name(p) = 'Eve';
+```
+
+This query retrieves into the environment variable `:eve2`, which the
+object of type `Person` whose name is `Eve`.
+
+**Notice** that if the result bag contains more
+than one object the *into* variable(s) will be bound only to the
+*first* object in the bag. In the example, if more that one person is
+named Eve only the first one found will be assigned to `:e`.
+
+If you wish to assign the entire result from the select statement to a
+variable, enclose it in parentheses. The result will be a
+[bag](basic-constructs.md#bag-expression). The elements of the bag can then be extracted with the infix `in` operator or the `in()` function.
+
+Example:
+```sql
+   set :r = (select p 
+               from Person p  
+              where name(p) = 'Eve');
+```
+
+Inspect `:r` with one of these equivalent queries:
+```sql
+   select p from Person p where p in :r;
+   in(:r); 
+```
+
+## <a name="aggregate-function"> Aggregate functions
+
+Aggregate functions such as `sum()`, `avg()`, `stdev()`, `min()`, `max()`, `count()` are handled specially. They are applied on entire collections (bags) of values, rather than being applied for each element using the [Daplex semantics](#daplex-semantics) of normal function calls.
+
+Example:
+```sql
+   count(friends(:p));
+```
+In this case `count()` is applied on the subquery of all friends of
+`:p`. The system uses a rule that arguments are converted (coerced)
+into a subquery when an argument of the calling function(e.g. `count`)
+is declared `Bag of`. 
+
+Example:
+```sql
+   sum(income(friends(:p));
+```
+Here, first Daplex semantics is used to form the bag of incomes of the friends of `:p` and then the aggregate function `sum` add together the incomes of the friends.
+
+Aggregate functions can be used in two ways:
+
+1. They can be used in [grouped selections](#group-by).
+2. They can be applied on *subqueries*.
+
+In the second case, the subqueries are specified as nested select expressions returning [bags](basic-constructs.md#bag-expression).
+
+Example:
+```
+   avg(select income(p) from Person p);
+```
+
+Local variables in queries may be declared as bags, which means that
+the variable is bound to a subquery that can be used as subquery arguments to
+aggregate functions. 
+
+Example:
+```sql
+   select sum(b), avg(b), stdev(b)
+     from Bag of Integer b
+    where b = (select income(p)
+                 from Person p);
+```
+
+Variables may be assigned to bags by
+assigning values of functions returning bags.
+
+Example:
+```sql
+   set :f = friends(:p);
+   count(:f);
+```
+
+Bags are not explicitly stored in the database, but are generated when
+needed, for example when they are used in aggregate functions. 
+
+Example:
+```sql
+   set :bigbag = iota(1,10000000);
+```
+
+The statement assigns `:bigbag` to a bag of 10^7^ numbers. The bag is
+not explicitly created through. Instead its elements are generated when
+needed, for example when passed to the aggregate function `count()`:
+```sql
+   count(:bigbag);
+```
+
+## <a name="ordered-selection"> Ordered selections
+The optional `order-by-clause` sorts the result ascending `asc`
+(default) or descending `desc`. A select statement with an
+order-by-clause is called an *ordered selection*. 
+
+Example:
+```sql
+   select name(p), income(p)
+     from Person p
+    where age(p) > 20
+    order by income(p) desc;
+```
+
+
+## <a name="group-by"> Grouped selections
 
 When analyzing data it is often necessary to group data, for example
 to get the sum of the salaries of employees per department. Such
-regroupings are specified though the `group-by-clause`. It specifies
-on which expressions in the select clause the data should be grouped
-and summarized.  A *grouped selection* is a select statement with a
-[group-by-clause](#group-by-clause) present. The execution semantics
+regroupings are specified though the optional `group-by-clause`. It specifies
+on which [expression](basic-constructs.md#general-expression) in the select clause the data should be grouped
+and summarized. This is called a *grouped selection*.  
+
+Example:
+```sql
+   select name(p), sum(income(p))
+     from Person p
+    where age(p) > 20
+    group by name(p);
+```
+
+A grouped selection is a select statement with a
+`group-by-clause` present. The execution semantics
 of a grouped selection is different than for regular queries.
 
 Example:
@@ -372,8 +414,7 @@ Example:
 Here the `group-by-clause` specifies that the result should be grouped
 on the names of the departments in the database. After the grouping,
 for each department `d` the salaries of the persons `p` working at
-that department should be summed using the [aggregate
-function](#aggregate-functions) `sum()`.
+that department should be summed using the [aggregate function](#aggregate-function) `sum()`.
 
 An element of a [select-clause](#select-clause) of a grouped selection
 must be one of:
@@ -383,15 +424,11 @@ which is `name(d)` in the example. The result is grouped on each group
 key. In the example the grouping is made over each department name so
 the group key is specified as `name(d)`.
 
-2. A call to an [aggregate function](#aggregate-functions), which is
+2. A call to an [aggregate function](#aggregate-function), which is
 `sum()` in the example. The aggregate function is applied for the set
 of bindings specified by the group key. In the example the aggregate
 function `sum()` is applied on the set of values of `salary(p)` for
 the persons `p` working in department `d`, i.e. where `dept(p)=d`.
-
-Aggregate functions such as `sum()`, `avg()`, `stdev()`, `min()`,
-`max()`, `count()` are applied on collections (bags) of values, rather
-than single objects.
 
 Contrast the above query to the regular (non-grouped) query:
 
@@ -415,9 +452,9 @@ without revealing the department names:
     group by name(d);
 ```
 
-## Ordered selections
+## <a name="order-by"> Ordered selections
 
-The [order-by-clause](#order-by-clause) specifies that the result
+The `order-by-clause` specifies that the result
 should be sorted by the specified *sort key*. The sort order is
 descending when `desc` is specified and ascending otherwise.
 
@@ -438,12 +475,13 @@ For example, the following query list the salaries of persons in descending orde
     order by name(p) desc;
 ```
 
-## Top-k queries
+## <a name="top-k-queries"> Top-k queries
 
-A *top-k query* is a query returning the first few tuples in a set of
-objects based on some ranking. The order-by-clause](#order-by-clause)
-and [limit-clause](#limit-clause) can be combined to specify top-k
-queries. For example, the following query returns the names and
+The optional `limit-clause` limits the number of returned values from
+the select statement. It is often used together with ordered
+selections to specify *top-k queries* returning the first few tuples in a set of objects based on some ranking.
+
+For example, the following query returns the names and
 salaries of the 10 highest income earners:
 
 ```sql
@@ -453,7 +491,9 @@ salaries of the 10 highest income earners:
     limit 10;
 ```
 
-The limit can be any numerical expression.For example, the following
+The limit can be any numerical [expression](basic-constructs.md#general-expression). 
+
+For example, the following
 query retrieves the `:k+3` lowest income earners, where `:k` is a
 variable bound to a numeric value:
 ```sql
@@ -463,57 +503,7 @@ variable bound to a numeric value:
     limit :k+3;
 ```
 
-## Aggregation over subqueries
-
-[Aggregate functions](#aggregate-functions) can be used in two ways:
-
-1. They can be used in [grouped selections](#grouped-selection).
-2. They can be applied on *subqueries*.
-
-In the second case, the subqueries are specified as nested select expressions returning [bags](#bags).
-
-Example:
-```
-   avg(select income(p) from Person p);
-```
-
-Nested function calls over bags are *flattened*. Consider the query:
-```sql
-   select name(friends(p))
-     from Person p
-    where name(p)= "Bill";
-```
-
-The function `friends()` returns a bag of persons, on which the
-function `name()` is applied. The normal semantics in sa.amos is that
-when a function (e.g. `name()`) is applied on a bag valued function
-(e.g. `friends()`) it will be *applied on each element* of the
-returned bag. In the example a bag of the names of the persons named
-Bill is returned. This is called [Daplex
-semantics](#daplex-semantics).
-
-Aggregate functions work differently. They are applied on the entire bag. 
-
-Example:
-```sql
-   count(friends(:p));
-```
-In this case `count()` is applied on the subquery of all friends of
-`:p`. The system uses a rule that arguments are converted (coerced)
-into a subquery when an argument of the calling function(e.g. `count`)
-is declared `Bag of`.
-
-Local variables in queries may be declared as bags, which means that
-the variable is bound to a subquery that can be used as arguments to
-aggregate functions. 
-
-Example:
-```sql
-   select sum(b), avg(b), stdev(b)
-     from Bag of Integer b
-    where b = (select income(p)
-                 from Person p);
-```
+xxxxxxx
 
 Elements in subqueries can be accessed with the `in` operator. 
 
@@ -526,31 +516,6 @@ Example:
 ```
 The query returns the names of all persons paired with the number of
 persons in the database. 
-
-Variables may be assigned to bags by
-assigning values of functions returning bags.
-
-Example:
-```sql
-   set :f = friends(:p);
-   count(:f);
-```
-
-Bags are not explicitly stored in the database, but are generated when
-needed, for example when they are used in aggregate functions or
-`in`. 
-
-Example:
-```sql
-   set :bigbag = iota(1,10000000);
-```
-
-The statement assigns `:bigbag` to a bag of 10^7^ numbers. The bag is
-not explicitly created though. Instead its elements are generated when
-needed, for example when executing:
-```sql
-   count(:bigbag);
-```
 
 To compare that two bags are equal use the function *bequal()*.
 
@@ -568,9 +533,6 @@ returns true.
 **Notice** that *bequal()* materializes its arguments before doing the
 equality computation, which may occupy a lot of temporary space in the
 database image if the bags are large.
-
-See [Aggregate functions](#aggregate-functions) for a details on
-aggregate functions.
 
 ## Quantifiers
 

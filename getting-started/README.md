@@ -71,6 +71,11 @@ Usually you load AmosQL definitions from a script file rather than entering them
 [sa.amos] 4> < 'mycode.amosql';
 ```
 
+### Domain calculus
+<a name="domain-calculus"> **Notice** that variables in AmosQL can be bound to *objects of any type*. This is different from select statements in SQL  where all variables must be bound to *tuples only*. AmosQL is based on *domain calculus* while SQL select statements are based on *tuple calculus*.
+
+
+
 ### Transactions
 
 Database changes can be undone by using the `rollback` statement with
@@ -136,10 +141,10 @@ define sa.amos [foreign functions](../accessing-external-systems/foreign-and-mul
 
 ## Graphical database browser
 
-The multi-database browser GOOVI [^CR01] is a graphical browser for
+The multi-database browser GOOVI [CR01](<http://www.it.uu.se/research/group/udbl/publ/goovipaper3.pdf>) is a graphical browser for
 sa.amos written as a Java application. You can start the GOOVI browser
 from the sa.amos top loop when Java is enabled by calling the AmosQL
-function:
+function: 
 ```
 [sa.amos] n> goovi();
 ```

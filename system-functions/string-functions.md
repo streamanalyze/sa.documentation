@@ -4,13 +4,34 @@ String concatenation is made using the `+` operator. Examples:
 ```
    "ab" + "cd" + "ef";  returns "abcdef"
    "ab"+12+"de"; returns "ab12de"
-   1+2+"ab"; is illegal since the first argument of '+' must be a string.
-   "ab"+1+2; returns "ab12" since '+' is left associative.
+   "ab"+1+2; returns "ab12"
+   1+2+"ab"; is illegal since the first argument of '+' must be a string!
 ```
+
+The following functions operate on strings (type `Charstring`):
+```
+   char_length(Charstring) -> Integer
+   like(Charstring string, Charstring pattern) -> Boolean
+   like_i(Charstring string, Charstring pattern) -> Boolean
+   locate(Charstring substr, Charstring str) -> Integer
+   lower(Charstring str) -> Charstring
+   ltrim(Charstring chars, Charstring str) -> Charstring
+   newline() -> Charstring
+   not_empty(Charstring s) -> Boolean
+   replace(Charstring str, Charstring from_str, Charstring to_str) -> Charstring
+   rtrim(Charstring chars, Charstring str) -> Charstring
+   stringify(Object x) -> Charstring s
+   substring(Charstring string,Integer start, Integer end) -> Charstring
+   trim(Charstring chars, Charstring str) -> Charstring
+   unstringify(Charstring s) -> Object x
+   upper(Charstring s)->Charstring
+```
+
+Descriptions:
 
 Count the number of characters in string:
 ```
-   char_length(Charstring)->Integer
+   char_length(Charstring) -> Integer
 ```
 
 Test if string matches regular expression pattern where `*` matches
@@ -44,10 +65,15 @@ Lowercase string:
 
 Remove characters in `chars` from beginning of `str`:
 ```
-   ltrim( Charstring chars, Charstring str) -> Charstring
+   ltrim(Charstring chars, Charstring str) -> Charstring
 ```
 
-Return `true` if string `s` contains only whitespace characters
+New line:
+```
+   newline() -> Charstring
+```
+
+Return `true` if string `s` contains not only whitespace characters
 (space, tab, or new line):
 ```
    not_empty(Charstring s) -> Boolean
@@ -64,14 +90,14 @@ Remove characters in chars from end of str:
    rtrim(Charstring chars, Charstring str) -> Charstring
 ```
 
-Convert any object x into a string:
+Convert any object x into a string, same as ""+x:
 ```
-   stringify(Object x)->Charstring s
+   stringify(Object x) -> Charstring s
 ```
 
 Extract substring from given character positions. First character has position 0:
 ```
-   substring(Charstring string,Integer start, Integer end)->Charstring
+   substring(Charstring string,Integer start, Integer end) -> Charstring
 ```
 
 Remove characters in `chars` from beginning and end of `str`.
@@ -79,7 +105,7 @@ Remove characters in `chars` from beginning and end of `str`.
    trim(Charstring chars, Charstring str) -> Charstring
 ```
 
-Convert string `s` to object `x`. Inverse of `stringify()`:
+Convert string `s` to object `x`. Inverse of `stringify(x)`:
 ```
    unstringify(Charstring s) -> Object x
 ```

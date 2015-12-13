@@ -6,21 +6,16 @@ applications, e.g. for clustering and identifying patterns in data
 collections. Primitives are provided for analyzing both unordered
 collections (bags) and ordered collections (vectors). In particular
 ordered collections are often used in data mining and for this the
-[vselect statement](#vselect) provides a powerful way to specify
-queries returning vectors. Another important issue is [grouping
-data](#grouped-selection) based on some grouping criteria and [top-k
-queries](#top-k-queries), which are handled by the group by construct
-supported both for [regular queries](#select-statement)and [vector
-queries](#vselect). System functions are provided for basic [numerical
-vector](#vector-numerical) computations,
-[distance](#distance-functions) computations, and
-[statistical](#statistical-functions)computations. The results of the
-analyzes can be visualized by calling an external [data
-visualization](#plot) package.
+[vselect statement](vector-queries.md#vselect-stmt) provides a powerful way to specify
+queries returning vectors. Another important issue is [grouping data](queries.md#group-by) based on some grouping criteria and [top-k-queries](queries.md#top-k-queries), which are handled by the `group by` construct
+supported both for [regular queries](queries.md#select-statement) and 
+[vector queries](vector-queries.md#vselect-stmt). System functions are provided for basic computations, distance computations, and statisticalcomputations. 
+The results of the
+analyzes can be visualized by calling an external [data visualization](#plot-fns) package.
 
-## Numerical vector functions
+## <a name="vector-numerical"> Numerical vector functions
 
-For numerical vectors the `times()` function (infix operator: `*` ) is defined as the scalar product:
+For numerical vectors the `times()` function (infix operator: `*`) is defined as the scalar product:
 ```
    times(Vector x, Vector y) -> Number r
 ```
@@ -30,7 +25,7 @@ Example:
 ```
 returns the number `32`.
 
-For numerical vectors the `elemtimes()` function (infix operator: `.*`) is defined as the element wise product for vectors of numbers:
+For numerical vectors the `elemtimes()` function (infix operator: `.*`) is defined as the element-wise product for vectors of numbers:
 ```
    elemtimes(Vector x, Vector y) -> Vector of Number r
 ```
@@ -75,10 +70,10 @@ returns `{5, 7, 9}`
 ```
 returns `{-3, -3, -3}`.
 
-The `times()` and `div()` functions (infix operators: `*` and `/` ) scale vectors by a scalar:
+The `times()` and `div()` functions (infix operators: `*` and `/`) scale vectors by a scalar:
 ```
-   times(Vector of number x,Number y) -> Vector of Number r
-   div(Vector of number x,Number y) -> Vector of Number r
+   times(Vector of number x,Number lambda) -> Vector of Number r
+   div(Vector of number x,Number lambda) -> Vector of Number r
 ```
 Example:
 ```
@@ -179,7 +174,7 @@ The function `maxnorm()` computes the Maxnorm distance between two points `p1` a
    maxnorm(Vector of Number p1, Vector of Number p2) -> Real d
 ```
 
-## Vector aggregate functions
+## <a name="vector-aggregate-functions"> Vector aggregate functions
 
 The following functions group and compute aggregate values over collections of numerical vectors.
 
@@ -234,9 +229,13 @@ Principal Component Analysis is performed using the function `pca()`:
    pca(Bag of Vector data)-> (Vector of Number eigval D, Vector of Vector of Number eigvec W)
 ```
 
-`pca()` takes a bag of M-dimensional vectors in data and computes the MxM covariance matrix C of the input vectors. Then, `pca()` computes the M eigenvalues D and the MxM eigenvector matrix W of the covariance matrix. `pca()` returns the eigenvalues D and their corresponding eigenvectors W.
+`pca()` takes a bag of M-dimensional vectors in data and computes the
+*MxM* covariance matrix *C* of the input vectors. Then, `pca()` computes
+the *M* eigenvalues *D* and the *MxM* eigenvector matrix *W* of the covariance
+matrix. `pca()` returns the eigenvalues *D* and their corresponding
+eigenvectors *W*.
 
-To use `pca()` to reduce the dimensionality to the L most significant dimensions, each input vector must be projected onto the eigenvectors corresponding to the L greatest eigenvalues using the scalar product. This is done using the function `pcascore()`:
+To use `pca()` to reduce the dimensionality to the *L* most significant dimensions, each input vector must be projected onto the eigenvectors corresponding to the *L* greatest eigenvalues using the scalar product. This is done using the function `pcascore()`:
 ```
    pcascore(Bag of Vector of Number, Integer d) -> Vector of Number score
 ```
@@ -250,7 +249,7 @@ The label of each vector remains unchanged during projection.
 
 Note that the input data might have to be pre-processed, using some vector normalization.
 
-## Plotting numerical data
+## <a name="plot-fns"> Plotting numerical data
 
 sa.amos can utilize GNU Plot (v 4.2 or above), to plot numerical
 data. The `plot()` function is used to plot a line connecting

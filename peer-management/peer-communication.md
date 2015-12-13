@@ -85,7 +85,7 @@ kills all peers. The name server and the current peer will still be alive afterw
 kills all the peers in the federation, including the name server and the peer calling kill_the_federation.
 <br><br>
 ```
-   is_running(Charstring peer)->Boolean
+   is_running(Charstring peer)->Boolean
 ```
 returns true if peer is listening.
 <br><br>

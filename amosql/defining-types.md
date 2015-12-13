@@ -41,12 +41,12 @@ unique in the database.
 The `attr-function-commalist` clause is optional, and provides a way
 to define properties of the new type, for example:
 
-Each property is a [function](#function-definitions) having a single
-argument and a single result. The argument type of a property function
-is the type being created and the result type is specified by the
-`type-spec`. The result type must be previously defined. In the above
-example the function `name()` has argument type `Person` and result
-type `Charstring`, i.e. signatures `name(Person)->Charstring` and
+Each property is a function having a single argument and a single
+result. The argument type of a property function is the type being
+created and the result type is specified by the `type-spec`. The
+result type must be previously defined. In the above example the
+function `name()` has argument type `Person` and result type
+`Charstring`, i.e. signatures `name(Person)->Charstring` and
 `income(Person)->Number`, respectively.
 
 The new type will be a subtype of all the supertypes in the under
@@ -63,7 +63,7 @@ system type named `Userobject`.
 
 If *key* is specified for a property, it indicates that each value of
 the attribute is unique and the system will raise an error if this
-[uniqueness is violated](#cardinality-constraints). In the following
+[uniqueness is violated](updates.md#cardinality-constraints). In the following
 example, two objects of type `Employee` cannot have the same value of
 property `emp_no`:
 

@@ -39,7 +39,7 @@ To set the names of the two persons, do:
    set name(:eve) = "Eve";
 ```
 
-To populate a bag valued function you can use [bag construction:](#Bags)
+To populate a bag valued function you can use [bag construction:](basic-constructs.md#bag-expression)
 
 ```sql
    set hobbies(:eve) = bag("Camping","Diving");
@@ -114,7 +114,7 @@ For example, the following function is updatable:
      as select q where married(p,q);
 ```
 
-The user can define [update procedures](#user-update-functions) for
+The user can define [update procedures](#dynamic-updates) for
 derived functions making also non-updatable functions updatable.
 
 The *multiple assignment statement* assigns several variables to the result of a tuple valued query.
@@ -124,7 +124,7 @@ Example:
    set (:mother,:father) = parents2(:eve);
 ```
 
-You can store [records](#records) in stored functions.
+You can store [records](basic-constructs.md#record-expression) in stored functions.
 
 Example:
 ```sql
@@ -143,16 +143,16 @@ The query:
 ```
 will return the string `"Hello, I am Tore"`.
 
-## Cardinality constraints
+## <a name="cardinality-constraints"> Cardinality constraints
 
 A *cardinality constraint* is a system maintained restriction on the
 number of allowed occurrences in the database of an argument or result
-of a [stored function](#stored-function). For example, a cardinality
+of a [stored function](defining-functions.md#stored-function). For example, a cardinality
 constraint can be that there is at most one salary per person, while a
 person may have any number of children. The cardinality constraints
 are normally specified by function signatures.
 
-For example, the following restricts each person to have one salary
+The following example restricts each person to have one salary
 while many children are allowed:
 ```sql
    create function salary(Person p) -> Charstring nm
@@ -194,8 +194,8 @@ will guarantee that a person's name is unique.
 *one-many* is normally represented by an inverse function with
 cardinality constraint *many-one*. 
 
-For example, suppose we want to represent a *one-many* relationship
-between types Department and Employee, i.e. there can be many
+Suppose we want to represent a *one-many* relationship
+between types `Department` and `Employee`, i.e. there can be many
 employees for a given department but only one department for a given
 employee. The recommended way is to define the function `department()`
 enforcing a *many-one* constraint between employees as departments:
@@ -211,20 +211,18 @@ The inverse function can then be defined as a derived function:
          where department(e) = d;
 ```
 
-Since inverse functions are [updatable](#updates) the function
-`employees()` is also updatable and can be used when
-[populating](#create-object)the database.
+Since inverse functions are updatable the function `employees()` is
+also updatable and can be used when populating the database.
 
 Any variable in a stored function can be specified as key, which will
-restrict the updates the stored functions to maintain key uniqueness
-for the argument or result of the stored function. 
+restrict the updates  maintain key uniqueness.
 
 Cardinality constraints can also be specified for foreign functions,
-which is important for optimizing queries involving foreign
-functions. However, it is up to the foreign function implementer to
-guarantee that specified cardinality constraints hold.
+which is important for optimizing queries using the functions. It is
+then up to the foreign function implementer to guarantee that
+specified cardinality constraints hold.
 
-## Changing object types
+## <a name="changing-object-types"> Changing object types
 
 The `add-type-stmt` changes the type of one or more objects to the
 specified type.
@@ -248,22 +246,22 @@ remove-type-stmt ::=
 
 Removing a type from an object may also remove properties from the
 object. If all user defined types have been removed from an objects,
-the object will still be member of type Userobject.
+the object will still be member of type `Userobject`.
 
-## Dynamic updates
+## <a name="dynamic-updates"> Dynamic updates
 
-Sometimes it is necessary to be able to create objects whose types are
-not known until runtime. Similarly one may wish to update functions
-without knowing the name of the function until runtime. For this there
-are the following system procedural system functions:
+Sometimes it is necessary to create objects whose types are not known
+until runtime. Similarly one may wish to update functions without
+knowing the name of the function until runtime. This is achieved by
+the following system procedural system functions:
 
 ```
-   createobject(Type t)->Object
-   createobject(Charstring tpe)->Object
-   deleteobject(Object o)->Boolean
-   addfunction(Function f, Vector argl, Vector resl)->Boolean
-   remfunction(Function f, Vector argl, Vector resl)->Boolean
-   setfunction(Function f, Vector argl, Vector resl)->Boolean
+   createobject(Type t) -> Object
+   createobject(Charstring tpe) -> Object
+   deleteobject(Object o) -> Boolean
+   addfunction(Function f, Vector argl, Vector resl) -> Boolean
+   remfunction(Function f, Vector argl, Vector resl) -> Boolean
+   setfunction(Function f, Vector argl, Vector resl) -> Boolean
 ```
 
 The function `createobject()` creates an object of the type specified

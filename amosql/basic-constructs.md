@@ -2,7 +2,7 @@
 
 The basic building blocks of the AmosQL query language are described here.
 
-## Syntactic conventions
+## <a name="syntax"> Syntactic conventions
 
 For the syntax we use BNF notation with the following special constructs:
 
@@ -15,7 +15,7 @@ A ::= B-commalist: A consists of one or more Bs separated by commas.
 'xyz': The keyword xyz.
 ```
 
-## Statements
+## <a name="statements"> Statements
 
 *Statements* instruct sa.amos to perform various kinds of operations on the database. AmosQL statements are always terminated by a semicolon (;). The following statements can be entered to the sa.amos top loop:
 
@@ -43,13 +43,13 @@ statement ::=
       exit-stmt
 ```
 
-## Identifiers
+## <a name="identifiers"> Identifiers
 
 *Identifiers* have the syntax:
 
 ```
 identifier ::=
-      ('_' | letter) [identifier-character-list] 
+      ('_' | letter) [identifier-character-list]
 
 identifier-character ::=
       alphanumeric | '_'
@@ -67,7 +67,7 @@ Notice that sa.amos identifiers are NOT case sensitive; i.e. they are
 always internally capitalized. By contrast sa.amos reserved keywords
 are always written with *lower case* letters.
 
-## Variables
+## <a name="variables"> Variables
 
 Variables are of two kinds: *local variables* or *interface variables*. 
 
@@ -77,12 +77,8 @@ variable ::=
      local variable | interface-variable
 ```
 
-*Local variables* are identifiers for data values inside AmosQL
-queries and functions. *Local variables* must be declared in function
-signatures (see [Function definitions](#function-definitions)), in
-from clauses (see [Queries](#query-statement)), or by the `declare`
-statement (see [procedural functions](#procedures)). Notice that
-variables are **not** case sensitive.
+*Local variables* are identifiers for data values inside AmosQL queries and functions. *Local variables* must be declared in function
+signatures (see [Function definitions](defining-functions.md)), in from clauses (see [Queries](queries.md)), or by the `declare` statement (see [procedural functions](../procedural-functions/README.md)). Notice that variables are **not** case sensitive.
 
 Syntax:
 ```
@@ -141,7 +137,7 @@ Examples
    set :i = 2 + sqrt(:x3);
 ```
 
-## Constants
+## <a name="constants"> Constants
 
 Constants can be integers, reals, strings, time stamps, booleans, or nil.
 
@@ -208,7 +204,7 @@ escape character inside the string, replacing the succeeding
 character. For example the string `'ab"\'` can also be written as
 `"ab\"\\"`, and the string `a'"b` must be written as `"a'\"b"`.
 
-A [simple value](#simple-value) is either a constant or a variable reference.
+A *simple value* is either a constant or a variable reference.
 
 Syntax:
 ```
@@ -222,7 +218,7 @@ Examples:
    "Hello World"
 ```
 
-## Expressions
+## <a name="general-expression"> Expressions
 
 *Expressions* are formulas expressed with the AmosQL syntax that can
 be evaluated by the system to produce a *value*. Complex expressions
@@ -253,7 +249,14 @@ the sa.amos top loop. Example:
    1+5*sqrt(6);
 ```
 
-Notice that Boolean expressions, [predicates](#predicates), either
+Entering simple expressions followed by a semicolon is the simplest
+form of AmosQL [queries](queries.md). Example:
+
+```
+   1+sqrt(25);
+```
+
+Notice that Boolean expressions, *predicates*, either
 return *true*, or nothing if the expression is not true. Example:
 
 ```
@@ -263,14 +266,7 @@ return *true*, or nothing if the expression is not true. Example:
      => nothing
 ```
 
-Entering simple expressions followed by a semicolon is the simplest
-form of AmosQL [queries](#query-statement). Example:
-
-```
-   1+sqrt(25);
-```
-
-## Collections
+## <a name="collections"> Collections
 
 Collections represent sets of objects. Amos II supports three kinds of
 collections: bags, vectors, and key-value associations (records):
@@ -309,13 +305,14 @@ Examples:
    {"id":1,"name":"Kalle","age":32}
 ```
 
-### Bags
+### <a name="bag-expression"> Bags
 
 The most common collection is *bags*, which are unordered sets of
 objects with duplicates allowed. The value of a query is usually a
 bag. When a query to the sa.amos toploop returns a bag as result the
-elements of the bag are printed on separate lines. For example:
+elements of the bag are printed on separate lines. 
 
+For example:
 ```
    select name(p) from Person p;
 ```
@@ -332,7 +329,7 @@ Bags can be explicitly created using the *bag-constr* syntax, for example:
    bag(1,2,2,3);
 ```
 
-### Vectors
+### <a name="vector-expression"> Vectors
 
 *Vectors* are sequences of objects of any kind. Curly brackets `{}`
 enclose vector elements, For example, `set :v={1,2,3};` then `:v;`
@@ -342,7 +339,7 @@ Vector element `vi` can be access with the notation `v[i]`, where the
 indexing `i` is from 0 and up. For example `set :v={1,2,3};` then
 `:v[2];` returns `3`.
 
-### Records
+### <a name="record-expression"> Records
 
 *Records* represent dynamic associations between keys and values. A
 record is a dynamic and associative array. Other commonly used terms
@@ -361,9 +358,9 @@ A field `f` of a record bound to a variable `r` can be access with the
 notation `r[f]`, for example:
 `:r['Greeting' ]` returns `Hello, I am Tore`.
 
-## Comments
+## <a name="comments"> Comments
 
-A *comment* can be placed anywhere in an AmosQL statement outside [identifiers](#identifiers), constants, or variables. 
+A *comment* can be placed anywhere in an AmosQL statement outside identifiers, constants, or variables. 
 
 Syntax:
 ```

@@ -3,13 +3,10 @@
 
 A *procedural function* is a function defined as a sequence of AmosQL
 statements that may have side effects, e.g. database update
-statements. Procedural functions may iteratively return elements of a
-result bag by issuing a [return](#result) statement. Each time
-*return* is executed another result element is *emitted* from the
-function. Procedural functions should be avoided in queries since
+statements. Procedural functions should be avoided in queries since
 procedural functions may update the database. Since the execution
 order of function calls in queries is undefined such side effect may
-cause unexpected behavior.  Most AmosQL statements are allowed in
+cause unexpected behavior. Most AmosQL statements are allowed in
 procedure bodies.
 
 Syntax:
@@ -139,8 +136,8 @@ returns the bag
    120
    190
 ```
-`sumb2()` illustrates the use of [while statements](#while-stmt) in
-procedural functions to iterate over several [scans](#cursors)
+`sumb2()` illustrates the use of `while` statements in
+procedural functions to iterate over several [scans](../amosql/scans.md)
 simultaneously.
 
 Queries and updates embedded in procedure bodies are immediately
@@ -150,11 +147,9 @@ is not needed when procedural functions are called.
 
 A procedural function may return a bag of result values iteratively by
 executing the `return` statement several times in a procedure
-body. Every time the `return` statement is executed an element of the
-result bag is emitted from the procedure. Unlike most programming
-languages, the `return` statement does not not abort the control flow;
-it rather specifies that a value is to be *emitted* to the result bag of the
-procedure. 
+body. The `return` statement does not not abort the control flow;
+it rather specifies that a value is to be *emitted* to the result bag of a
+procedure.
 
 Example:
 
@@ -179,7 +174,7 @@ returns the bag:
    5
 ```
 
-Notice that [scans](#cursors) can be used for iterating over functions
+Notice that [scans](../amosql/scans.md) can be used for iterating over functions
 producing very large bags by many executions of the return
 statement. 
 
