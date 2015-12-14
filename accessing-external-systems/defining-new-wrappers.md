@@ -6,7 +6,7 @@ Wrappers make data sources queryable. Some wrapper functionality is completely d
 
 Objects of type *Datasource* describe properties of different kinds of data sources accessible through sa.amos. A wrapper interfacing a particular external data manager is defined as a subtype of *Datasource*. For example, the types *Amos*, *Relational*, and *Jdbc* define interfaces to sa.amos peers, relational databases, and relational data bases accessed through JDBC, respectively. These types are all subtypes of type *Datasource*. Each *instance* of a data source type represents a particular database of that kind, e.g. a particular relational database accessed trough JDBC are instances of type *Jdbc*.
 
-## Mapped types
+## <a name="mapped-type"> Mapped types
 
 A *mapped type* is a type whose instances are identified by a *key* consisting of one or several other objects [^FR97]. Mapped types are needed when proxy objects corresponding to external values from some data source are created in a peer. For example, a wrapped relational database may have a table PERSON(SSN,NAME,AGE) where SSN is the key. One may then wish to define a mapped type named *Pers* representing proxy objects for the persons in the table. The instances of the proxy objects are identified by an SSN. The type *Pers* should furthermore have the following property functions derived from the contents of the wrapped table `PERSON`:
 
@@ -16,7 +16,7 @@ name(Pers)->Charstring
 age(Pers)->Integer
 ```
 
- The instances and primary properties of a mapped type are defined through a *source function* that returns these as a set of tuples, one for each instance. In our example the source function should return tuples of three elements `(ssn,name,age)`. The [relational database wrapper](#relational) will automatically generate  a source function for table PERSON (type `Pers`) with signature:
+ The instances and primary properties of a mapped type are defined through a *source function* that returns these as a set of tuples, one for each instance. In our example the source function should return tuples of three elements `(ssn,name,age)`. The [relational database wrapper](the-relational-database-wrapper.md) will automatically generate  a source function for table PERSON (type `Pers`) with signature:
 
 ```
 pers_cc()->Bag of (Integer ssn, Charstring name, Integer age) as ...
@@ -31,7 +31,7 @@ create_mapped_type(Charstring name, Vector keys, Vector attrs, Charstring ccfn)-
 where:
 
  - `name` is the name of the mapped type\
- - `keys` is a [vector](#vector) of the names of the keys identifying each instance of the mapped type.
+ - `keys` is a vector of the names of the keys identifying each instance of the mapped type.
  - `attrs` is a vector of the names of the properties of the mapped type.
  - `ccfn` is the name of the core cluster function.
 

@@ -50,7 +50,7 @@ The name of the type `t`.
    name(Type t) -> Charstring nm
 ```
 
-The [generic](#overloaded-functions) functions having a single
+The [generic](../amosql/defining-functions.md#overloaded-function) functions having a single
 argument of type `t` and a single result:
 ```
    attributes(Type t) -> Bag of Function g
@@ -82,16 +82,16 @@ The object representing the function named `nm`:
 ```
    functionnamed(Charstring nm) -> Function
 ```
-Useful for [secondorder functions](#second-order-functions).
+Useful for [second order functions](../amosql/second-order-functions.md).
 
-The *one and only* [resolvent](#overloaded-functions) of a generic
+The *one and only* [resolvent](../amosql/defining-functions.md#overloaded-function) of a generic
 function named `nm`:
 ```
    theresolvent(Charstring nm) -> Function
 ```
 If there is more than one resolvent for `nm` an
 error is raised. If `fn` is the name of a resolvent its functional is
-returned. The notation [#'...'](#functional-constant) is syntactic
+returned. The notation [#'...'](../amosql/second-order-functions.md) is syntactic
 sugar for `theresolvent('...')`.
 
 
@@ -115,12 +115,12 @@ The kind of the function `f` as a string:
 The result can be one of 'stored', 'derived', 'foreign' or
 'overloaded'
 
-Yhe [generic](#overloaded-functions) function of a resolvent:
+Yhe [generic](../amosql/defining-functions.md#overloaded-function) function of a resolvent:
 ```
    generic(Function f) -> Function
 ```
 
-The resolvents of an [overloaded](#overloaded-functions) function `g`:
+The resolvents of an [overloaded](../amosql/defining-functions.md#overloaded-function) function `g`:
 ```
    resolvents(Function g) -> Bag of Function
 ```

@@ -1,9 +1,7 @@
 # Getting started
 
 
-Unpack the zip file to a directory for sa.amos, `<privdir>`. The
-following files are needed in `<privdir>/bin;`: `sa.amos.exe sa.amos.dll
-sa.amos.dmp`
+Unpack the zip file to a directory for sa.amos, `<privdir>`. 
 
 sa.amos is ready to run in `<privdir>/bin` by the command:
 
@@ -57,11 +55,12 @@ For example:
  ("Eva", 280);
 ```
 
-When the database is populated you can [query](#query-statement) it, e.g.:
+When the database is populated you can [query](../amosql/queries.md) it, e.g.:
 
 ```
-[sa.amos] 3> select income(p) from
-        Person p where name(p)="Ulla";
+[sa.amos] 3> select income(p) 
+               from Person p 
+              where name(p)="Ulla";
 ```
 
 Usually you load AmosQL definitions from a script file rather than entering them on the command line, e.g.
@@ -69,6 +68,11 @@ Usually you load AmosQL definitions from a script file rather than entering them
 ```
 [sa.amos] 4> < 'mycode.amosql';
 ```
+
+### <a name="domain-calculus"> Domain calculus
+**Notice** that variables in AmosQL can be bound to *objects of any type*. This is different from select statements in SQL  where all variables must be bound to *tuples only*. AmosQL is based on *domain calculus* while SQL select statements are based on *tuple calculus*.
+
+
 
 ### Transactions
 
@@ -130,15 +134,15 @@ executing the command:
 [sa.amos] 1> enable_java(); ...
 ```
 Once Java is enabled the sa.amos kernel can call code written in Java. You can
-define sa.amos [foreign functions](#foreign-functions) in Java (the
+define sa.amos [foreign functions](../accessing-external-systems/foreign-and-multi-directional-functions.md) in Java (the
 *callout* interface).
 
 ## Graphical database browser
 
-The multi-database browser GOOVI [^CR01] is a graphical browser for
+The multi-database browser GOOVI [CR01](<http://www.it.uu.se/research/group/udbl/publ/goovipaper3.pdf>) is a graphical browser for
 sa.amos written as a Java application. You can start the GOOVI browser
 from the sa.amos top loop when Java is enabled by calling the AmosQL
-function:
+function: 
 ```
 [sa.amos] n> goovi();
 ```
@@ -150,9 +154,9 @@ thread. When you close the browser you return to the sa.amos top loop.
 sa.amos includes a interface to relational databases using JDBC when
 Java is enabled. Relational databases can be accessed and queried in
 terms of AmosQL using this interface. The interface is described in
-the section [Relational database wrapper](#relational).
+the section [Relational database wrapper](../accessing-external-systems/the-relational-database-wrapper.md).
 
 ## C interface
 
 The system is interfaced with the programming language C (and
-C++). Foreign AmosQL functions can be implemented in C[^Ris12].
+C++). Foreign AmosQL functions can be implemented in C [Ris12](<http://user.it.uu.se/~torer/publ/externalC.pdf>).

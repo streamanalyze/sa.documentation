@@ -1,8 +1,8 @@
 # Vector queries
 
 The order of the objects in the bag returned by a regular [select
-statement](#select-statement) is __not__ predetermined unless an
-[order-by](#order-by-clause) clause is specified. However, even if
+statement](queries.md#select-statement) is __not__ predetermined unless an
+[order-by](queries.md#ordered-selection) clause is specified. However, even if
 order-by is specified the system will not preserve the order of the
 result of a select-statement if it is used in other operations.
 
@@ -22,16 +22,16 @@ that creates a new vector from other objects.
 2. It can be a [vector indexing](#vector-index) expression that
 accesses vector elements by their indexes.
 
-3. It can be a regular [select statement](#select-statement) returning
+3. It can be a regular [select statement](queries.md#select-statement) returning
 a set of constructed vectors.
 
-4. It can be a [vselect statement](#vselect) that returns an ordered
+4. It can be a [vselect statement](#vselect-stmt) that returns an ordered
 vector rather than an unordered bag as the regular select statement.
 
-5. It can be a call to some [vector function](#vector-function)
+5. It can be a call to some [vector function](../system-functions/vector-functions.md)
 returning vectors as result.
 
-## Vector construction
+## <a name="vector-construction"> Vector construction
 
 The vector constructor `{...}` notation creates a single vector with
 explicit contents. The following query constructs a vector of three
@@ -54,7 +54,7 @@ bag of tuples::
     where name(p)="Bill"
 ```
 
-## The vselect statement
+## <a name="vselect-stmt"> The vselect statement
 
 The *vselect* statement provides a powerful way to construct new vectors
 by queries. It has the same syntax as the select-statement. The
@@ -119,7 +119,33 @@ Example:
 ```
 returns the vector `{-4,-3,-2,-1,0,1,2,3,4,5}`
 
-## Accessing vector elements
+
+[Vector functions](../system-functions/vector-functions.md) and operators can be used in queries.
+
+Example:
+```sql
+   select lambda
+     from Number lambda
+    where {1, 2} - lambda = {11, 12};
+```
+returns `-10`.
+
+If the equation has no solution, the query will have no result:
+```sql
+   select lambda
+     from Number lambda
+    where {1, 3} - lambda = {11, 12};
+```
+
+By contrast, note that this query:
+```sql
+   select lambda
+     from Vector of Number lambda
+    where {1, 2} - lambda = {11, 12};
+```
+returns `{-10,-10}`.
+
+## <a name="vector-index"> Accessing vector elements
 
 Vector elements can be accessed using the `vector-indexing` syntax:
 ```
@@ -142,7 +168,7 @@ Index variables as numbers can be used in queries to specify iteration over all 
 Example:
 ```sql
    vselect a[i]
-      from Integer i
+      from Vector a, Integer i
      where a[i] != 2
        and a = {1,2,3}
      order by i;
@@ -157,36 +183,4 @@ bound to the interface variables `:u` and `:v`:
    vselect :u[i] * :v[i]
       from Integer i
      order by i;
-```
-
-## Vector functions
-
-There is a library of numerical vector functions for numerical
-computations and analyses described in the [data mining
-section](data-mining-primitives.md). 
-
-The function `project()` constructs a new vector by extracting from
-the vector v the elements in the positions in pv:
-```
-   project(Vector v, Vector of Number pv) -> Vector r
-```
-Example:
-```
-   project({10, 20, 30, 40},{0, 3, 2});
-```
-returns `{10, 40, 30}`
-
-The function `substv()` replaces `x` with `y` in any collection `v`:
-```
-   substv(Object x, Object y, Object v) -> Object r
-```
-
-The system function `dim()` computes the size `d` of a vector `v`:
-```
-   dim(Vector v) -> Integer d
-```
-
-The function `concat()` concatenates two vectors:
-```
-   concat(Vector x, Vector y) -> Vector r
 ```

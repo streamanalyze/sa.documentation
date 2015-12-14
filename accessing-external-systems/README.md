@@ -1,7 +1,22 @@
 # Accessing external systems
 
-This chapter first describes multi-directional foreign functions[^LR92], the basis for accessing external systems from sa.amos queries. Then we describe how to query relational databases through sa.amos. Finally some general types and functions used for defining wrappers of external sources are described.
+This chapter first describes *multi-directional foreign functions*,
+the basis for accessing external systems from sa.amos queries. Then we
+describe how to query relational databases through sa.amos. Finally
+some general types and functions used for querying external sources
+are described.
 
-sa.amos provides a number of primitives for accessing different external data sources by defining *wrappers* for each kind external sources. A wrapper is a software module for making it possible to query an external data source using AmosQL. The basic wrapper interface is based on user defined *multi-directional* foreign functions having various capabilities used to access external data sources in different ways[^LR92] depending on what variables are bound or free in an execution plan, the *binding patterns*. On top of the basic foreign function mechanism object oriented abstractions are defined through *mapped types* [^FR97]. A number of important query rewrite techniques used in the system for scalable access to wrapped sources, in particular relational databases, are described in [^FR97]. Rewrites for handling scalable execution of queries involving late bound function calls are described in [^FR95]. Multi-database views are further described in [^JR99a] [^JR99b]. The distributed query decomposer is described in [^JR02] and [^RJK03].
+sa.amos provides a number of primitives for accessing different
+external data sources by defining *wrappers* for each kind external
+sources. A wrapper is a software module making it possible to query an
+external data source using AmosQL. The basic wrapper interface is
+based on user defined *multi-directional* foreign functions having
+various capabilities used to access external data sources in different
+ways depending on what variables are bound or free in an execution
+plan, the *binding patterns*. Object oriented abstractions are defined
+through *mapped types* on top of the basic foreign function
+mechanism. A number of query rewrite techniques are used in the system
+for scalable access to wrapped sources, in particular relational
+databases.
 
-A general wrapper for [relational databases](#relational) using JDBC is predefined in sa.amos.
+A general wrapper for [relational databases](the-relational-database-wrapper.md) using JDBC is predefined in sa.amos.

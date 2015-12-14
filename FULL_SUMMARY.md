@@ -2,7 +2,7 @@
     * [Copy-Paste Tutorial](getting-started/tutorial.md)
 * [AmosQL](amosql/README.md)
   * [Basic constructs](amosql/basic-constructs.md)
-    * Syntactic conventions
+    **  Syntactic conventions
     * Statements
     * Indentifiers
     * Variables

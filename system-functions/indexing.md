@@ -4,7 +4,7 @@ The system supports indexing on any single argument or result of a
 stored function. Indexes can be *unique* or *non-unique*. A unique
 index disallows storing several values for the indexed argument or
 result. The cardinality constraint `key` of stored functions
-([Cardinality Constraints](#cardinality-constraints)) is implemented
+([Cardinality Constraints](../amosql/updates.md#cardinality-constraints)) is implemented
 as unique indexes. By default the system puts a unique index on the
 first argument of stored functions. That index can be made non-unique
 by suffixing the first argument declaration with the keyword `nonkey`
@@ -42,7 +42,7 @@ For example:
 The parameters of `create_index()` are:
 
 `fn`: The name of a stored function. Use the resolvent name for
-[overloaded](#overloaded-functions) functions.
+[overloaded](../amosql/defining-functions.md#overloaded-functions) functions.
 
 `arg`: The name of the argument/result parameter to be indexed. When
 unambiguous, the names of types of arguments/results can also be used
