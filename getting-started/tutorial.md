@@ -22,7 +22,7 @@ sourcecode(apropos("max"));
 __What system version am I running?__
 
 ```sql
-system_version();
+amos_version();
 ```
 
 __What folder is my current working direcory?__
