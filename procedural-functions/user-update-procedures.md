@@ -1,8 +1,8 @@
 # User update procedures
 
 It is possible to register user defined *user update procedures* for
-any function. The user update procedures are [procedural
-functions](#procedures) which are transparently invoked when update
+any function. The user update procedures are procedural
+functions that are transparently invoked when update
 statements are executed for the function.
 
 ```sql
@@ -30,7 +30,7 @@ Then we can define the following user update procedure:
         end;
 ```
 
-The following declaration makes `netincome()` updatable with the [set](#updates) statement:
+The following declaration makes `netincome()` updatable with the [set](../amos1l/updates.md) statement:
 
 ```
    set_setfunction(#'employee.netincome->number',

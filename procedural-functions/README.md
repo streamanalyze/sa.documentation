@@ -107,6 +107,7 @@ Example of use:
 ```
    flatten_incomes(1000);
 ```
+<a name="multiple-scan">Iterating over multiple scans.
 
 The function `sumb2()` multiplies the elements of two bags:
 ```sql
