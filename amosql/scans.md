@@ -16,7 +16,7 @@ scan is reached the `fetch` statement returns no more result.
 Syntax:
 ```
 open-stmt ::=
-      'open' variable 'for' expr
+      'open' variable 'for' expr;
 
 fetch-stmt ::=
       'fetch' cursor-name ['into' variable-commalist]
