@@ -22,7 +22,7 @@ sourcecode(apropos("max"));
 __What system version am I running?__
 
 ```sql
-amos_version();
+system_version();
 ```
 
 __What folder is my current working direcory?__
@@ -287,11 +287,11 @@ select name(p), sum(balance(a))
 __What are the lowest incomes in each department?__
 
 ```sql
-select name(p), min(income(p))
+select name(d), min(income(p))
   from Department d, Person p
  where dept(p) = d
- group by name(p)
- order by income(p);
+ group by name(d)
+ order by min(income(p));
 ```
 
 __Get the two departments with highest average incomes with standard deviations__
