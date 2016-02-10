@@ -12,66 +12,54 @@ Notice that the [vselect statement](../amosql/vector-queries.md) provide a power
 ## <a name="numerical-vector-functions"> Numerical vector functions
 
 The following *operators* over vectors `x` and `y` and number `lambda` are defined:
-```
-   x + y                       element-wise additions
-   lambda + x                  add number to elements
-   x + lambda                  -"-
-   x - y                       element-wise subtractions
-   -x                          negate elements
-   x - lambda                  subtract number from elements
-   lambda - x                  subtract elements from number
-   x * Y                       scalar product
-   x .* y                      element-wise multiplications
-   lambda * x                  multiply elements with number
-   x * lambda                  -"-
-   x ./ y                      element-wise divisions
-   x / lambda                  divide elements with number
-   lambda / x                  divide number with elements
-   x .^ lambda                 make power of elements
-```
+
+| operation     | description                  | implemented as function
+|:-------------:|:----------------------------:|-------------------------|
+| `x + y`       | element-wise addition        | plus
+| `lambda + x`  | add number to elements       | plus
+| `x + lambda`  |         -"-                  | plus
+| `x - y`       | element-wise subtractions    | minus
+| `-x`          | negate elements              | uminus
+| `x - lambda`  | subtract number from elements| minus
+| `lambda - x`  | subtract elements from number| minus
+| `x * y`       | scalar product               | times
+| `x .* y`      | element-wise multiplications | elemtimes
+| `lambda * x`  | multiply elements with number| times
+| `x * lambda`  |            -"-               | times
+| `x ./ y`      | element-wise divisions       | elemdiv
+| `x / lambda`  | divide elements with number  | div
+| `lambda / x`  | divide number with elements  | div
+| `x .^ lambda` | make power of elements       | elempower
+
 
 The following functions operate on vectors of numbers:
-```
-   dim(Vector v) -> Integer                          number of elements
-   div(Number lambda, Vector of number x) 
-                         -> Vector of Number         same as lambda/x
-   div(Vector of number x, Number lambda) 
-                         -> Vector of Number         same as x/lambda
-   elemdiv(Vector x, Vector y) -> Vector of Number   same as x./y
-   elempower(Vector of Number x, Number exp) 
-                         -> Vector of Number         same as x.^exp
-   elemtimes(Vector x, Vector y) -> Vector of Number same as x.*y
-   euclid(Vector of Number p1, Vector of Number p2)
-                         -> Real                     Euclidean distance
-   maxnorm(Vector of Number p1, Vector of Number p2)
-                         -> Real                     maxnorm distance
-   median(Vector of Number v) -> Number              median of elements
-   minkowski(Vector of Number p1, 
-             Vector of Number p2, Real r) -> Real    Minkowski distance
-   minus(Vector of Number x, Vector of Number y) 
-                         -> Vector of Number         same as x-y
-   minus(Number lambda, Vector of Number x) 
-                         -> Vector of Number         same a lambda-x
-   minus(Vector of Number x, Number lambda) 
-                         -> Vector of Number         same as x-lambda
-   ones(Number n) -> Vector of Number                vector of n ones
-   plus(Vector of Number x, Vector of Number y) 
-                         -> Vector of Number         same as x+y
-   plus(Number lambda, Vector of Number x) 
-                         ->  Vector of Number        same as lambda*x
-   plus(Vector of Number x, Number lambda) 
-                         ->  Vector of Number        same as x*lambda
-   roundto(Vector of Number v, Integer d) 
-                         -> Vector of Number         round elements to d digits
-   times(Vector x, Vector y) -> Number               same as x*y
-   times(Number lambda, Vector of Number x) 
-                         -> Vector of Number         same as lambda*x
-   times(Vector of Number x, Number lambda) 
-                         -> Vector of Number         same as x*lambda
-   vavg(Vector of Number v) -> Real                  average
-   vstdev(Vector of Number v) -> Real                standard deviation
-   zeros(Number n) -> Vector of Number               vector of n zeros  
-```
+
+| signature | description 
+|-----------|----------
+|`dim(Vector v) -> Integer`|number of elements|
+|`div(Number lambda, Vector of number x) -> Vector of Number`|same as lambda/x
+|`div(Vector of number x, Number lambda) -> Vector of Number`|same as x/lambda
+|`elemdiv(Vector x, Vector y) -> Vector of Number`|same as x./y
+|`elempower(Vector of Number x, Number exp) -> Vector of Number`|same as x.^exp
+|`elemtimes(Vector x, Vector y) -> Vector of Number`|same as x.*y
+|`euclid(Vector of Number p1, Vector of Number p2) -> Real`|Euclidean distance
+|`maxnorm(Vector of Number p1, Vector of Number p2) -> Real`|maxnorm distance
+|`median(Vector of Number v) -> Number`|median of elements
+|`minkowski(Vector of Number p1, Vector of Number p2, Real r) -> Real`| Minkowski distance
+|`minus(Vector of Number x, Vector of Number y) -> Vector of Number`| same as x-y
+|`minus(Number lambda, Vector of Number x) -> Vector of Number`|same as lambda-x
+|`minus(Vector of Number x, Number lambda) -> Vector of Number`|same as x-lambda
+|`ones(Number n) -> Vector of Number`|vector of n ones
+|`plus(Vector of Number x, Vector of Number y) -> Vector of Number`|same as x+y
+|`plus(Number lambda, Vector of Number x) ->  Vector of Number`|same as lambda*x
+|`plus(Vector of Number x, Number lambda) ->  Vector of Number`|same as x*lambda
+|`roundto(Vector of Number v, Integer d) -> Vector of Number`|round elements to d digits
+|`times(Vector x, Vector y) -> Number`|same as x*y
+|`times(Number lambda, Vector of Number x) -> Vector of Number`|same as lambda*x
+|`times(Vector of Number x, Number lambda) -> Vector of Number`|same as x*lambda
+|`vavg(Vector of Number v) -> Real`|average of elements
+|`vstdev(Vector of Number v) -> Real`|standard deviation of elements
+|`zeros(Number n) -> Vector of Number`|vector of n zeros  
 
 ### Descriptions:
 
