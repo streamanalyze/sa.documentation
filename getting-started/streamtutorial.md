@@ -99,13 +99,41 @@ __Run a stream of tumbling windows__
 winagg(mymix(heartbeat(0.1)),5,5)
 ```
 
-__Visualize moving average of tumbling window having 5 elements every 0.05 s__
+__Visualize moving average of tumbling window having 5 elements every 0.5 s__
 ```sql
-vavg(winagg(mymix(heartbeat(0.01)),5,5))
+vavg(winagg(mymix(heartbeat(0.1)),5,5))
 ```
 
-__Visualize moving average of sliding window having 10 elements every 0.05 s__
+__Visualize moving average of sliding window having 10 elements every 0.5 s__
 ```sql
-vavg(winagg(mymix(heartbeat(0.01)),10,5))
+vavg(winagg(mymix(heartbeat(0.1)),10,5))
+```
+
+__Make function returning index of largest value in vector__
+```sql
+create function maxi(Vector v) -> Number
+  as select i
+       from Number i, Number x
+      where vmax(v) = (i, x);
+```
+
+__Test maxi__
+```sql
+maxi({1,7,3,5,2,9,3})
+```
+
+__Take FFT of vector__
+```sql
+rfft({1,2,3,4})
+```
+
+__Run FFT of vectors in mymix__
+```sql
+rfft(winagg(mymix(heartbeat(0.1)),4,4))
+```
+
+__Visuamize with scatter lot dominating frequency in FFT of vectors in mymix_
+```sql
+maxi(winagg(mymix(heartbeat(0.1)),4,4))
 ```
 
