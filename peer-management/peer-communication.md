@@ -3,14 +3,21 @@
 The following AmosQL system functions are available for inter-peer communication:
 
 ```
+   nameserver(Charstring name,Charstring hostname,Number portno)->Charstring
+```
+
+The function starts a name server with the given `name`, identified by the given `hostname`, and listening on the given `portno`. If name is empty ("") the name server will become *anonymous* and not registered as a peer. It can be accessed under the peer name "NAMESERVER" though. 
+
+```
    nameserver(Charstring name)->Charstring
 ```
-The function makes the current stand-alone database into a name server and registers there itself as a peer with the given `name`. If name is empty ("") the name server will become *anonymous* and not registered as a peer. It can be accessed under the peer name "NAMESERVER" though.
-<br><br>
+The function prepares the current stand-alone database to become a name server and registers there itself as a peer with the given `name`. The host name is the name of the computer (obtained by OS call *gethostname()*), unless overridden by setting environment variable MYHOSTNAME. The port number is 32021 unless overridden by first calling `nameserverport(Number portno)`.  The name server is *not* started but has to be started by calling `listen()`.
+
 ```
    listen()
 ```
 The function starts the peer listening loop. It informs the name server that this peer is ready to receive incoming messages. The listening loop can be interrupted with CTRL-C and resumed again by calling `listen()`. The name server must be listening before any other peer can register.
+
 <br><br>
 ```
    register(Charstring name)->Charstring
